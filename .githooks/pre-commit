@@ -1,0 +1,20 @@
+#! /bin/sh
+
+# Get list of staged files on git
+files=$(git diff --cached --name-only --diff-filter=ACMR -- '*.php');
+
+# Run Laravel pint
+if [ -n "$files" ]
+then
+    echo "Running Laravel Pint..."
+    ./vendor/bin/pint $files
+    git add $files
+fi
+
+# Run PHPStan
+echo "Running PHPStan..."
+./vendor/bin/phpstan
+
+# Run test
+echo "Running tests..."
+php artisan test --parallel

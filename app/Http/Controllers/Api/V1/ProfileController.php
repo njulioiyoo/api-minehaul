@@ -26,9 +26,11 @@ class ProfileController extends Controller
     public function updateProfile(Request $request)
     {
         $headers = $this->prepareHeaders($request);
+
         $input = $request->json()->all();
         $input['data']['id'] = (string)auth()->id();
         $input['data']['type'] = 'users';
+
         $queryParams = $request->query();
 
         return $this->profileService->updateProfile(auth()->id(), $input, $headers, $queryParams);
