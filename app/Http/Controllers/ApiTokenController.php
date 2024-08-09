@@ -27,7 +27,7 @@ class ApiTokenController extends Controller
         $apiToken = Str::random(60);
 
         // Update atau buat token baru
-        CoreApiToken::updateOrCreate(
+        $token = CoreApiToken::updateOrCreate(
             ['user_id' => $user->id], // Kondisi pencarian
             [
                 'session_id' => Str::random(40),
