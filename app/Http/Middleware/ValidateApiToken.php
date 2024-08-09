@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Middleware;
 
 use App\Models\CoreApiToken;
@@ -12,8 +14,6 @@ class ValidateApiToken
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
     public function handle(Request $request, Closure $next)
@@ -24,7 +24,7 @@ class ValidateApiToken
         // Log untuk debugging
         Log::info('Received API token:', ['apiToken' => $apiToken]);
 
-        if (!$apiToken) {
+        if (! $apiToken) {
             return response()->json(['message' => 'API token is required'], 401);
         }
 
@@ -34,7 +34,7 @@ class ValidateApiToken
         // Log token record untuk debugging
         Log::info('Token record:', ['tokenRecord' => $tokenRecord]);
 
-        if (!$tokenRecord) {
+        if (! $tokenRecord) {
             return response()->json(['message' => 'Invalid API token'], 403);
         }
 

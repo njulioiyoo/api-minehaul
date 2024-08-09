@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Auth;
 use App\Models\CoreApiToken;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class ApiTokenController extends Controller
 {
@@ -25,7 +27,7 @@ class ApiTokenController extends Controller
         $apiToken = Str::random(60);
 
         // Update atau buat token baru
-        $token = CoreApiToken::updateOrCreate(
+        CoreApiToken::updateOrCreate(
             ['user_id' => $user->id], // Kondisi pencarian
             [
                 'session_id' => Str::random(40),

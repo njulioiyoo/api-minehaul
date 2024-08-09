@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\UserProfile;
 
 use GuzzleHttp\Client;
@@ -42,7 +44,7 @@ class ProfileService
     {
         try {
             $response = $this->httpClient->$method($url, $data);
-            $responseBody = json_decode((string)$response->getBody(), true);
+            $responseBody = json_decode((string) $response->getBody(), true);
             $responseStatus = $response->getStatusCode();
             $responseHeaders = $this->parseHeaders($response->getHeaders());
 
