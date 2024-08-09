@@ -19,7 +19,7 @@ class ApiTokenController extends Controller
     public function generateToken(Request $request)
     {
         $user = Auth::user();
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'Unauthenticated'], 401);
         }
 
@@ -27,7 +27,7 @@ class ApiTokenController extends Controller
         $apiToken = Str::random(60);
 
         // Update atau buat token baru
-        $token = CoreApiToken::updateOrCreate(
+        CoreApiToken::updateOrCreate(
             ['user_id' => $user->id], // Kondisi pencarian
             [
                 'session_id' => Str::random(40),
