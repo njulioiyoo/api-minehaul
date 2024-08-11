@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\ProfileController;
+use App\Http\Controllers\Api\V1\VehicleController;
 use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
@@ -23,4 +24,7 @@ JsonApiRoute::server('v1')->middleware('validate.api')->resources(function (Reso
     $server->resource('users', JsonApiController::class);
     Route::get('me', [ProfileController::class, 'readProfile']);
     Route::patch('me', [ProfileController::class, 'updateProfile']);
+
+    // $server->resource('mh_vehicle', JsonApiController::class);
+    // Route::get('vehicles', [VehicleController::class, 'readVehicle']);
 });
