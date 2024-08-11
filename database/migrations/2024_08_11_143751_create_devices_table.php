@@ -30,6 +30,7 @@ return new class extends Migration
             $table->integer('dt_editor')->nullable()->default(null);
             $table->dateTime('dt_edit_date')->nullable()->default(null);
             $table->string('uid', 100)->nullable()->default(null);
+            $table->timestamp('deleted_at')->nullable();
 
             $table->primary('device_id');
         });
