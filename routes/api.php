@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\V1\Configuration\DeviceController;
 use App\Http\Controllers\Api\V1\ProfileController;
-use App\Http\Controllers\Api\V1\VehicleController;
 use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +25,9 @@ JsonApiRoute::server('v1')->middleware('validate.api')->resources(function (Reso
     Route::get('me', [ProfileController::class, 'readProfile']);
     Route::patch('me', [ProfileController::class, 'updateProfile']);
 
-    // $server->resource('mh_vehicle', JsonApiController::class);
-    // Route::get('vehicles', [VehicleController::class, 'readVehicle']);
+    $server->resource('devices', JsonApiController::class);
+    Route::get('device', [DeviceController::class, 'readDevice']);
+    Route::post('device', [DeviceController::class, 'createDevice']);
+    Route::patch('device', [DeviceController::class, 'updateDevice']);
+    Route::delete('device', [DeviceController::class, 'deleteDevice']);
 });
