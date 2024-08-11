@@ -16,7 +16,7 @@ Route::middleware('json.api')->group(function () {
 });
 
 Route::middleware('auth:api')->group(function () {
-    Route::get('/api-token', [ApiTokenController::class, 'generateToken']);
+    Route::post('/api-token', [ApiTokenController::class, 'generateToken']);
 });
 
 JsonApiRoute::server('v1')->middleware('validate.api')->resources(function (ResourceRegistrar $server) {
