@@ -6,7 +6,6 @@ namespace App\Services\Configuration\Device;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
-use Illuminate\Support\Facades\Log;
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Responses\ErrorResponse;
 
@@ -75,16 +74,15 @@ class DeviceService
             return response()->json($responseBody, $responseStatus)
                 ->withHeaders($responseHeaders);
         } catch (ClientException $e) {
-            Log::error('ClientException', [
-                'message' => $e->getMessage(),
-                'response' => $e->getResponse()->getBody()->getContents(),
-            ]);
+            $responseBody = json_decode($e->getResponse()->getBody()->getContents(), true);
+            $errors = $responseBody['errors'] ?? [];
 
-            $errors = json_decode($e->getResponse()->getBody()->getContents(), true)['errors'];
+            // Convert the errors into JSON:API Error objects
             $errors = collect($errors)->map(function ($error) {
                 return Error::fromArray($error);
             });
 
+            // Return JSON:API Error Response
             return ErrorResponse::make($errors);
         }
     }
