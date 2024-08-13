@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\Configuration\DeviceController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PermissionController;
 use Illuminate\Support\Facades\Route;
 use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 use LaravelJsonApi\Laravel\Http\Controllers\JsonApiController;
@@ -30,4 +31,10 @@ JsonApiRoute::server('v1')->middleware('validate.api')->resources(function (Reso
     Route::post('device', [DeviceController::class, 'createDevice']);
     Route::patch('device', [DeviceController::class, 'updateDevice']);
     Route::delete('device', [DeviceController::class, 'deleteDevice']);
+
+    $server->resource('permissions', JsonApiController::class);
+    Route::get('permission', [PermissionController::class, 'readPermission']);
+    Route::post('permission', [PermissionController::class, 'createPermission']);
+    Route::patch('permission', [PermissionController::class, 'updatePermission']);
+    Route::delete('permission', [PermissionController::class, 'deletePermission']);
 });

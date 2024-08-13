@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\JsonApi\V1\Configurations\Device;
 
 use App\Models\Device;
-use LaravelJsonApi\Eloquent\Contracts\Paginator;
 use LaravelJsonApi\Eloquent\Fields\DateTime;
 use LaravelJsonApi\Eloquent\Fields\ID;
 use LaravelJsonApi\Eloquent\Fields\Str;

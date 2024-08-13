@@ -6,20 +6,24 @@ namespace App\Http\Controllers\Api\V1\Configuration;
 
 use App\Http\Controllers\Controller;
 use App\Services\Configuration\Device\DeviceService;
+use App\Services\HeaderService;
 use Illuminate\Http\Request;
 
 class DeviceController extends Controller
 {
     protected $deviceService;
 
-    public function __construct(DeviceService $deviceService)
+    protected $headerService;
+
+    public function __construct(DeviceService $deviceService, HeaderService $headerService)
     {
         $this->deviceService = $deviceService;
+        $this->headerService = $headerService;
     }
 
     public function createDevice(Request $request)
     {
-        $headers = $this->prepareHeaders($request);
+        $headers = $this->headerService->prepareHeaders($request);
 
         $input = $request->json()->all();
         $input['data']['type'] = 'devices';
@@ -31,7 +35,7 @@ class DeviceController extends Controller
 
     public function readDevice(Request $request)
     {
-        $headers = $this->prepareHeaders($request);
+        $headers = $this->headerService->prepareHeaders($request);
         $queryParams = $request->query();
 
         return $this->deviceService->readDevice($queryParams, $headers);
@@ -39,7 +43,7 @@ class DeviceController extends Controller
 
     public function updateDevice(Request $request)
     {
-        $headers = $this->prepareHeaders($request);
+        $headers = $this->headerService->prepareHeaders($request);
 
         $input = $request->json()->all();
         $deviceId = isset($input['data']['id']) ? $input['data']['id'] : null;
@@ -53,7 +57,7 @@ class DeviceController extends Controller
 
     public function deleteDevice(Request $request)
     {
-        $headers = $this->prepareHeaders($request);
+        $headers = $this->headerService->prepareHeaders($request);
 
         $input = $request->json()->all();
         $deviceId = isset($input['data']['id']) ? $input['data']['id'] : null;
@@ -63,15 +67,5 @@ class DeviceController extends Controller
 
         // Panggil metode deleteDevice dengan ID yang diperoleh
         return $this->deviceService->deleteDevice($deviceId, $input, $headers, $queryParams);
-    }
-
-    private function prepareHeaders(Request $request)
-    {
-        return [
-            'Accept' => 'application/vnd.api+json',
-            'Authorization' => $request->header('Authorization'),
-            'x-api-token' => $request->header('x-api-token'),
-            'Content-Type' => 'application/vnd.api+json',
-        ];
     }
 }
