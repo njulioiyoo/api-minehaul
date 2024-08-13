@@ -7,10 +7,12 @@ namespace App\Providers;
 use App\Models\Device;
 use App\Policies\DevicePolicy;
 use App\Policies\PermissionPolicy;
+use App\Policies\RolePolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passport\Passport;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,5 +32,6 @@ class AppServiceProvider extends ServiceProvider
         Passport::enablePasswordGrant();
         Gate::policy(Device::class, DevicePolicy::class);
         Gate::policy(Permission::class, PermissionPolicy::class);
+        Gate::policy(Role::class, RolePolicy::class);
     }
 }
