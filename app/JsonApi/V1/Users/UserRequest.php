@@ -18,6 +18,7 @@ class UserRequest extends ResourceRequest
         if ($model = $this->model()) {
             return [
                 'name' => ['sometimes', 'string'],
+                'account_id' => ['sometimes', 'string'],
                 'email' => ['sometimes', 'email', Rule::unique('users')->ignore($model->id)],
                 'password' => ['sometimes', 'confirmed', 'string', 'min:8'],
             ];
@@ -25,6 +26,7 @@ class UserRequest extends ResourceRequest
 
         return [
             'name' => ['required', 'string'],
+            'account_id' => ['required', 'string'],
             'email' => ['required', 'email', Rule::unique('users')],
             'password' => ['required', 'confirmed', 'string', 'min:8'],
         ];

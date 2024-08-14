@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\System\AccessController;
 use App\Http\Controllers\Api\V1\System\PermissionController;
 use App\Http\Controllers\Api\V1\System\RoleController;
+use App\Http\Controllers\Api\V1\System\UserController;
 use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
@@ -34,11 +35,16 @@ JsonApiRoute::server('v1')->middleware('validate.api')->resources(function (Reso
     Route::patch('device', [DeviceController::class, 'updateDevice']);
     Route::delete('device', [DeviceController::class, 'deleteDevice']);
 
-    $server->resource('permissions', JsonApiController::class);
-    Route::get('permission', [PermissionController::class, 'readPermission'])->middleware('verify.user.role:Administrator');
-    Route::post('permission', [PermissionController::class, 'createPermission']);
-    Route::patch('permission', [PermissionController::class, 'updatePermission']);
-    Route::delete('permission', [PermissionController::class, 'deletePermission']);
+    Route::middleware(['verify.user.role:Administrator'])->group(function () use ($server) {
+        // Resource route with JSON:API controller
+        $server->resource('permissions', JsonApiController::class);
+
+        // Routes requiring the same middleware
+        Route::get('permission', [PermissionController::class, 'readPermission']);
+        Route::post('permission', [PermissionController::class, 'createPermission']);
+        Route::patch('permission', [PermissionController::class, 'updatePermission']);
+        Route::delete('permission', [PermissionController::class, 'deletePermission']);
+    });
 
     $server->resource('roles', JsonApiController::class);
     Route::get('role', [RoleController::class, 'readRole']);
@@ -48,4 +54,15 @@ JsonApiRoute::server('v1')->middleware('validate.api')->resources(function (Reso
 
     Route::patch('users/{user}/roles', [AccessController::class, 'updateUserRoles']);
     Route::patch('roles/{role}/permissions', [AccessController::class, 'updateRolePermissions']);
+
+    Route::middleware(['verify.user.role:Administrator'])->group(function () use ($server) {
+        // Resource route with JSON:API controller
+        $server->resource('users', JsonApiController::class);
+
+        // Routes requiring the same middleware
+        Route::get('user', [UserController::class, 'readUser']);
+        Route::post('user', [UserController::class, 'createUser']);
+        Route::patch('user', [UserController::class, 'updateUser']);
+        Route::delete('user', [UserController::class, 'deleteUser']);
+    });
 });

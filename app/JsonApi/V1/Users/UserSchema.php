@@ -21,6 +21,8 @@ class UserSchema extends Schema
      */
     public static string $model = User::class;
 
+    protected ?array $defaultPagination = ['number' => 1];
+
     /**
      * Get the resource fields.
      */
@@ -29,6 +31,7 @@ class UserSchema extends Schema
         return [
             ID::make(),
             Str::make('name')->sortable(),
+            Str::make('account_id')->sortable(),
             Str::make('email')->sortable(),
             Str::make('password')->hidden(),
             Str::make('password_confirmation')->hidden(),
