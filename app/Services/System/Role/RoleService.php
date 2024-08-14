@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services\Configuration\Role;
+namespace App\Services\System\Role;
 
 use App\Services\HttpService;
 

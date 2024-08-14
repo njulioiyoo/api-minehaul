@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\V1\System;
 
-use App\Services\Configuration\Role\RoleService;
+use App\Http\Controllers\Controller;
 use App\Services\HeaderService;
+use App\Services\System\Role\RoleService;
 use Illuminate\Http\Request;
 
 class RoleController extends Controller

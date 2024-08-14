@@ -24,6 +24,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'account_id',
     ];
 
     /**
@@ -47,5 +48,10 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function account()
+    {
+        return $this->belongsTo(Account::class, 'account_id', 'account_id');
     }
 }

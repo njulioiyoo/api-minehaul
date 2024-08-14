@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\Configuration\DeviceController;
 use App\Http\Controllers\Api\V1\ProfileController;
+use App\Http\Controllers\Api\V1\System\AccessController;
+use App\Http\Controllers\Api\V1\System\PermissionController;
+use App\Http\Controllers\Api\V1\System\RoleController;
 use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\PermissionController;
-use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
 use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 use LaravelJsonApi\Laravel\Http\Controllers\JsonApiController;
@@ -34,7 +35,7 @@ JsonApiRoute::server('v1')->middleware('validate.api')->resources(function (Reso
     Route::delete('device', [DeviceController::class, 'deleteDevice']);
 
     $server->resource('permissions', JsonApiController::class);
-    Route::get('permission', [PermissionController::class, 'readPermission']);
+    Route::get('permission', [PermissionController::class, 'readPermission'])->middleware('verify.user.role:Administrator');
     Route::post('permission', [PermissionController::class, 'createPermission']);
     Route::patch('permission', [PermissionController::class, 'updatePermission']);
     Route::delete('permission', [PermissionController::class, 'deletePermission']);
@@ -44,4 +45,7 @@ JsonApiRoute::server('v1')->middleware('validate.api')->resources(function (Reso
     Route::post('role', [RoleController::class, 'createRole']);
     Route::patch('role', [RoleController::class, 'updateRole']);
     Route::delete('role', [RoleController::class, 'deleteRole']);
+
+    Route::patch('users/{user}/roles', [AccessController::class, 'updateUserRoles']);
+    Route::patch('roles/{role}/permissions', [AccessController::class, 'updateRolePermissions']);
 });

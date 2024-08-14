@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\JsonApi\V1\Configurations\Role;
+namespace App\JsonApi\V1\System\Role;
 
 use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
 

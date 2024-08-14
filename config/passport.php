@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
 
     /*
@@ -70,6 +72,11 @@ return [
     'personal_access_client' => [
         'id' => env('PASSPORT_PERSONAL_ACCESS_CLIENT_ID'),
         'secret' => env('PASSPORT_PERSONAL_ACCESS_CLIENT_SECRET'),
+    ],
+
+    'tokens' => [
+        'expires_in' => env('PASSPORT_ACCESS_TOKEN_EXPIRES_IN', 3600), // 1 hour
+        'refresh_token_expires_in' => env('PASSPORT_REFRESH_TOKEN_EXPIRES_IN', 2592000), // 30 days
     ],
 
 ];

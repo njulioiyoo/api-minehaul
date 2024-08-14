@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\JsonApi\V1;
 
 use App\JsonApi\V1\Configurations\Device\DeviceSchema;
-use App\JsonApi\V1\Configurations\Permission\PermissionSchema;
-use App\JsonApi\V1\Configurations\Role\RoleSchema;
+use App\JsonApi\V1\System\Permission\PermissionSchema;
+use App\JsonApi\V1\System\Role\RoleSchema;
 use App\JsonApi\V1\Users\UserSchema;
 use LaravelJsonApi\Core\Server\Server as BaseServer;
 

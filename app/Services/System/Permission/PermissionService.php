@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services\Configuration\Permission;
+namespace App\Services\System\Permission;
 
 use App\Services\HttpService;
 

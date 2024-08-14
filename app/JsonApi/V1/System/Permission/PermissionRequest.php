@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\JsonApi\V1\Configurations\Permission;
+namespace App\JsonApi\V1\System\Permission;
 
 use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
 

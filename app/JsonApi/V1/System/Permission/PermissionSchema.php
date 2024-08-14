@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\JsonApi\V1\Configurations\Role;
+namespace App\JsonApi\V1\System\Permission;
 
 use LaravelJsonApi\Eloquent\Fields\DateTime;
 use LaravelJsonApi\Eloquent\Fields\ID;
@@ -10,14 +10,14 @@ use LaravelJsonApi\Eloquent\Fields\Str;
 use LaravelJsonApi\Eloquent\Filters\WhereIdIn;
 use LaravelJsonApi\Eloquent\Pagination\PagePagination;
 use LaravelJsonApi\Eloquent\Schema;
-use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
-class RoleSchema extends Schema
+class PermissionSchema extends Schema
 {
     /**
      * The model the schema corresponds to.
      */
-    public static string $model = Role::class;
+    public static string $model = Permission::class;
 
     protected ?array $defaultPagination = ['number' => 1];
 
