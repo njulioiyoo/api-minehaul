@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('devices', function (Blueprint $table) {
-            $table->increments('device_id');
+            $table->id()->bigIncrements();
             $table->integer('account_id')->nullable()->default(null);
             $table->integer('device_type_id')->nullable()->default(null);
             $table->string('device_display_id', 100)->nullable()->default(null);

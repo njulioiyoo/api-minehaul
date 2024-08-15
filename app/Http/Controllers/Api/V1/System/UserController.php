@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api\V1\System;
 
 use App\Http\Controllers\Controller;
 use App\Services\HeaderService;
+use App\Services\RequestHelperService;
 use App\Services\System\User\UserService;
 use Illuminate\Http\Request;
 
@@ -15,20 +16,19 @@ class UserController extends Controller
 
     protected $userService;
 
-    public function __construct(HeaderService $headerService, UserService $userService)
+    protected $requestHelperService;
+
+    public function __construct(HeaderService $headerService, UserService $userService, RequestHelperService $requestHelperService)
     {
         $this->headerService = $headerService;
         $this->userService = $userService;
+        $this->requestHelperService = $requestHelperService;
     }
 
     public function createUser(Request $request)
     {
         $headers = $this->headerService->prepareHeaders($request);
-
-        $input = $request->json()->all();
-        $input['data']['type'] = 'users';
-
-        $queryParams = $request->query();
+        [$input, $userId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'users');
 
         return $this->userService->createUser($input, $headers, $queryParams);
     }
@@ -44,12 +44,7 @@ class UserController extends Controller
     public function updateUser(Request $request)
     {
         $headers = $this->headerService->prepareHeaders($request);
-
-        $input = $request->json()->all();
-        $userId = isset($input['data']['id']) ? $input['data']['id'] : null;
-        $input['data']['type'] = 'users';
-
-        $queryParams = $request->query();
+        [$input, $userId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'users');
 
         // Panggil metode updateDevice dengan ID yang diperoleh
         return $this->userService->updateUser($userId, $input, $headers, $queryParams);
@@ -58,12 +53,7 @@ class UserController extends Controller
     public function deleteUser(Request $request)
     {
         $headers = $this->headerService->prepareHeaders($request);
-
-        $input = $request->json()->all();
-        $userId = isset($input['data']['id']) ? $input['data']['id'] : null;
-        $input['data']['type'] = 'users';
-
-        $queryParams = $request->query();
+        [$input, $userId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'users');
 
         // Panggil metode deleteDevice dengan ID yang diperoleh
         return $this->userService->deleteUser($userId, $input, $headers, $queryParams);

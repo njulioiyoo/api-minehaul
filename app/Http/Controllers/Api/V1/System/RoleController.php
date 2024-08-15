@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api\V1\System;
 
 use App\Http\Controllers\Controller;
 use App\Services\HeaderService;
+use App\Services\RequestHelperService;
 use App\Services\System\Role\RoleService;
 use Illuminate\Http\Request;
 
@@ -15,20 +16,19 @@ class RoleController extends Controller
 
     protected $roleService;
 
-    public function __construct(HeaderService $headerService, RoleService $roleService)
+    protected $requestHelperService;
+
+    public function __construct(HeaderService $headerService, RoleService $roleService, RequestHelperService $requestHelperService)
     {
         $this->headerService = $headerService;
         $this->roleService = $roleService;
+        $this->requestHelperService = $requestHelperService;
     }
 
     public function createRole(Request $request)
     {
         $headers = $this->headerService->prepareHeaders($request);
-
-        $input = $request->json()->all();
-        $input['data']['type'] = 'roles';
-
-        $queryParams = $request->query();
+        [$input, $roleId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'roles');
 
         return $this->roleService->createRole($input, $headers, $queryParams);
     }
@@ -44,12 +44,7 @@ class RoleController extends Controller
     public function updateRole(Request $request)
     {
         $headers = $this->headerService->prepareHeaders($request);
-
-        $input = $request->json()->all();
-        $roleId = isset($input['data']['id']) ? $input['data']['id'] : null;
-        $input['data']['type'] = 'roles';
-
-        $queryParams = $request->query();
+        [$input, $roleId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'roles');
 
         // Panggil metode updateDevice dengan ID yang diperoleh
         return $this->roleService->updateRole($roleId, $input, $headers, $queryParams);
@@ -58,12 +53,7 @@ class RoleController extends Controller
     public function deleteRole(Request $request)
     {
         $headers = $this->headerService->prepareHeaders($request);
-
-        $input = $request->json()->all();
-        $roleId = isset($input['data']['id']) ? $input['data']['id'] : null;
-        $input['data']['type'] = 'roles';
-
-        $queryParams = $request->query();
+        [$input, $roleId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'roles');
 
         // Panggil metode deleteDevice dengan ID yang diperoleh
         return $this->roleService->deleteRole($roleId, $input, $headers, $queryParams);

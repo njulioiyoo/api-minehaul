@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('device_model_ref', function (Blueprint $table) {
-            $table->increments('device_model_id');
+            $table->id()->bigIncrements();
             $table->integer('device_make_id')->nullable()->default(null);
             $table->string('device_model_name', 255)->nullable()->default(null);
             $table->enum('dt_status', ['active', 'inactive', 'nullified'])->default('active');

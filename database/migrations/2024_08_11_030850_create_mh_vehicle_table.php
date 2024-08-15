@@ -14,7 +14,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('mh_vehicle', function (Blueprint $table) {
-            $table->id('vehicle_id');
+            $table->id()->bigIncrements();
+            $table->integer('account_id');
+            $table->integer('pit_id');
             $table->string('vehicle_display_id', 100)->nullable();
             $table->string('vehicle_name', 255)->nullable();
             $table->string('vehicle_vin', 255)->nullable();

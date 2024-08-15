@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,12 +14,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('core_api_token', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('user_id'); // Sesuaikan dengan tipe data ID user
-            $table->string('session_id'); // Tipe data bisa disesuaikan jika perlu
-            $table->string('url_call'); // Tipe data bisa disesuaikan jika perlu
-            $table->string('api_token')->unique(); // Unik untuk mencegah token duplikat
-            $table->timestamps(); // created_at dan updated_at
+            $table->id()->bigIncrements();
+            $table->unsignedBigInteger('user_id');
+            $table->string('session_id');
+            $table->string('url_call');
+            $table->string('api_token')->unique();
+            $table->timestamps();
 
             // Tambahkan foreign key constraint jika user_id merujuk ke tabel users
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

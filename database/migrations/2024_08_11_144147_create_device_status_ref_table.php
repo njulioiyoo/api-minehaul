@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('device_status_ref', function (Blueprint $table) {
-            $table->increments('device_status_id');
+            $table->id()->bigIncrements();
             $table->string('device_status_name', 255)->nullable()->default(null);
             $table->enum('device_status_theme', ['primary', 'success', 'info', 'warning', 'danger'])->nullable()->default(null);
             $table->enum('dt_status', ['active', 'inactive', 'nullified'])->default('active');

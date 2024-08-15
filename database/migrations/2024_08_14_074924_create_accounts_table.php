@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('accounts', function (Blueprint $table) {
-            $table->id('account_id'); // Primary key
+            $table->id()->bigIncrements();
             $table->string('account_name'); // Account name
             $table->string('company_id'); // Company ID
             $table->timestamps(); // Optional: created_at and updated_at timestamps
