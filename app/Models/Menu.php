@@ -24,7 +24,6 @@ class Menu extends Model
     {
         parent::boot();
 
-        // Event sebelum model disimpan (baik create atau update)
         static::saving(function ($menu) {
             if (request()->has('data.attributes.roles')) {
                 $roles = request()->input('data.attributes.roles');
@@ -32,12 +31,45 @@ class Menu extends Model
             }
         });
 
-        // Event setelah model disimpan (baik create atau update)
         static::saved(function ($menu) {
-            // Sinkronisasi roles di tabel pivot
             if (! empty($menu->rolesToSync) && is_array($menu->rolesToSync)) {
                 Log::info('Syncing roles: ', $menu->rolesToSync);
                 $menu->roles()->sync($menu->rolesToSync);
+
+                // Ambil permissions yang terkait dengan roles
+                $permissions = Role::whereIn('id', $menu->rolesToSync)->with('permissions')->get()
+                    ->pluck('permissions')
+                    ->flatten()
+                    ->unique('id')
+                    ->mapWithKeys(function ($permission) {
+                        return [$permission->id => 'read'];
+                    })
+                    ->toArray();
+
+                Log::info('Permissions to sync:', $permissions);
+
+                // Sinkronisasi permissions di tabel pivot PermissionMenu
+                foreach ($permissions as $permissionId => $status) {
+                    Log::info('Updating or creating PermissionMenu with:', [
+                        'menu_id' => $menu->id,
+                        'permission_id' => $permissionId,
+                        'status' => $status,
+                    ]);
+
+                    try {
+                        PermissionMenu::updateOrCreate(
+                            ['menu_id' => $menu->id, 'permission_id' => $permissionId],
+                            ['status' => $status]
+                        );
+                    } catch (\Exception $e) {
+                        Log::error('Error syncing PermissionMenu:', [
+                            'menu_id' => $menu->id,
+                            'permission_id' => $permissionId,
+                            'status' => $status,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
+                }
             }
         });
     }
