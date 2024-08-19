@@ -14,17 +14,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('device_model_ref', function (Blueprint $table) {
-            $table->id()->bigIncrements();
+            $table->id()->bigIncrements()->primary();
             $table->integer('device_make_id')->nullable()->default(null);
-            $table->string('device_model_name', 255)->nullable()->default(null);
-            $table->enum('dt_status', ['active', 'inactive', 'nullified'])->default('active');
-            $table->integer('dt_creator')->nullable()->default(null);
-            $table->dateTime('dt_create_date')->nullable()->default(null);
-            $table->integer('dt_editor')->nullable()->default(null);
-            $table->dateTime('dt_edit_date')->nullable()->default(null);
+            $table->string('name', 255)->nullable()->default(null);
+            $table->enum('status', ['active', 'inactive', 'nullified'])->default('active');
+            $table->integer('created_by')->nullable()->default(null);
+            $table->integer('updated_by')->nullable()->default(null);
             $table->string('uid', 100)->nullable()->default(null);
 
-            $table->primary('device_model_id');
+            $table->timestamps();
+            $table->timestamp('deleted_at')->nullable();
         });
     }
 

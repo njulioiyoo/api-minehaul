@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\JsonApi\V1\Users;
+namespace App\JsonApi\V1\System\Users;
 
 use Illuminate\Validation\Rule;
 use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
@@ -17,16 +17,16 @@ class UserRequest extends ResourceRequest
         /** @var \App\Models\User|null $model */
         if ($model = $this->model()) {
             return [
-                'name' => ['sometimes', 'string'],
-                'account_id' => ['sometimes', 'string'],
+                'username' => ['sometimes', 'string'],
+                'person_id' => ['sometimes', 'string'],
                 'email' => ['sometimes', 'email', Rule::unique('users')->ignore($model->id)],
                 'password' => ['sometimes', 'confirmed', 'string', 'min:8'],
             ];
         }
 
         return [
-            'name' => ['required', 'string'],
-            'account_id' => ['required', 'string'],
+            'username' => ['required', 'string'],
+            'person_id' => ['required', 'string'],
             'email' => ['required', 'email', Rule::unique('users')],
             'password' => ['required', 'confirmed', 'string', 'min:8'],
         ];

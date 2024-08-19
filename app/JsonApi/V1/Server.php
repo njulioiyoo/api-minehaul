@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\JsonApi\V1;
 
 use App\JsonApi\V1\Configurations\Device\DeviceSchema;
+use App\JsonApi\V1\System\Menu\MenuSchema;
 use App\JsonApi\V1\System\Permission\PermissionSchema;
 use App\JsonApi\V1\System\Role\RoleSchema;
-use App\JsonApi\V1\Users\UserSchema;
+use App\JsonApi\V1\System\Users\UserSchema;
 use LaravelJsonApi\Core\Server\Server as BaseServer;
 
 class Server extends BaseServer
@@ -35,6 +36,7 @@ class Server extends BaseServer
             DeviceSchema::class,
             PermissionSchema::class,
             RoleSchema::class,
+            MenuSchema::class,
         ];
     }
 }

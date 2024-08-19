@@ -13,10 +13,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('device_status_ref', function (Blueprint $table) {
+        Schema::create('vehicle', function (Blueprint $table) {
             $table->id()->bigIncrements()->primary();
-            $table->string('status_name', 255)->nullable()->default(null);
-            $table->enum('status_theme', ['primary', 'success', 'info', 'warning', 'danger'])->nullable()->default(null);
+            $table->integer('account_id');
+            $table->integer('pit_id');
+            $table->string('display_id', 100)->nullable();
+            $table->string('name', 255)->nullable();
+            $table->string('vin', 255)->nullable();
+            $table->string('license_plate', 50)->nullable();
+            $table->year('year')->nullable();
+            $table->integer('type_id')->nullable();
+            $table->integer('make_id')->nullable();
+            $table->integer('model_id')->nullable();
+            $table->integer('status_id')->nullable();
             $table->enum('status', ['active', 'inactive', 'nullified'])->default('active');
             $table->integer('created_by')->nullable()->default(null);
             $table->integer('updated_by')->nullable()->default(null);
@@ -32,6 +41,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('device_status_ref');
+        Schema::dropIfExists('vehicle');
     }
 };

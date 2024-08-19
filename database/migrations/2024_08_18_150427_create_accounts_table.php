@@ -14,10 +14,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('accounts', function (Blueprint $table) {
-            $table->id()->bigIncrements();
-            $table->string('account_name'); // Account name
-            $table->string('company_id'); // Company ID
-            $table->timestamps(); // Optional: created_at and updated_at timestamps
+            $table->id();
+            $table->string('company_code');
+            $table->string('company_name');
+            $table->integer('created_by')->nullable()->default(null);
+            $table->integer('updated_by')->nullable()->default(null);
+
+            $table->timestamps();
+            $table->timestamp('deleted_at')->nullable();
         });
     }
 

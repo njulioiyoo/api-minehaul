@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\JsonApi\V1\Users;
+namespace App\JsonApi\V1\System\Users;
 
 use App\Models\User;
 use Carbon\Carbon;
@@ -30,8 +30,8 @@ class UserSchema extends Schema
     {
         return [
             ID::make(),
-            Str::make('name')->sortable(),
-            Str::make('account_id')->sortable(),
+            Str::make('username')->sortable(),
+            Str::make('person_id')->sortable(),
             Str::make('email')->sortable(),
             Str::make('password')->hidden(),
             Str::make('password_confirmation')->hidden(),

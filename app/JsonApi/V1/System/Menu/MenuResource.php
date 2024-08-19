@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\JsonApi\V1\Users;
+namespace App\JsonApi\V1\System\Menu;
 
 use LaravelJsonApi\Core\Resources\JsonApiResource;
 
-class UserResource extends JsonApiResource
+class MenuResource extends JsonApiResource
 {
     /**
      * Get the resource's attributes.
@@ -16,12 +16,14 @@ class UserResource extends JsonApiResource
     public function attributes($request): iterable
     {
         return [
+            'id' => $this->id,
             'name' => $this->name,
-            'account' => $this->account,
-            'email' => $this->email,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'icon' => $this->icon,
+            'url' => $this->url,
+            'parent_id' => $this->parent_id,
+            'position' => $this->position,
             'roles' => $this->roles,
+            'children' => $this->children,
         ];
     }
 }

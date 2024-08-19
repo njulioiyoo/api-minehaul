@@ -20,26 +20,28 @@ class AuthController extends Controller
         $client = DB::table('oauth_clients')->where('password_client', 1)->first();
 
         if (! $client) {
-            return Error::fromArray([
-                'title' => 'Client not found',
-                'detail' => 'The password client could not be found.',
-                'status' => Response::HTTP_BAD_REQUEST,
-            ]);
+            return $this->createError('Client not found', 'The password client could not be found.', Response::HTTP_BAD_REQUEST);
         }
 
-        // Verifikasi kredensial pengguna dan account_id dalam satu kueri
-        $user = User::where('email', $request->input('email'))
-            ->whereHas('account', function ($query) use ($request) {
-                $query->where('company_id', $request->input('account_id'));
-            })
-            ->first();
+        // Verifikasi kredensial pengguna dan person_id dalam satu kueri
+        $user = User::select('id', 'username', 'person_id', 'email', 'password')->where('username', $request->input('username'))
+            ->with(['persons.account' => function ($query) use ($request) {
+                $query->select('id', 'company_code')->where('company_code', '=', $request->input('company_code'));
+            }])->first();
 
-        if (! $user || ! Hash::check($request->input('password'), $user->password)) {
-            return Error::fromArray([
-                'title' => 'Authentication Failed',
-                'detail' => 'Invalid credentials or other authentication error.',
-                'status' => Response::HTTP_BAD_REQUEST,
-            ]);
+        // Cek apakah user ditemukan
+        if (! $user) {
+            return $this->createError('User not found', 'Sorry, your User ID is not registered.', Response::HTTP_BAD_REQUEST);
+        }
+
+        // Cek apakah user memiliki person dan account yang sesuai
+        if (! $user->persons || ! $user->persons->account) {
+            return $this->createError('Invalid Data', 'Sorry, your Company ID is not registered.', Response::HTTP_BAD_REQUEST);
+        }
+
+        // Verifikasi password
+        if (! Hash::check($request->input('password'), $user->password)) {
+            return $this->createError('Authentication Failed', 'Sorry, your Password is wrong.', Response::HTTP_BAD_REQUEST);
         }
 
         // Buat permintaan token ke endpoint oauth/token
@@ -48,18 +50,14 @@ class AuthController extends Controller
                 'grant_type' => 'password',
                 'client_id' => $client->id,
                 'client_secret' => $client->secret,
-                'username' => $request->input('email'),
+                'username' => $request->input('username'),
                 'password' => $request->input('password'),
                 'scope' => '',
             ])
         );
 
         if ($response->getStatusCode() !== Response::HTTP_OK) {
-            return Error::fromArray([
-                'title' => 'Authentication Failed',
-                'detail' => 'Invalid credentials or other authentication error.',
-                'status' => Response::HTTP_BAD_REQUEST,
-            ]);
+            return $this->createError('Authentication Failed', 'Invalid credentials or other authentication error.', Response::HTTP_BAD_REQUEST);
         }
 
         return $response;
@@ -70,5 +68,14 @@ class AuthController extends Controller
         $request->user()->token()->revoke(); // Cabut token akses saat ini
 
         return response()->json(['message' => 'Successfully logged out']);
+    }
+
+    private function createError(string $title, string $detail, int $status): Error
+    {
+        return Error::fromArray([
+            'title' => $title,
+            'detail' => $detail,
+            'status' => $status,
+        ]);
     }
 }

@@ -24,7 +24,6 @@ class AccessController extends Controller
         $roleId = $input['data']['attributes']['roles'] ?? [];
 
         $user = User::findOrFail($userId);
-
         $user->syncRoles($roleId);
 
         // Optionally sync permissions for the assigned roles

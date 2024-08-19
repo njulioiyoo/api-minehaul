@@ -8,6 +8,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 use Laravel\Passport\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -21,10 +22,10 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'username',
         'email',
         'password',
-        'account_id',
+        'person_id',
     ];
 
     /**
@@ -50,8 +51,68 @@ class User extends Authenticatable
         ];
     }
 
-    public function account()
+    public function findForPassport($username)
     {
-        return $this->belongsTo(Account::class, 'account_id', 'account_id');
+        return $this->where('username', $username)->first();
+    }
+
+    public function persons()
+    {
+        return $this->belongsTo(Person::class, 'person_id', 'id')->select('id', 'full_name', 'account_id');
+    }
+
+    public function getMenusForRole(): Collection
+    {
+        // Get the IDs of the roles the user has
+        $roleIds = $this->roles->pluck('id');
+
+        // Get the menus associated with these roles and filter for active status
+        $menus = Menu::select('id', 'name', 'key', 'icon', 'url', 'parent_id', 'position')
+            ->whereIn('id', function ($query) use ($roleIds) {
+                $query->select('menu_id')
+                    ->from('role_menus')
+                    ->whereIn('role_id', $roleIds);
+            })
+            ->where('status', 'active') // Filter for active menus
+            ->get();
+
+        // Convert menus to a tree structure
+        return $this->buildMenuTree($menus);
+    }
+
+    /**
+     * Build a tree structure from the flat list of menus.
+     */
+    protected function buildMenuTree(Collection $menus): Collection
+    {
+        // Create a map of menu items by their ID
+        $menuMap = $menus->keyBy('id');
+
+        // Initialize an empty collection to hold the tree structure
+        $tree = collect();
+
+        foreach ($menus as $menu) {
+            if ($menu->parent_id === null) {
+                // If the menu has no parent, add it to the root of the tree
+                $tree->push($this->buildMenuNode($menu, $menuMap));
+            }
+        }
+
+        return $tree;
+    }
+
+    /**
+     * Build a menu node with its children.
+     */
+    protected function buildMenuNode(Menu $menu, Collection $menuMap): array
+    {
+        $node = $menu->toArray();
+        $node['children'] = $menuMap->filter(function ($item) use ($menu) {
+            return $item->parent_id === $menu->id;
+        })->map(function ($item) use ($menuMap) {
+            return $this->buildMenuNode($item, $menuMap);
+        })->values(); // Ensure children is a simple array
+
+        return $node;
     }
 }
