@@ -15,6 +15,8 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         $roles = [
+            ['name' => 'Super Administrator', 'guard_name' => 'api'],
+            ['name' => 'Accountan', 'guard_name' => 'api'],
             ['name' => 'Admin', 'guard_name' => 'api'],
             ['name' => 'Manajer Tambang', 'guard_name' => 'api'],
             ['name' => 'Operator Peralatan', 'guard_name' => 'api'],

@@ -15,6 +15,18 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         $permissions = [
+            // Permissions for Super Administrator
+            ['name' => 'Manage All Data', 'guard_name' => 'api'],
+            ['name' => 'Assign Roles', 'guard_name' => 'api'],
+            ['name' => 'Revoke Roles', 'guard_name' => 'api'],
+            ['name' => 'Manage Permissions', 'guard_name' => 'api'],
+
+            // Permissions for Accountan
+            ['name' => 'Manage Financial Records', 'guard_name' => 'api'],
+            ['name' => 'View Financial Reports', 'guard_name' => 'api'],
+            ['name' => 'Approve Financial Transactions', 'guard_name' => 'api'],
+
+            // Other existing permissions
             ['name' => 'View Mine Data', 'guard_name' => 'api'],
             ['name' => 'Edit Mine Data', 'guard_name' => 'api'],
             ['name' => 'Delete Mine Data', 'guard_name' => 'api'],
@@ -32,9 +44,6 @@ class PermissionSeeder extends Seeder
             ['name' => 'Manage Environmental Compliance', 'guard_name' => 'api'],
             ['name' => 'View Environmental Reports', 'guard_name' => 'api'],
             ['name' => 'Edit Environmental Reports', 'guard_name' => 'api'],
-            ['name' => 'Manage Financial Records', 'guard_name' => 'api'],
-            ['name' => 'View Financial Reports', 'guard_name' => 'api'],
-            ['name' => 'Approve Financial Transactions', 'guard_name' => 'api'],
         ];
 
         foreach ($permissions as $permission) {

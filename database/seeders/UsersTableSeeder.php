@@ -15,11 +15,21 @@ class UsersTableSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('users')->insert([
-            'username' => 'administrator',
-            'person_id' => '1',
-            'email' => 'admin@admin.com',
-            'password' => Hash::make('password'),
-        ]);
+        $users = [
+            [
+                'username' => 'super_administrator',
+                'person_id' => '1',
+                'email' => 'admin@admin.com',
+                'password' => Hash::make('password'),
+            ],
+            [
+                'username' => 'accountan',
+                'person_id' => '2',
+                'email' => 'accountan@company.com',
+                'password' => Hash::make('accountan_password'),
+            ],
+        ];
+
+        DB::table('users')->insert($users);
     }
 }

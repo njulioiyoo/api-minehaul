@@ -14,30 +14,33 @@ class RoleMenuSeeder extends Seeder
      */
     public function run(): void
     {
-        // Contoh penugasan menu ke pengguna. Sesuaikan dengan ID pengguna dan menu yang tersedia di database Anda.
+        $roles = DB::table('roles')->pluck('id')->toArray();
+        $menus = DB::table('menus')->pluck('id')->toArray();
 
-        // Asumsikan kita memiliki beberapa role dengan ID 1, 2, dan 3
-        // Dan kita akan memberikan mereka menu yang berbeda.
+        if (! in_array(1, $roles)) {
+            throw new \Exception('Role ID 1 not found in roles table');
+        }
 
-        // Role 1 mendapatkan akses ke menu Dashboard, Tracking, dan Alerts
+        if (! in_array(2, $roles)) {
+            throw new \Exception('Role ID 2 not found in roles table');
+        }
+
         DB::table('role_menus')->insert([
-            ['role_id' => 1, 'menu_id' => 1], // Dashboard
-            ['role_id' => 1, 'menu_id' => 2], // Tracking
-            ['role_id' => 1, 'menu_id' => 4], // Alerts
+            ['role_id' => 1, 'menu_id' => 1],
+            ['role_id' => 1, 'menu_id' => 2],
+            ['role_id' => 1, 'menu_id' => 4],
         ]);
 
-        // Role 2 mendapatkan akses ke menu Dashboard, Reports, dan Configuration
         DB::table('role_menus')->insert([
-            ['role_id' => 2, 'menu_id' => 1], // Dashboard
-            ['role_id' => 2, 'menu_id' => 5], // Reports
-            ['role_id' => 2, 'menu_id' => 7], // Configuration
+            ['role_id' => 2, 'menu_id' => 1],
+            ['role_id' => 2, 'menu_id' => 5],
+            ['role_id' => 2, 'menu_id' => 7],
         ]);
 
-        // Role 3 mendapatkan akses ke semua menu
         $menus = DB::table('menus')->get();
         foreach ($menus as $menu) {
             DB::table('role_menus')->insert([
-                'role_id' => 2,
+                'role_id' => 3,
                 'menu_id' => $menu->id,
             ]);
         }
