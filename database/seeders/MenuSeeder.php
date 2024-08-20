@@ -16,13 +16,13 @@ class MenuSeeder extends Seeder
     public function run(): void
     {
         $menus = [
-            ['name' => 'dashboard', 'icon' => 'dashboard_icon', 'url' => '/dashboard', 'position' => 1],
-            ['name' => 'tracking', 'icon' => 'tracking_icon', 'url' => '/tracking', 'position' => 2],
-            ['name' => 'navigation', 'icon' => 'navigation_icon', 'url' => '/navigation', 'position' => 3],
-            ['name' => 'alerts', 'icon' => 'alerts_icon', 'url' => '/alerts', 'position' => 4],
-            ['name' => 'reports', 'icon' => 'reports_icon', 'url' => '/reports', 'position' => 5],
-            ['name' => 'reports history', 'icon' => 'history_icon', 'url' => '/reports/history', 'position' => 6],
-            ['name' => 'configuration', 'icon' => 'configuration_icon', 'url' => '/configuration', 'position' => 7],
+            ['name' => 'Dashboard', 'icon' => 'dashboard_icon', 'url' => '', 'position' => 1],
+            ['name' => 'Tracking', 'icon' => 'tracking_icon', 'url' => '', 'position' => 2],
+            ['name' => 'Navigation', 'icon' => 'navigation_icon', 'url' => '', 'position' => 3],
+            ['name' => 'Alerts', 'icon' => 'alerts_icon', 'url' => '', 'position' => 4],
+            ['name' => 'Reports', 'icon' => 'reports_icon', 'url' => '', 'position' => 5],
+            ['name' => 'Reports history', 'icon' => 'history_icon', 'url' => '', 'position' => 6],
+            ['name' => 'Configuration', 'icon' => 'configuration_icon', 'url' => '', 'position' => 7],
         ];
 
         // Insert main menus
@@ -35,10 +35,10 @@ class MenuSeeder extends Seeder
 
         // Insert submenus for 'configuration'
         $submenus = [
-            ['name' => 'permission', 'icon' => 'permission_icon', 'url' => '/configuration/permission', 'position' => 1],
-            ['name' => 'role', 'icon' => 'role_icon', 'url' => '/configuration/role', 'position' => 2],
-            ['name' => 'user', 'icon' => 'user_icon', 'url' => '/configuration/user', 'position' => 3],
-            ['name' => 'menu', 'icon' => 'menu_icon', 'url' => '/configuration/menu', 'position' => 4],
+            ['name' => 'Permission', 'icon' => 'permission_icon', 'url' => 'api/permission', 'position' => 1],
+            ['name' => 'Role', 'icon' => 'role_icon', 'url' => 'api/role', 'position' => 2],
+            ['name' => 'User', 'icon' => 'user_icon', 'url' => 'api/user', 'position' => 3],
+            ['name' => 'Menu', 'icon' => 'menu_icon', 'url' => 'api/menu', 'position' => 4],
         ];
 
         // Insert submenus
@@ -51,9 +51,9 @@ class MenuSeeder extends Seeder
 
         // Insert other menus
         $otherMenus = [
-            ['name' => 'tags', 'icon' => 'tags_icon', 'url' => '/tags', 'position' => 8],
-            ['name' => 'notifications', 'icon' => 'notifications_icon', 'url' => '/notifications', 'position' => 9],
-            ['name' => 'minehaul ai', 'icon' => 'ai_icon', 'url' => '/minehaul-ai', 'position' => 10],
+            ['name' => 'Tags', 'icon' => 'tags_icon', 'url' => '', 'position' => 8],
+            ['name' => 'Notifications', 'icon' => 'notifications_icon', 'url' => '', 'position' => 9],
+            ['name' => 'Minehaul AI', 'icon' => 'ai_icon', 'url' => '', 'position' => 10],
         ];
 
         // Insert remaining menus

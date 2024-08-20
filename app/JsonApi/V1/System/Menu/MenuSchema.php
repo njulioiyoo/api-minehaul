@@ -29,6 +29,7 @@ class MenuSchema extends Schema
         $fields = [
             ID::make(),
             Str::make('name')->sortable(),
+            Str::make('key')->sortable(),
             Str::make('icon')->sortable(),
             Str::make('url')->sortable(),
             Number::make('parent_id')->sortable(),

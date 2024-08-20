@@ -6,14 +6,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 
 class Menu extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
-    protected $fillable = ['name', 'url', 'parent_id', 'position'];
+    protected $fillable = ['name', 'key', 'url', 'parent_id', 'position', 'deleted_at'];
 
     public $timestamps = false;
 
@@ -25,6 +28,9 @@ class Menu extends Model
         parent::boot();
 
         static::saving(function ($menu) {
+            // Generate the key from the name field
+            $menu->key = Str::slug($menu->name);
+
             if (request()->has('data.attributes.roles')) {
                 $roles = request()->input('data.attributes.roles');
                 $menu->rolesToSync = $roles;
