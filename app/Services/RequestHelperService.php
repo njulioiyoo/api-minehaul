@@ -10,11 +10,11 @@ class RequestHelperService
     public function getInputAndId($request, $type, $includeId = false)
     {
         $input = $request->json()->all();
-        $permissionId = $includeId && isset($input['data']['id']) ? $input['data']['id'] : null;
+        $dataId = $includeId && isset($input['data']['id']) ? $input['data']['id'] : null;
         $input['data']['type'] = $type;
 
         $queryParams = $request->query();
 
-        return [$input, $permissionId, $queryParams];
+        return [$input, $dataId, $queryParams];
     }
 }

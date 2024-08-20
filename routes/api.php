@@ -59,15 +59,15 @@ JsonApiRoute::server('v1')->middleware('validate.api')->resources(function (Reso
     $server->resource('users', JsonApiController::class);
     // Routes requiring the same middleware
     Route::get('user', [UserController::class, 'readUser'])->name('user.index')->middleware('verify.user.role');
-    Route::post('user', [UserController::class, 'createUser'])->name('user.create');
-    Route::patch('user', [UserController::class, 'updateUser'])->name('user.update');
-    Route::delete('user', [UserController::class, 'deleteUser'])->name('user.delete');
+    Route::post('user', [UserController::class, 'createUser'])->name('user.create')->middleware('verify.user.role');
+    Route::patch('user', [UserController::class, 'updateUser'])->name('user.update')->middleware('verify.user.role');
+    Route::delete('user', [UserController::class, 'deleteUser'])->name('user.delete')->middleware('verify.user.role');
 
     // Resource route with JSON:API controller
     $server->resource('menus', JsonApiController::class);
     // Routes requiring the same middleware
     Route::get('menu', [MenuController::class, 'index'])->name('menu.index')->middleware('verify.user.role');
-    Route::post('menu', [MenuController::class, 'createMenu'])->name('menu.create');
-    Route::patch('menu', [MenuController::class, 'updateMenu'])->name('menu.update');
-    Route::delete('menu', [MenuController::class, 'deleteMenu'])->name('menu.delete');
+    Route::post('menu', [MenuController::class, 'createMenu'])->name('menu.create')->middleware('verify.user.role');
+    Route::patch('menu', [MenuController::class, 'updateMenu'])->name('menu.update')->middleware('verify.user.role');
+    Route::delete('menu', [MenuController::class, 'deleteMenu'])->name('menu.delete')->middleware('verify.user.role');
 });

@@ -23,7 +23,8 @@ class UserResource extends JsonApiResource
             'updated_at' => $this->updated_at,
             'roles' => $this->roles->map(fn ($role) => $this->transformRole($role)),
             'menus' => $this->getMenusForRole(),
-            'account' => $this->persons->account,
+            'account' => $this->persons?->account,
+
         ];
     }
 

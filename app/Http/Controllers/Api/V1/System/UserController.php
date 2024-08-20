@@ -44,7 +44,7 @@ class UserController extends Controller
     public function updateUser(Request $request)
     {
         $headers = $this->headerService->prepareHeaders($request);
-        [$input, $userId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'users');
+        [$input, $userId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'users', true);
 
         // Panggil metode updateDevice dengan ID yang diperoleh
         return $this->userService->updateUser($userId, $input, $headers, $queryParams);
@@ -53,7 +53,7 @@ class UserController extends Controller
     public function deleteUser(Request $request)
     {
         $headers = $this->headerService->prepareHeaders($request);
-        [$input, $userId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'users');
+        [$input, $userId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'users', true);
 
         // Panggil metode deleteDevice dengan ID yang diperoleh
         return $this->userService->deleteUser($userId, $input, $headers, $queryParams);
