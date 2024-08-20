@@ -21,7 +21,6 @@ class DatabaseSeeder extends Seeder
         $this->call(PersonSeeder::class);
         // $this->call(RoleMenuSeeder::class);
         $this->call(RoleSeeder::class);
-        // $this->call(UserMenuSeeder::class);
         $this->call(PassportClientSeeder::class);
     }
 }
