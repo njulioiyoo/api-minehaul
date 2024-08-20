@@ -15,35 +15,47 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         $permissions = [
+            // Permissions for Account
+            ['name' => 'View Dashboard', 'guard_name' => 'api'],
+            ['name' => 'View Tracking', 'guard_name' => 'api'],
+            ['name' => 'View Navigation', 'guard_name' => 'api'],
+            ['name' => 'Create Navigation', 'guard_name' => 'api'],
+            ['name' => 'Edit Navigation', 'guard_name' => 'api'],
+            ['name' => 'Delete Navigation', 'guard_name' => 'api'],
+            ['name' => 'View Alerts', 'guard_name' => 'api'],
+            ['name' => 'View Reports', 'guard_name' => 'api'],
+            ['name' => 'View Reports History', 'guard_name' => 'api'],
+            //Start - Configuration
+            ['name' => 'View Vehicle', 'guard_name' => 'api'],
+            ['name' => 'Create Vehicle', 'guard_name' => 'api'],
+            ['name' => 'Edit Vehicle', 'guard_name' => 'api'],
+            ['name' => 'Delete Vehicle', 'guard_name' => 'api'],
+            ['name' => 'View Device', 'guard_name' => 'api'],
+            ['name' => 'Create Device', 'guard_name' => 'api'],
+            ['name' => 'Edit Device', 'guard_name' => 'api'],
+            ['name' => 'Delete Device', 'guard_name' => 'api'],
+            ['name' => 'View Driver', 'guard_name' => 'api'],
+            ['name' => 'Create Driver', 'guard_name' => 'api'],
+            ['name' => 'Edit Driver', 'guard_name' => 'api'],
+            ['name' => 'Delete Driver', 'guard_name' => 'api'],
+            //End - Configuration
+            ['name' => 'View Tags', 'guard_name' => 'api'],
+            ['name' => 'View Notifications', 'guard_name' => 'api'],
+            ['name' => 'View Minehaul AI', 'guard_name' => 'api'],
+
             // Permissions for Super Administrator
-            ['name' => 'Manage All Data', 'guard_name' => 'api'],
-            ['name' => 'Assign Roles', 'guard_name' => 'api'],
-            ['name' => 'Revoke Roles', 'guard_name' => 'api'],
-            ['name' => 'Manage Permissions', 'guard_name' => 'api'],
-
-            // Permissions for Accountan
-            ['name' => 'Manage Financial Records', 'guard_name' => 'api'],
-            ['name' => 'View Financial Reports', 'guard_name' => 'api'],
-            ['name' => 'Approve Financial Transactions', 'guard_name' => 'api'],
-
-            // Other existing permissions
-            ['name' => 'View Mine Data', 'guard_name' => 'api'],
-            ['name' => 'Edit Mine Data', 'guard_name' => 'api'],
-            ['name' => 'Delete Mine Data', 'guard_name' => 'api'],
-            ['name' => 'Manage Equipment', 'guard_name' => 'api'],
-            ['name' => 'View Equipment Status', 'guard_name' => 'api'],
-            ['name' => 'Edit Equipment Status', 'guard_name' => 'api'],
-            ['name' => 'Manage Personnel', 'guard_name' => 'api'],
-            ['name' => 'View Personnel Records', 'guard_name' => 'api'],
-            ['name' => 'Edit Personnel Records', 'guard_name' => 'api'],
-            ['name' => 'View Production Reports', 'guard_name' => 'api'],
-            ['name' => 'Generate Production Reports', 'guard_name' => 'api'],
-            ['name' => 'Manage Safety Protocols', 'guard_name' => 'api'],
-            ['name' => 'View Safety Incidents', 'guard_name' => 'api'],
-            ['name' => 'Report Safety Incidents', 'guard_name' => 'api'],
-            ['name' => 'Manage Environmental Compliance', 'guard_name' => 'api'],
-            ['name' => 'View Environmental Reports', 'guard_name' => 'api'],
-            ['name' => 'Edit Environmental Reports', 'guard_name' => 'api'],
+            //Start - System
+            ['name' => 'View Users', 'guard_name' => 'api'],
+            ['name' => 'Create Users', 'guard_name' => 'api'],
+            ['name' => 'Edit Users', 'guard_name' => 'api'],
+            ['name' => 'Delete Users', 'guard_name' => 'api'],
+            ['name' => 'View Roles', 'guard_name' => 'api'],
+            ['name' => 'Create Roles', 'guard_name' => 'api'],
+            ['name' => 'Edit Roles', 'guard_name' => 'api'],
+            ['name' => 'Delete Roles', 'guard_name' => 'api'],
+            ['name' => 'View Menus', 'guard_name' => 'api'],
+            ['name' => 'Edit Menus', 'guard_name' => 'api'],
+            //End - System
         ];
 
         foreach ($permissions as $permission) {
