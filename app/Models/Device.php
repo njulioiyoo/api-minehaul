@@ -14,27 +14,23 @@ class Device extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $primaryKey = 'device_id';
-
     protected $table = 'devices';
 
     protected $guarded = [];
 
     public $timestamps = false;
 
-    public static function boot()
+    protected static function boot()
     {
         parent::boot();
 
-        static::creating(function ($create) {
-            $create->dt_creator = auth()->user()->id;
-            $create->dt_create_date = date('Y-m-d H:i:s');
-            $create->uid = Str::uuid()->toString();
+        static::saving(function ($device) {
+            $device->uid = $device->exists ? $device->uid : Str::uuid()->toString();
+            $device->{$device->exists ? 'updated_by' : 'created_by'} = auth()->user()->id;
         });
 
-        static::updating(function ($update) {
-            $update->dt_editor = auth()->user()->id;
-            $update->dt_edit_date = date('Y-m-d H:i:s');
+        static::saved(function ($device) {
+            // Logic tambahan setelah disimpan, jika diperlukan
         });
     }
 }

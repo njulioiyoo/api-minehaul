@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\JsonApi\V1\Configurations\Device;
 
 use App\Models\Device;
-use LaravelJsonApi\Eloquent\Fields\DateTime;
 use LaravelJsonApi\Eloquent\Fields\ID;
+use LaravelJsonApi\Eloquent\Fields\Number;
 use LaravelJsonApi\Eloquent\Fields\Str;
 use LaravelJsonApi\Eloquent\Filters\WhereIdIn;
 use LaravelJsonApi\Eloquent\Pagination\PagePagination;
@@ -27,21 +27,20 @@ class DeviceSchema extends Schema
     public function fields(): array
     {
         return [
-            ID::make('device_id'),
-            Str::make('account_id')->sortable(),
-            Str::make('device_type_id')->sortable(),
-            Str::make('device_display_id')->sortable(),
-            Str::make('device_name')->sortable(),
-            Str::make('device_sim_id')->sortable(),
-            Str::make('device_year')->sortable(),
-            Str::make('device_make_id')->sortable(),
-            Str::make('device_model_id')->sortable(),
-            Str::make('device_status_id')->sortable(),
-            Str::make('dt_status')->sortable(),
-            Str::make('dt_creator')->sortable(),
-            DateTime::make('dt_create_date')->sortable()->readOnly(),
-            Str::make('dt_editor')->sortable(),
-            DateTime::make('dt_edit_date')->sortable()->readOnly(),
+            ID::make(),
+            Number::make('account_id')->sortable(),
+            Number::make('pit_id')->sortable(),
+            Number::make('type_id')->sortable(),
+            Str::make('display_id')->sortable(),
+            Str::make('name')->sortable(),
+            Str::make('sim_id')->sortable(),
+            Number::make('year')->sortable(),
+            Number::make('make_id')->sortable(),
+            Number::make('model_id')->sortable(),
+            Number::make('status_id')->sortable(),
+            Str::make('status')->sortable(),
+            Number::make('created_by')->sortable(),
+            Number::make('updated_by')->sortable(),
             Str::make('uid')->sortable(),
         ];
     }

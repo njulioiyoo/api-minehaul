@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use Faker\Factory as Faker;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class DevicesTableSeeder extends Seeder
 {
@@ -15,28 +15,29 @@ class DevicesTableSeeder extends Seeder
      */
     public function run(): void
     {
-        $faker = Faker::create();
+        $devices = [];
 
-        $statuses = ['active', 'inactive', 'nullified'];
-
-        for ($i = 0; $i < 100; $i++) {
-            DB::table('devices')->insert([
-                'account_id' => $faker->optional()->randomNumber(),
-                'device_type_id' => $faker->optional()->randomNumber(),
-                'device_display_id' => $faker->optional()->bothify('??-#####'),
-                'device_name' => $faker->optional()->word,
-                'device_sim_id' => $faker->optional()->bothify('SIM-########'),
-                'device_year' => $faker->optional()->year,
-                'device_make_id' => $faker->optional()->randomNumber(),
-                'device_model_id' => $faker->optional()->randomNumber(),
-                'device_status_id' => $faker->optional()->randomNumber(),
-                'dt_status' => $faker->randomElement($statuses),
-                'dt_creator' => $faker->optional()->randomNumber(),
-                'dt_create_date' => $faker->optional()->dateTime,
-                'dt_editor' => $faker->optional()->randomNumber(),
-                'dt_edit_date' => $faker->optional()->dateTime,
-                'uid' => $faker->optional()->uuid,
-            ]);
+        for ($i = 1; $i <= 10; $i++) {
+            $devices[] = [
+                'account_id' => rand(1, 5),  // Ganti dengan ID akun yang valid
+                'pit_id' => rand(1, 5),      // Ganti dengan ID pit yang valid
+                'type_id' => rand(1, 5),     // Ganti dengan ID tipe yang valid
+                'display_id' => 'D'.str_pad((string) $i, 5, '0', STR_PAD_LEFT),
+                'name' => 'Device '.$i,
+                'sim_id' => 'SIM'.str_pad((string) $i, 10, '0', STR_PAD_LEFT),
+                'year' => rand(2018, 2024),
+                'make_id' => rand(1, 5),     // Ganti dengan ID make yang valid
+                'model_id' => rand(1, 5),    // Ganti dengan ID model yang valid
+                'status_id' => rand(1, 5),   // Ganti dengan ID status yang valid
+                'status' => ['active', 'inactive', 'nullified'][rand(0, 2)],
+                'created_by' => rand(1, 5),  // Ganti dengan ID pengguna yang valid
+                'updated_by' => rand(1, 5),  // Ganti dengan ID pengguna yang valid
+                'uid' => Str::uuid()->toString(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
         }
+
+        DB::table('devices')->insert($devices);
     }
 }

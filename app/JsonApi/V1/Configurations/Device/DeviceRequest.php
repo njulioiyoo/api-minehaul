@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\JsonApi\V1\Configurations\Device;
 
+use Illuminate\Support\Facades\Log;
 use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
 
 class DeviceRequest extends ResourceRequest
@@ -13,20 +14,20 @@ class DeviceRequest extends ResourceRequest
      */
     public function rules(): array
     {
-        // Periksa apakah permintaan adalah untuk pembaruan atau pembuatan
-        $rules = [
-            'account_id' => ['required', 'string', 'max:255'],
-            'device_type_id' => ['required', 'integer', 'max:255'],
-            'device_display_id' => ['nullable', 'string', 'max:255'],
-            'device_name' => ['required', 'string', 'max:255'],
-            'device_sim_id' => ['nullable', 'string', 'max:255'],
-            'device_year' => ['nullable', 'integer'],
-            'device_make_id' => ['nullable', 'integer', 'max:255'],
-            'device_model_id' => ['nullable', 'integer', 'max:255'],
-            'device_status_id' => ['nullable', 'integer', 'max:255'],
-            'dt_status' => ['nullable', 'string', 'max:255'],
-        ];
+        Log::info('Request Data:', $this->all());
 
-        return $rules;
+        return [
+            'account_id' => ['required', 'integer'],
+            'pit_id' => ['nullable', 'integer'],
+            'type_id' => ['nullable', 'integer'],
+            'display_id' => ['nullable', 'string'],
+            'name' => ['nullable', 'string'],
+            'sim_id' => ['nullable', 'string'],
+            'year' => ['nullable', 'integer'],
+            'make_id' => ['nullable', 'integer'],
+            'model_id' => ['nullable', 'integer'],
+            'status_id' => ['nullable', 'integer'],
+            'status' => ['nullable', 'string'],
+        ];
     }
 }

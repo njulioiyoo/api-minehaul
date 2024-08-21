@@ -44,7 +44,7 @@ class DeviceController extends Controller
     public function updateDevice(Request $request)
     {
         $headers = $this->headerService->prepareHeaders($request);
-        [$input, $deviceId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'devices');
+        [$input, $deviceId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'devices', true);
 
         // Panggil metode updateDevice dengan ID yang diperoleh
         return $this->deviceService->updateDevice($deviceId, $input, $headers, $queryParams);
@@ -53,7 +53,7 @@ class DeviceController extends Controller
     public function deleteDevice(Request $request)
     {
         $headers = $this->headerService->prepareHeaders($request);
-        [$input, $deviceId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'devices');
+        [$input, $deviceId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'devices', true);
 
         // Panggil metode deleteDevice dengan ID yang diperoleh
         return $this->deviceService->deleteDevice($deviceId, $input, $headers, $queryParams);

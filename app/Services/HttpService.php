@@ -21,7 +21,7 @@ class HttpService
     public function handleRequest($method, $url, $data)
     {
         try {
-            $response = $this->httpClient->$method($url, $data);
+            $response = $this->httpClient->$method($url, array_merge($data, ['timeout' => 60]));
             $responseBody = json_decode((string) $response->getBody(), true);
             $responseStatus = $response->getStatusCode();
             $responseHeaders = $this->parseHeaders($response->getHeaders());
@@ -31,7 +31,6 @@ class HttpService
             return response()->json($responseBody, $responseStatus)
                 ->withHeaders($responseHeaders);
         } catch (ClientException $e) {
-            dd($e);
             $responseBody = json_decode($e->getResponse()->getBody()->getContents(), true);
             $errors = $responseBody['errors'] ?? [];
 
