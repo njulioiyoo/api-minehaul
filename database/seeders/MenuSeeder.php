@@ -7,6 +7,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 
 class MenuSeeder extends Seeder
 {
@@ -15,6 +16,10 @@ class MenuSeeder extends Seeder
      */
     public function run(): void
     {
+        // Fetch roles
+        $superAdminRole = Role::where('name', 'Super Administrator')->first();
+        $accountRole = Role::where('name', 'Account')->first();
+
         // Insert main menus
         $menus = [
             ['name' => 'Dashboard', 'icon' => 'dashboard_icon', 'url' => '', 'position' => 1],
@@ -44,11 +49,12 @@ class MenuSeeder extends Seeder
             ['name' => 'Driver', 'icon' => 'driver_icon', 'url' => 'api/driver', 'position' => 3, 'parent_id' => $menuIds['Configuration']],
         ];
 
+        $configurationSubmenuIds = [];
         foreach ($configurationSubmenus as $submenu) {
             $submenu['key'] = Str::slug($submenu['name']);
             $submenu['created_at'] = now();
             $submenu['updated_at'] = now();
-            DB::table('menus')->insert($submenu);
+            $configurationSubmenuIds[] = DB::table('menus')->insertGetId($submenu);
         }
 
         // Insert submenus for 'System'
@@ -59,11 +65,59 @@ class MenuSeeder extends Seeder
             ['name' => 'Menu', 'icon' => 'menu_icon', 'url' => 'api/menu', 'position' => 4, 'parent_id' => $menuIds['System']],
         ];
 
+        $systemSubmenuIds = [];
         foreach ($systemSubmenus as $submenu) {
             $submenu['key'] = Str::slug($submenu['name']);
             $submenu['created_at'] = now();
             $submenu['updated_at'] = now();
-            DB::table('menus')->insert($submenu);
+            $systemSubmenuIds[] = DB::table('menus')->insertGetId($submenu);
+        }
+
+        // Assign all menus to super_admin role
+        foreach ($menuIds as $menuId) {
+            DB::table('role_menus')->insert([
+                'role_id' => $superAdminRole->id,
+                'menu_id' => $menuId,
+            ]);
+        }
+
+        // Assign all submenus to super_admin role
+        foreach (array_merge($configurationSubmenuIds, $systemSubmenuIds) as $submenuId) {
+            DB::table('role_menus')->insert([
+                'role_id' => $superAdminRole->id,
+                'menu_id' => $submenuId,
+            ]);
+        }
+
+        // Assign menus to account role except 'Configuration' and 'System' menus and their submenus
+        foreach ($menuIds as $menuName => $menuId) {
+            if (! in_array($menuName, ['Configuration', 'System'])) {
+                DB::table('role_menus')->insert([
+                    'role_id' => $accountRole->id,
+                    'menu_id' => $menuId,
+                ]);
+            }
+        }
+
+        // Ensure submenus under 'Configuration' and 'System' are not assigned to account role
+        $excludedSubmenus = array_merge($configurationSubmenuIds, $systemSubmenuIds);
+
+        foreach ($configurationSubmenuIds as $submenuId) {
+            if (! in_array($submenuId, $excludedSubmenus)) {
+                DB::table('role_menus')->insert([
+                    'role_id' => $accountRole->id,
+                    'menu_id' => $submenuId,
+                ]);
+            }
+        }
+
+        foreach ($systemSubmenuIds as $submenuId) {
+            if (! in_array($submenuId, $excludedSubmenus)) {
+                DB::table('role_menus')->insert([
+                    'role_id' => $accountRole->id,
+                    'menu_id' => $submenuId,
+                ]);
+            }
         }
     }
 }
