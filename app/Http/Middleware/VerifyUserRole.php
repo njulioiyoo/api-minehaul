@@ -42,9 +42,19 @@ class VerifyUserRole
             ], 404);
         }
 
-        // Cek apakah menu terkait dengan user melalui tabel user_menus
-        $userId = Auth::id();
-        $userMenu = RoleMenu::where('role_id', $userId)
+        // Ambil role_id dari user yang sedang login
+        $roleId = Auth::user()->roles->first()->id ?? null;
+
+        // Cek jika role_id tidak ditemukan
+        if (! $roleId) {
+            return response()->json([
+                'error' => 'Unauthorized',
+                'message' => 'User does not have a valid role.',
+            ], 403);
+        }
+
+        // Cek apakah menu terkait dengan role melalui tabel role_menus
+        $userMenu = RoleMenu::where('role_id', $roleId)
             ->where('menu_id', $menu->id)
             ->first();
 

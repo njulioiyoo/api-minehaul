@@ -17,15 +17,6 @@ class RoleSeeder extends Seeder
         $roles = [
             ['name' => 'Super Administrator', 'guard_name' => 'api'],
             ['name' => 'Accountan', 'guard_name' => 'api'],
-            ['name' => 'Admin', 'guard_name' => 'api'],
-            ['name' => 'Manajer Tambang', 'guard_name' => 'api'],
-            ['name' => 'Operator Peralatan', 'guard_name' => 'api'],
-            ['name' => 'Pengawas Keselamatan', 'guard_name' => 'api'],
-            ['name' => 'Analis Produksi', 'guard_name' => 'api'],
-            ['name' => 'Pengelola Lingkungan', 'guard_name' => 'api'],
-            ['name' => 'Keuangan', 'guard_name' => 'api'],
-            ['name' => 'Personel Tambang', 'guard_name' => 'api'],
-            ['name' => 'Staf Administrasi', 'guard_name' => 'api'],
         ];
 
         foreach ($roles as $role) {
