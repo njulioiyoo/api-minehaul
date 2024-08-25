@@ -18,8 +18,6 @@ class Device extends Model
 
     protected $guarded = [];
 
-    public $timestamps = false;
-
     protected static function boot()
     {
         parent::boot();
