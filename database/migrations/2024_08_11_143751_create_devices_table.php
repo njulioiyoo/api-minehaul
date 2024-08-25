@@ -18,8 +18,8 @@ return new class extends Migration
             $table->integer('account_id')->nullable()->default(null);
             $table->integer('pit_id')->nullable()->default(null);
             $table->integer('device_type_id')->nullable()->default(null);
-            $table->integer('display_make_id')->nullable()->default(null);
-            $table->integer('display_model_id')->nullable()->default(null);
+            $table->integer('device_make_id')->nullable()->default(null);
+            $table->integer('device_model_id')->nullable()->default(null);
             $table->string('display_id', 100)->nullable()->default(null);
             $table->string('name', 255)->nullable()->default(null);
             $table->string('sim_id', 255)->nullable()->default(null);

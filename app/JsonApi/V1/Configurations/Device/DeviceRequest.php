@@ -19,13 +19,13 @@ class DeviceRequest extends ResourceRequest
         return [
             'account_id' => ['required', 'integer'],
             'pit_id' => ['nullable', 'integer'],
-            'type_id' => ['nullable', 'integer'],
+            'device_type_id' => ['nullable', 'integer'],
             'display_id' => ['nullable', 'string'],
             'name' => ['nullable', 'string'],
             'sim_id' => ['nullable', 'string'],
             'year' => ['nullable', 'integer'],
-            'make_id' => ['nullable', 'integer'],
-            'model_id' => ['nullable', 'integer'],
+            'device_make_id' => ['nullable', 'integer'],
+            'device_model_id' => ['nullable', 'integer'],
             'status_id' => ['nullable', 'integer'],
             'status' => ['nullable', 'string'],
         ];
