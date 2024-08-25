@@ -6,7 +6,6 @@ namespace App\Services;
 
 class RequestHelperService
 {
-    // Metode untuk mendapatkan input dan ID
     public function getInputAndId($request, $type, $includeId = false)
     {
         $input = $request->json()->all();

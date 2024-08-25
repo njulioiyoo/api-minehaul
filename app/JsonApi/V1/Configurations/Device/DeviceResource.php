@@ -16,7 +16,7 @@ class DeviceResource extends JsonApiResource
     public function attributes($request): iterable
     {
         return [
-            'id' => $this->id,
+            'id' => $this->uid,
             'account' => $this->account,
             'pit' => $this->pit,
             'device_type' => $this->deviceType,
@@ -26,8 +26,7 @@ class DeviceResource extends JsonApiResource
             'name' => $this->name,
             'sim_id' => $this->sim_id,
             'year' => $this->year,
-            'status' => $this->status,
-            'uid' => $this->uid,
+            'status' => $this->status
         ];
     }
 }
