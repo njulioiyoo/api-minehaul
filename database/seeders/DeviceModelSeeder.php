@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Faker\Factory as Faker;
 
-class DeviceModelRefSeeder extends Seeder
+class DeviceModelSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -18,7 +18,7 @@ class DeviceModelRefSeeder extends Seeder
     {
         $faker = Faker::create();
 
-        $deviceMakes = DB::table('device_make_ref')->pluck('id', 'name');
+        $deviceMakes = DB::table('device_makes')->pluck('id', 'name');
 
         $deviceModels = [
             'Apple' => ['iPhone 12', 'iPhone 13', 'iPad Pro', 'MacBook Air'],
@@ -36,13 +36,11 @@ class DeviceModelRefSeeder extends Seeder
         foreach ($deviceMakes as $makeName => $makeId) {
             if (isset($deviceModels[$makeName])) {
                 foreach ($deviceModels[$makeName] as $modelName) {
-                    DB::table('device_model_ref')->insert([
+                    DB::table('device_models')->insert([
                         'device_make_id' => $makeId,
                         'name' => $modelName,
-                        'status' => $faker->randomElement(['active', 'inactive', 'nullified']),
                         'created_by' => $faker->randomDigitNotNull,
                         'updated_by' => $faker->randomDigitNotNull,
-                        'uid' => Str::uuid()->toString(),
                         'created_at' => now(),
                         'updated_at' => now(),
                         'deleted_at' => null,
