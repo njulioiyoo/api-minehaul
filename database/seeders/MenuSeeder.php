@@ -8,6 +8,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class MenuSeeder extends Seeder
 {
@@ -19,6 +20,10 @@ class MenuSeeder extends Seeder
         // Fetch roles
         $superAdminRole = Role::where('name', 'Super Administrator')->first();
         $accountRole = Role::where('name', 'Account')->first();
+
+        // Fetch permissions
+        $permissions = Permission::all();
+        $permissionIds = $permissions->pluck('id', 'name');
 
         // Insert main menus
         $menus = [
@@ -116,6 +121,27 @@ class MenuSeeder extends Seeder
                 DB::table('role_menus')->insert([
                     'role_id' => $accountRole->id,
                     'menu_id' => $submenuId,
+                ]);
+            }
+        }
+
+        // Insert into permission_menus table for permissions
+        foreach ($permissions as $permission) {
+            // Assign menus to all permissions
+            foreach ($menuIds as $menuId) {
+                DB::table('permission_menus')->insert([
+                    'permission_id' => $permission->id,
+                    'menu_id' => $menuId,
+                    'status' => 'read', // Pastikan nilai ini sesuai dengan constraint
+                ]);
+            }
+
+            // Assign submenus to all permissions
+            foreach (array_merge($configurationSubmenuIds, $systemSubmenuIds) as $submenuId) {
+                DB::table('permission_menus')->insert([
+                    'permission_id' => $permission->id,
+                    'menu_id' => $submenuId,
+                    'status' => 'read', // Pastikan nilai ini sesuai dengan constraint
                 ]);
             }
         }
