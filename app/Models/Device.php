@@ -33,4 +33,29 @@ class Device extends Model
             // Logic tambahan setelah disimpan, jika diperlukan
         });
     }
+
+    public function account()
+    {
+        return $this->belongsTo(Account::class)->select('id', 'company_code', 'company_name');
+    }
+
+    public function pit()
+    {
+        return $this->belongsTo(Pit::class, 'pit_id')->select('name', 'description');
+    }
+
+    public function deviceType()
+    {
+        return $this->belongsTo(DeviceTypeRef::class, 'device_type_id')->select('name');
+    }
+
+    public function deviceMake()
+    {
+        return $this->belongsTo(DeviceMakeRef::class, 'device_make_id')->select('name');
+    }
+
+    public function deviceModel()
+    {
+        return $this->belongsTo(DeviceModelRef::class, 'device_model_id')->select('name');
+    }
 }

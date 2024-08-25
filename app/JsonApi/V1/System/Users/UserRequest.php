@@ -17,17 +17,17 @@ class UserRequest extends ResourceRequest
         /** @var \App\Models\User|null $model */
         if ($model = $this->model()) {
             return [
-                'username' => ['sometimes', 'string'],
-                'person_id' => ['sometimes', 'string'],
-                'email' => ['sometimes', 'email', Rule::unique('users')->ignore($model->id)],
+                'username' => ['sometimes', 'string', 'regex:/^[a-zA-Z0-9._-]{3,20}$/'],
+                'person_id' => ['sometimes', 'string', 'regex:/^\d+$/'],
+                'email' => ['sometimes', 'email', 'regex:/^[\w\.-]+@[\w\.-]+\.[a-zA-Z]{2,6}$/', Rule::unique('users')->ignore($model->id)],
                 'password' => ['sometimes', 'confirmed', 'string', 'min:8'],
             ];
         }
 
         return [
-            'username' => ['required', 'string'],
-            'person_id' => ['required', 'string'],
-            'email' => ['required', 'email', Rule::unique('users')],
+            'username' => ['required', 'string', 'regex:/^[a-zA-Z0-9._-]{3,20}$/'],
+            'person_id' => ['required', 'string', 'regex:/^\d+$/'],
+            'email' => ['required', 'email', 'regex:/^[\w\.-]+@[\w\.-]+\.[a-zA-Z]{2,6}$/', Rule::unique('users')],
             'password' => ['required', 'confirmed', 'string', 'min:8'],
         ];
     }
