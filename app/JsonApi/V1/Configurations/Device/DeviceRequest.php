@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\JsonApi\V1\Configurations\Device;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
 
@@ -17,7 +18,6 @@ class DeviceRequest extends ResourceRequest
         /** @var \App\Models\Device|null $model */
         if ($model = $this->model()) {
             return [
-                'account_id' => ['sometimes', 'integer'],
                 'pit_id' => ['sometimes', 'integer'],
                 'device_type_id' => ['sometimes', 'integer'],
                 'display_id' => ['sometimes', 'string', 'regex:/^[A-Za-z0-9_-]+$/'],
@@ -32,7 +32,6 @@ class DeviceRequest extends ResourceRequest
         }
 
         return [
-            'account_id' => ['required', 'integer'],
             'pit_id' => ['nullable', 'integer'],
             'device_type_id' => ['nullable', 'integer'],
             'display_id' => ['nullable', 'string', 'regex:/^[A-Za-z0-9_-]+$/'],

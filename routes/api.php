@@ -36,17 +36,13 @@ JsonApiRoute::server('v1')->middleware('validate.api')->resources(function (Reso
     Route::patch('device', [DeviceController::class, 'updateDevice'])->name('device.update')->middleware('verify.user.role');
     Route::delete('device', [DeviceController::class, 'deleteDevice'])->name('device.delete')->middleware('verify.user.role');
 
-    // Resource route with JSON:API controller
     $server->resource('permissions', JsonApiController::class);
-    // Routes requiring the same middleware
     Route::get('permission', [PermissionController::class, 'readPermission'])->name('permission.index')->middleware('verify.user.role');
     Route::post('permission', [PermissionController::class, 'createPermission'])->name('permission.create')->middleware('verify.user.role');
     Route::patch('permission', [PermissionController::class, 'updatePermission'])->name('permission.update')->middleware('verify.user.role');
     Route::delete('permission', [PermissionController::class, 'deletePermission'])->name('permission.delete')->middleware('verify.user.role');
 
-    // Resource route with JSON:API controller
     $server->resource('roles', JsonApiController::class);
-    // Routes requiring the same middleware
     Route::get('role', [RoleController::class, 'readRole'])->name('role.index')->middleware('verify.user.role');
     Route::post('role', [RoleController::class, 'createRole'])->name('role.create')->middleware('verify.user.role');
     Route::patch('role', [RoleController::class, 'updateRole'])->name('role.update')->middleware('verify.user.role');
@@ -55,17 +51,13 @@ JsonApiRoute::server('v1')->middleware('validate.api')->resources(function (Reso
     Route::patch('users/{user}/roles', [AccessController::class, 'updateUserRoles']);
     Route::patch('roles/{role}/permissions', [AccessController::class, 'updateRolePermissions']);
 
-    // Resource route with JSON:API controller
     $server->resource('users', JsonApiController::class);
-    // Routes requiring the same middleware
     Route::get('user', [UserController::class, 'readUser'])->name('user.index')->middleware('verify.user.role');
     Route::post('user', [UserController::class, 'createUser'])->name('user.create')->middleware('verify.user.role');
     Route::patch('user', [UserController::class, 'updateUser'])->name('user.update')->middleware('verify.user.role');
     Route::delete('user', [UserController::class, 'deleteUser'])->name('user.delete')->middleware('verify.user.role');
 
-    // Resource route with JSON:API controller
     $server->resource('menus', JsonApiController::class);
-    // Routes requiring the same middleware
     Route::get('menu', [MenuController::class, 'index'])->name('menu.index')->middleware('verify.user.role');
     Route::post('menu', [MenuController::class, 'createMenu'])->name('menu.create')->middleware('verify.user.role');
     Route::patch('menu', [MenuController::class, 'updateMenu'])->name('menu.update')->middleware('verify.user.role');

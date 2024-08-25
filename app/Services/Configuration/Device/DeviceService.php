@@ -36,7 +36,7 @@ class DeviceService
         return $this->httpService->handleRequest('get', route('v1.devices.index'), $data);
     }
 
-    public function updateDevice($deviceId, $inputData, $headers, $queryParams)
+    public function updateDevice($deviceUid, $inputData, $headers, $queryParams)
     {
         $data = [
             'headers' => $headers,
@@ -44,10 +44,10 @@ class DeviceService
             'query' => $queryParams,
         ];
 
-        return $this->httpService->handleRequest('patch', route('v1.devices.update', ['device' => $deviceId]), $data);
+        return $this->httpService->handleRequest('patch', route('v1.devices.update', ['device' => $deviceUid]), $data);
     }
 
-    public function deleteDevice($deviceId, $inputData, $headers, $queryParams)
+    public function deleteDevice($deviceUid, $inputData, $headers, $queryParams)
     {
         $data = [
             'headers' => $headers,
@@ -55,6 +55,6 @@ class DeviceService
             'query' => $queryParams,
         ];
 
-        return $this->httpService->handleRequest('delete', route('v1.devices.destroy', ['device' => $deviceId]), $data);
+        return $this->httpService->handleRequest('delete', route('v1.devices.destroy', ['device' => $deviceUid]), $data);
     }
 }
