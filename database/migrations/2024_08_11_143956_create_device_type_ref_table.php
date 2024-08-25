@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('device_type_ref', function (Blueprint $table) {
             $table->id()->bigIncrements()->primary();
-            $table->string('type_name', 255)->nullable()->default(null);
+            $table->string('name', 255)->nullable()->default(null);
             $table->enum('status', ['active', 'inactive', 'nullified'])->default('nullified');
             $table->integer('created_by')->nullable()->default(null);
             $table->integer('updated_by')->nullable()->default(null);

@@ -46,7 +46,7 @@ class AuthController extends Controller
 
         // Buat permintaan token ke endpoint oauth/token
         $response = app()->handle(
-            Request::create(config('app.url').'/oauth/token', 'POST', [
+            Request::create(config('app.url') . '/oauth/token', 'POST', [
                 'grant_type' => 'password',
                 'client_id' => $client->id,
                 'client_secret' => $client->secret,

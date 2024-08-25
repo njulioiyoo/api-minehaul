@@ -6,19 +6,19 @@ namespace Database\Seeders;
 
 use App\Models\Account;
 use Illuminate\Database\Seeder;
+use Faker\Factory as Faker;
 
 class AccountSeeder extends Seeder
 {
     public function run(): void
     {
-        $accounts = [
-            ['company_code' => 'MIN001', 'company_name' => 'Golden Rock Mining Co.'],
-            ['company_code' => 'MIN002', 'company_name' => 'Black Diamond Extraction Ltd.'],
-            ['company_code' => 'MIN003', 'company_name' => 'Iron Mountain Resources'],
-        ];
+        $faker = Faker::create();
 
-        foreach ($accounts as $account) {
-            Account::create($account);
+        for ($i = 1; $i <= 10; $i++) {
+            Account::create([
+                'company_code' => 'MIN' . str_pad((string)$i, 3, '0', STR_PAD_LEFT),
+                'company_name' => $faker->company,
+            ]);
         }
     }
 }

@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use App\Models\User; // Pastikan model User Anda ada di namespace ini
 
 class RolePermissionSeeder extends Seeder
 {
@@ -73,5 +76,20 @@ class RolePermissionSeeder extends Seeder
         // Assign permissions to roles
         $accountRole->syncPermissions($accountPermissions);
         $superAdminRole->syncPermissions($superAdminPermissions);
+
+        // Define an associative array of users and their corresponding roles
+        $usersWithRoles = [
+            'super_administrator' => $superAdminRole,
+            'accountan' => $accountRole,
+        ];
+
+        // Loop through each user and assign the corresponding role
+        foreach ($usersWithRoles as $username => $role) {
+            $user = User::where('username', $username)->first();
+
+            if ($user) {
+                $user->assignRole($role);
+            }
+        }
     }
 }
