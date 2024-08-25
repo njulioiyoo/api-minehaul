@@ -13,13 +13,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('device_type_ref', function (Blueprint $table) {
+        Schema::create('device_models', function (Blueprint $table) {
             $table->id()->bigIncrements()->primary();
+            $table->foreignId('device_make_id')->constrained()->onDelete('cascade');
             $table->string('name', 255)->nullable()->default(null);
-            $table->enum('status', ['active', 'inactive', 'nullified'])->default('nullified');
             $table->integer('created_by')->nullable()->default(null);
             $table->integer('updated_by')->nullable()->default(null);
-            $table->string('uid', 100)->nullable()->default(null);
 
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();
@@ -31,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('device_type_ref');
+        Schema::dropIfExists('device_models');
     }
 };
