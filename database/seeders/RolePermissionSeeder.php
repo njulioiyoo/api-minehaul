@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
-use App\Models\User; // Pastikan model User Anda ada di namespace ini
+use App\Models\User;
 
 class RolePermissionSeeder extends Seeder
 {
@@ -60,6 +58,10 @@ class RolePermissionSeeder extends Seeder
             'Create Roles',
             'Edit Roles',
             'Delete Roles',
+            'View Permissions',
+            'Create Permissions',
+            'Edit Permissions',
+            'Delete Permissions',
             'View Menus',
             'Edit Menus',
         ]);
@@ -73,7 +75,7 @@ class RolePermissionSeeder extends Seeder
         $accountPermissions = Permission::whereIn('name', $accountPermissions)->get();
         $superAdminPermissions = Permission::whereIn('name', $superAdminPermissions)->get();
 
-        // Assign permissions to roles
+        // Sync permissions to roles
         $accountRole->syncPermissions($accountPermissions);
         $superAdminRole->syncPermissions($superAdminPermissions);
 
@@ -88,7 +90,9 @@ class RolePermissionSeeder extends Seeder
             $user = User::where('username', $username)->first();
 
             if ($user) {
-                $user->assignRole($role);
+                $user->syncRoles([$role]); // Sync roles
+                // Optionally sync permissions as well
+                $user->syncPermissions($role->permissions); // Ensure permissions are also synced
             }
         }
     }

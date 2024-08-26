@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class DeviceMakeRef extends Model
+class DeviceType extends Model
 {
     use HasFactory;
     use SoftDeletes;
 
-    protected $table = 'device_make_ref';
+    protected $table = 'device_types';
 }

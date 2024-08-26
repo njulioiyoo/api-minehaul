@@ -60,16 +60,16 @@ class Device extends Model
 
     public function deviceType()
     {
-        return $this->belongsTo(DeviceTypeRef::class, 'device_type_id')->select('id', 'name');
+        return $this->belongsTo(DeviceType::class, 'device_type_id')->select('id', 'name');
     }
 
     public function deviceMake()
     {
-        return $this->belongsTo(DeviceMakeRef::class, 'device_make_id')->select('id', 'name');
+        return $this->belongsTo(DeviceMake::class, 'device_make_id')->select('id', 'name');
     }
 
     public function deviceModel()
     {
-        return $this->belongsTo(DeviceModelRef::class, 'device_model_id')->select('id', 'name');
+        return $this->belongsTo(DeviceModel::class, 'device_model_id')->select('id', 'name');
     }
 }
