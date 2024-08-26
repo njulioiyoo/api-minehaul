@@ -22,9 +22,9 @@ class DatabaseSeeder extends Seeder
         $this->call(PersonSeeder::class);
         $this->call(AccountSeeder::class);
         $this->call(PitsTableSeeder::class);
-        $this->call(DeviceTypeRefSeeder::class);
-        $this->call(DeviceMakeRefSeeder::class);
-        $this->call(DeviceModelRefSeeder::class);
+        $this->call(DeviceTypeSeeder::class);
+        $this->call(DeviceMakeSeeder::class);
+        $this->call(DeviceModelSeeder::class);
         $this->call(DevicesTableSeeder::class);
     }
 }
