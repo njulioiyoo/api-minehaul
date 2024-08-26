@@ -28,12 +28,6 @@ JsonApiRoute::server('v1')->middleware('validate.api')->resources(function (Reso
     Route::get('me', [ProfileController::class, 'readProfile']);
     Route::patch('me', [ProfileController::class, 'updateProfile']);
 
-    $server->resource('permissions', JsonApiController::class);
-    Route::get('permission', [PermissionController::class, 'readPermission'])->name('permission.index')->middleware('verify.user.role');
-    Route::post('permission', [PermissionController::class, 'createPermission'])->name('permission.create');
-    Route::patch('permission', [PermissionController::class, 'updatePermission'])->name('permission.update');
-    Route::delete('permission', [PermissionController::class, 'deletePermission'])->name('permission.delete');
-
     Route::patch('users/{user}/roles', [AccessController::class, 'updateUserRoles']);
     Route::patch('roles/{role}/permissions', [AccessController::class, 'updateRolePermissions']);
 });
