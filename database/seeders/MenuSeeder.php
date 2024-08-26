@@ -132,7 +132,7 @@ class MenuSeeder extends Seeder
                 DB::table('permission_menus')->insert([
                     'permission_id' => $permission->id,
                     'menu_id' => $menuId,
-                    'status' => 'read', // Pastikan nilai ini sesuai dengan constraint
+                    'status' => 'read',
                 ]);
             }
 
@@ -141,7 +141,7 @@ class MenuSeeder extends Seeder
                 DB::table('permission_menus')->insert([
                     'permission_id' => $permission->id,
                     'menu_id' => $submenuId,
-                    'status' => 'read', // Pastikan nilai ini sesuai dengan constraint
+                    'status' => 'read',
                 ]);
             }
         }

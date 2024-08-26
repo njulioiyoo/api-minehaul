@@ -24,15 +24,15 @@ class AccessController extends Controller
         $roleId = $input['data']['attributes']['roles'] ?? [];
 
         $user = User::findOrFail($userId);
+
         $user->syncRoles($roleId);
 
-        // Optionally sync permissions for the assigned roles
         $permissions = Role::whereIn('id', $roleId)
-            ->with('permissions')
+            ->with('permissions:id,name')
             ->get()
             ->pluck('permissions')
             ->flatten()
-            ->pluck('id')
+            ->pluck('name')
             ->unique()
             ->toArray();
 
@@ -54,7 +54,6 @@ class AccessController extends Controller
 
         $role = Role::findOrFail($roleId);
 
-        // Sinkronisasi permissions untuk role
         $role->syncPermissions($permissions);
 
         return new DataResponse($role);

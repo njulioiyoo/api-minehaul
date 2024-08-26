@@ -32,7 +32,7 @@ class VerifyUserRole
         $currentUrl = $request->path();
 
         // Cari menu berdasarkan URL
-        $menu = Menu::where('url', $currentUrl)->first();
+        $menu = Menu::with('permissionMenu')->where('url', $currentUrl)->first();
 
         // Jika menu tidak ditemukan, berikan validasi
         if (! $menu) {
