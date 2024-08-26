@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Models\Device;
+use App\Models\Menu;
+use App\Models\User;
 use App\Policies\DevicePolicy;
+use App\Policies\MenuPolicy;
 use App\Policies\PermissionPolicy;
 use App\Policies\RolePolicy;
+use App\Policies\UserPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passport\Passport;
@@ -37,8 +41,10 @@ class AppServiceProvider extends ServiceProvider
         // Mengatur masa berlaku token personal
         Passport::personalAccessTokensExpireIn(now()->addDays(7)); // Personal Access Token expired in 7 days
 
-        // Gate::policy(Device::class, DevicePolicy::class);
-        // Gate::policy(Permission::class, PermissionPolicy::class);
-        // Gate::policy(Role::class, RolePolicy::class);
+        Gate::policy(Device::class, DevicePolicy::class);
+        Gate::policy(Menu::class, MenuPolicy::class);
+        Gate::policy(Permission::class, PermissionPolicy::class);
+        Gate::policy(Role::class, RolePolicy::class);
+        Gate::policy(User::class, UserPolicy::class);
     }
 }
