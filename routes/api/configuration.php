@@ -25,10 +25,10 @@ JsonApiRoute::server('v1')->middleware('validate.api')->resources(function (Reso
     Route::middleware('verify.user.role')->group(function () {
         // Routes for devices
         Route::prefix('device')->group(function () {
-            Route::get('/', [DeviceController::class, 'readDevice'])->name('device.index')->middleware(['verify.user.role', 'verify.user.permission:View Device']);
-            Route::post('/', [DeviceController::class, 'createDevice'])->name('device.create')->middleware(['verify.user.role', 'verify.user.permission:Create Device']);
-            Route::patch('/', [DeviceController::class, 'updateDevice'])->name('device.update')->middleware(['verify.user.role', 'verify.user.permission:Edit Device']);
-            Route::delete('/', [DeviceController::class, 'deleteDevice'])->name('device.delete')->middleware(['verify.user.role', 'verify.user.permission:Delete Device']);
+            Route::get('/', [DeviceController::class, 'readDevice'])->name('device.index')->middleware('verify.user.permission:View Device');
+            Route::post('/', [DeviceController::class, 'createDevice'])->name('device.create')->middleware('verify.user.permission:Create Device');
+            Route::patch('/', [DeviceController::class, 'updateDevice'])->name('device.update')->middleware('verify.user.permission:Edit Device');
+            Route::delete('/', [DeviceController::class, 'deleteDevice'])->name('device.delete')->middleware('verify.user.permission:Delete Device');
         });
     });
 });

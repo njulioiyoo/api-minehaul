@@ -9,9 +9,9 @@ use LaravelJsonApi\Eloquent\Fields\ID;
 use LaravelJsonApi\Eloquent\Fields\Number;
 use LaravelJsonApi\Eloquent\Fields\Str;
 use LaravelJsonApi\Eloquent\Filters\WhereIdIn;
+use LaravelJsonApi\Eloquent\Filters\Where;
 use LaravelJsonApi\Eloquent\Pagination\PagePagination;
 use LaravelJsonApi\Eloquent\Schema;
-use LaravelJsonApi\Eloquent\Filters\Where;
 
 class DeviceSchema extends Schema
 {
@@ -50,6 +50,10 @@ class DeviceSchema extends Schema
         return [
             WhereIdIn::make($this),
             Where::make('display_id'),
+            Where::make('status'),
+            Where::make('year'),
+            Where::make('device_type_id'),
+            Where::make('device_make_id'),
         ];
     }
 
