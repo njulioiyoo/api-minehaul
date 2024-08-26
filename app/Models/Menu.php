@@ -28,6 +28,11 @@ class Menu extends Model
         return $this->hasMany(RoleMenu::class, 'menu_id');
     }
 
+    public function permissionMenu()
+    {
+        return $this->hasMany(PermissionMenu::class, 'menu_id');
+    }
+
     // Relasi belongsToMany ke Spatie\Permission\Models\Role
     public function roles()
     {

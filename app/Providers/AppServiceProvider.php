@@ -37,8 +37,8 @@ class AppServiceProvider extends ServiceProvider
         // Mengatur masa berlaku token personal
         Passport::personalAccessTokensExpireIn(now()->addDays(7)); // Personal Access Token expired in 7 days
 
-        Gate::policy(Device::class, DevicePolicy::class);
-        Gate::policy(Permission::class, PermissionPolicy::class);
-        Gate::policy(Role::class, RolePolicy::class);
+        // Gate::policy(Device::class, DevicePolicy::class);
+        // Gate::policy(Permission::class, PermissionPolicy::class);
+        // Gate::policy(Role::class, RolePolicy::class);
     }
 }

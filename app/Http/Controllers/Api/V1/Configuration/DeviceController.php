@@ -9,6 +9,7 @@ use App\Services\Configuration\Device\DeviceService;
 use App\Services\HeaderService;
 use App\Services\RequestHelperService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DeviceController extends Controller
 {

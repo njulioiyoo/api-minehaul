@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\JsonApi\V1\Configurations\Device;
 
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 use LaravelJsonApi\Laravel\Http\Requests\ResourceRequest;
 
 class DeviceRequest extends ResourceRequest
