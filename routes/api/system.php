@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\System\MenuController;
+use App\Http\Controllers\Api\V1\System\PermissionController;
 use App\Http\Controllers\Api\V1\System\RoleController;
 use App\Http\Controllers\Api\V1\System\UserController;
 use Illuminate\Support\Facades\Route;
@@ -22,9 +23,10 @@ use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 */
 
 JsonApiRoute::server('v1')->middleware('validate.api')->resources(function (ResourceRegistrar $server) {
-    $server->resource('roles', JsonApiController::class);
-    $server->resource('menus', JsonApiController::class);
     $server->resource('users', JsonApiController::class);
+    $server->resource('menus', JsonApiController::class);
+    $server->resource('roles', JsonApiController::class);
+    $server->resource('permissions', JsonApiController::class);
 
     Route::middleware('verify.user.role')->group(function () {
         // Routes for roles
@@ -33,6 +35,14 @@ JsonApiRoute::server('v1')->middleware('validate.api')->resources(function (Reso
             Route::post('/', [RoleController::class, 'createRole'])->name('role.create')->middleware('verify.user.permission:Create Roles');
             Route::patch('/', [RoleController::class, 'updateRole'])->name('role.update')->middleware('verify.user.permission:Edit Roles');
             Route::delete('/', [RoleController::class, 'deleteRole'])->name('role.delete')->middleware('verify.user.permission:Delete Roles');
+        });
+
+        // Routes for permissions
+        Route::prefix('permission')->group(function () {
+            Route::get('/', [PermissionController::class, 'readPermission'])->name('permission.index')->middleware('verify.user.permission:View Permissions');
+            Route::post('/', [PermissionController::class, 'createPermission'])->name('permission.create')->middleware('verify.user.permission:View Permissions');
+            Route::patch('/', [PermissionController::class, 'updatePermission'])->name('permission.update')->middleware('verify.user.permission:View Permissions');
+            Route::delete('/', [PermissionController::class, 'deletePermission'])->name('permission.delete')->middleware('verify.user.permission:View Permissions');
         });
 
         // Routes for users

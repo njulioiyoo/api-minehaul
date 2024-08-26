@@ -20,7 +20,10 @@ class ApiTokenController extends Controller
     {
         $user = Auth::user();
         if (! $user) {
-            return response()->json(['message' => 'Unauthenticated'], 401);
+            return response()->json([
+                'error' => 'Unauthorized',
+                'message' => 'You must be logged in to access this resource.',
+            ], 401);
         }
 
         // Buat token baru

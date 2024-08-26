@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use LaravelJsonApi\Core\Document\Error;
 use Symfony\Component\HttpFoundation\Response;
-use LaravelJsonApi\Core\Responses\DataResponse;
 
 class AuthController extends Controller
 {
