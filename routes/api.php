@@ -34,6 +34,11 @@ Route::middleware('auth:api')->group(function () {
     // require base_path('routes/api/system.php');
 
     JsonApiRoute::server('v1')->middleware('validate.api')->resources(function (ResourceRegistrar $server) {
+        $server->resource('devices', JsonApiController::class);
+        $server->resource('roles', JsonApiController::class);
+        $server->resource('permissions', JsonApiController::class);
+        $server->resource('users', JsonApiController::class);
+        $server->resource('menus', JsonApiController::class);
 
         Route::get('me', [ProfileController::class, 'readProfile']);
         Route::patch('me', [ProfileController::class, 'updateProfile']);
@@ -41,18 +46,12 @@ Route::middleware('auth:api')->group(function () {
         Route::patch('users/{user}/roles', [AccessController::class, 'updateUserRoles']);
         Route::patch('roles/{role}/permissions', [AccessController::class, 'updateRolePermissions']);
 
-        $server->resource('devices', JsonApiController::class);
-        $server->resource('roles', JsonApiController::class);
-        $server->resource('permissions', JsonApiController::class);
-        $server->resource('users', JsonApiController::class);
-        $server->resource('menus', JsonApiController::class);
-
         Route::middleware('verify.user.role')->group(function () {
             Route::prefix('device')->group(function () {
-                Route::get('/', [DeviceController::class, 'readDevice'])->name('device.index')->middleware('verify.user.permission:View Device');
-                Route::post('/', [DeviceController::class, 'createDevice'])->name('device.create')->middleware('verify.user.permission:Create Device');
-                Route::patch('/', [DeviceController::class, 'updateDevice'])->name('device.update')->middleware('verify.user.permission:Edit Device');
-                Route::delete('/', [DeviceController::class, 'deleteDevice'])->name('device.delete')->middleware('verify.user.permission:Delete Device');
+                Route::get('/', [DeviceController::class, 'readDevice'])->name('device.index');
+                Route::post('/', [DeviceController::class, 'createDevice'])->name('device.create');
+                Route::patch('/', [DeviceController::class, 'updateDevice'])->name('device.update');
+                Route::delete('/', [DeviceController::class, 'deleteDevice'])->name('device.delete');
             });
 
             // Routes for roles
@@ -73,10 +72,10 @@ Route::middleware('auth:api')->group(function () {
 
             // Routes for users
             Route::prefix('user')->group(function () {
-                Route::get('/', [UserController::class, 'readUser'])->name('user.index')->middleware('verify.user.permission:View Users');
-                Route::post('/', [UserController::class, 'createUser'])->name('user.create')->middleware('verify.user.permission:Create Users');
-                Route::patch('/', [UserController::class, 'updateUser'])->name('user.update')->middleware('verify.user.permission:Edit Users');
-                Route::delete('/', [UserController::class, 'deleteUser'])->name('user.delete')->middleware('verify.user.permission:Delete Users');
+                Route::get('/', [UserController::class, 'readUser'])->name('user.index');
+                Route::post('/', [UserController::class, 'createUser'])->name('user.create');
+                Route::patch('/', [UserController::class, 'updateUser'])->name('user.update');
+                Route::delete('/', [UserController::class, 'deleteUser'])->name('user.delete');
             });
 
             // Routes for menus
