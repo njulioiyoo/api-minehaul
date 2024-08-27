@@ -32,6 +32,7 @@ class HttpService
             return response()->json($responseBody, $responseStatus)
                 ->withHeaders($responseHeaders);
         } catch (ClientException $e) {
+            dd($e);
             Log::error("ClientException: {$e->getMessage()}");
             $responseBody = json_decode($e->getResponse()->getBody()->getContents(), true);
             $errors = $responseBody['errors'] ?? [];
