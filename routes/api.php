@@ -28,9 +28,6 @@ Route::middleware('auth:api')->group(function () {
     require base_path('routes/api/system.php');
 
     JsonApiRoute::server('v1')->middleware('validate.api')->resources(function (ResourceRegistrar $server) {
-        Route::get('me', [ProfileController::class, 'readProfile']);
-        Route::patch('me', [ProfileController::class, 'updateProfile']);
-
         Route::patch('users/{user}/roles', [AccessController::class, 'updateUserRoles']);
         Route::patch('roles/{role}/permissions', [AccessController::class, 'updateRolePermissions']);
     });
