@@ -55,12 +55,12 @@ JsonApiRoute::server('v1')->middleware('json.api')->resources(function (Resource
         //     });
 
         //     // Routes for users
-        //     Route::prefix('user')->group(function () {
-        //         Route::get('/', [UserController::class, 'readUser'])->name('user.index')->middleware('verify.user.permission:View Users');
-        //         Route::post('/', [UserController::class, 'createUser'])->name('user.create')->middleware('verify.user.permission:Create Users');
-        //         Route::patch('/', [UserController::class, 'updateUser'])->name('user.update')->middleware('verify.user.permission:Edit Users');
-        //         Route::delete('/', [UserController::class, 'deleteUser'])->name('user.delete')->middleware('verify.user.permission:Delete Users');
-        //     });
+        Route::prefix('user')->group(function () {
+            Route::get('/', [UserController::class, 'readUser'])->name('users.index')->middleware('verify.user.permission:View Users');
+            Route::post('/', [UserController::class, 'createUser'])->name('users.create')->middleware('verify.user.permission:Create Users');
+            Route::patch('/', [UserController::class, 'updateUser'])->name('users.update')->middleware('verify.user.permission:Edit Users');
+            Route::delete('/', [UserController::class, 'deleteUser'])->name('users.delete')->middleware('verify.user.permission:Delete Users');
+        });
 
         //     // Routes for menus
         //     Route::prefix('menu')->group(function () {

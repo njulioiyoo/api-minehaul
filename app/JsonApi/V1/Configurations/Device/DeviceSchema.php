@@ -20,6 +20,13 @@ class DeviceSchema extends Schema
      */
     public static string $model = Device::class;
 
+    /**
+     * Whether resources of this type have a self link.
+     *
+     * @var bool
+     */
+    protected bool $selfLink = false;
+
     protected ?array $defaultPagination = ['number' => 1];
 
     /**
@@ -37,7 +44,6 @@ class DeviceSchema extends Schema
             Number::make('year')->sortable(),
             Number::make('device_make_id')->sortable(),
             Number::make('device_model_id')->sortable(),
-            Number::make('status_id')->sortable(),
             Str::make('status')->sortable(),
         ];
     }
