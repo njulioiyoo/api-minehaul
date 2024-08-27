@@ -34,12 +34,13 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Passport::enablePasswordGrant();
-        // Mengatur masa berlaku token access dan refresh token
-        Passport::tokensExpireIn(now()->addHours(1)); // Access token expired in 1 hour
-        Passport::refreshTokensExpireIn(now()->addDays(3)); // Refresh token expired in 3 days
 
-        // Mengatur masa berlaku token personal
-        Passport::personalAccessTokensExpireIn(now()->addDays(7)); // Personal Access Token expired in 7 days
+        // Mengatur masa berlaku token access dan refresh token menjadi sebulan
+        Passport::tokensExpireIn(now()->addMonths(1)); // Access token expired in 1 month
+        Passport::refreshTokensExpireIn(now()->addMonths(1)); // Refresh token expired in 1 month
+
+        // Mengatur masa berlaku token personal menjadi sebulan
+        Passport::personalAccessTokensExpireIn(now()->addMonths(1)); // Personal Access Token expired in 1 month
 
         Gate::policy(Device::class, DevicePolicy::class);
         Gate::policy(Menu::class, MenuPolicy::class);
