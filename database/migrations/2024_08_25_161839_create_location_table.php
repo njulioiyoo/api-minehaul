@@ -12,14 +12,14 @@ return new class extends Migration
     {   
         if (Schema::hasTable('locations')) {
 
-            Schema::table('locations', function (Blueprint $table) {
-                $table->dropColumn('geom');
-            });
+            // Schema::table('locations', function (Blueprint $table) {
+            //     $table->dropColumn('geom');
+            // });
 
-            $postgisExists = DB::select("SELECT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'postgis') AS exists");
-            if ($postgisExists[0]->exists) {
-                DB::statement('DROP EXTENSION postgis');
-            }
+            // $postgisExists = DB::select("SELECT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'postgis') AS exists");
+            // if ($postgisExists[0]->exists) {
+            //     DB::statement('DROP EXTENSION postgis');
+            // }
             Schema::drop('locations');
         }
 
@@ -37,7 +37,7 @@ return new class extends Migration
             $table->string('name');
             $table->text('address')->nullable()->default(null);;
             $table->enum('geom_type', ['Polygon', 'Point'])->nullable()->default(null);;
-            $table->geometry('geom')->nullable()->default(null);;
+            $table->longText('geom')->nullable()->default(null);;
             $table->float('radius')->nullable()->default(null);;
 
             $table->integer('created_by')->nullable()->default(null);
