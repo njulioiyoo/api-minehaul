@@ -48,7 +48,7 @@ class DeviceService
         return $device;
     }
 
-    public function readDevice(array $queryParams, array $headers)
+    public function readDevice(array $queryParams)
     {
         // Define default pagination parameters
         $perPage = $queryParams['page']['size'] ?? 15;
@@ -173,7 +173,7 @@ class DeviceService
         return $device;
     }
 
-    public function deleteDevice(string $deviceUid, array $inputData, array $headers, array $queryParams)
+    public function deleteDevice(string $deviceUid)
     {
         $device = Device::find($deviceUid);
 

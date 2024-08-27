@@ -30,7 +30,6 @@ class DeviceController extends Controller
 
     public function createDevice(Request $request)
     {
-        $headers = $this->headerService->prepareHeaders($request);
         // Extract input and queryParams
         $input = $request->input(); // This should now be the full request payload
 
@@ -69,11 +68,10 @@ class DeviceController extends Controller
 
     public function readDevice(Request $request)
     {
-        $headers = $this->headerService->prepareHeaders($request);
         $queryParams = $request->query();
 
         try {
-            $response = $this->deviceService->readDevice($queryParams, $headers);
+            $response = $this->deviceService->readDevice($queryParams);
             return response()->json($response);
         } catch (\Exception $e) {
             Log::error("Error reading devices: {$e->getMessage()}");
@@ -123,11 +121,10 @@ class DeviceController extends Controller
 
     public function deleteDevice(Request $request)
     {
-        $headers = $this->headerService->prepareHeaders($request);
         [$input, $deviceUid, $queryParams] = $this->requestHelperService->getInputAndId($request, 'devices', true);
 
         try {
-            $this->deviceService->deleteDevice($deviceUid, $input, $headers, $queryParams);
+            $this->deviceService->deleteDevice($deviceUid);
             return response()->json(['message' => 'Device deleted successfully.']);
         } catch (\Exception $e) {
             Log::error("Error deleting device: {$e->getMessage()}");
