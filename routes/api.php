@@ -16,14 +16,14 @@ Route::middleware('json.api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth:api');
 });
 
-// Route::middleware('auth:api')->group(function () {
-Route::get('/get-users', function () {
-    $users = User::all();
-    return response()->json($users);
+Route::middleware('auth:api')->group(function () {
+    Route::get('/get-users', function () {
+        $users = User::all();
+        return response()->json($users);
+    });
+
+    Route::post('/api-token', [ApiTokenController::class, 'generateToken']);
+
+    require base_path('routes/api/configuration.php');
+    require base_path('routes/api/system.php');
 });
-
-Route::post('/api-token', [ApiTokenController::class, 'generateToken']);
-
-require base_path('routes/api/configuration.php');
-require base_path('routes/api/system.php');
-// });
