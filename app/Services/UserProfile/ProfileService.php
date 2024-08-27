@@ -22,7 +22,7 @@ class ProfileService
             'query' => $queryParams,
         ];
 
-        return $this->httpService->handleRequest('get', route('v1.users.show', ['user' => $userId]), $data);
+        return $this->httpService->handleRequest('get', route('v1.users.show', ['user' => '1']), $data);
     }
 
     public function updateProfile($userId, $inputData, $headers, $queryParams)
