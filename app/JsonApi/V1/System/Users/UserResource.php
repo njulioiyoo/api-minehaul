@@ -19,8 +19,6 @@ class UserResource extends JsonApiResource
             'username' => $this->username,
             'person_id' => $this->person_id,
             'email' => $this->email,
-            // 'created_at' => $this->created_at,
-            // 'updated_at' => $this->updated_at,
             'roles' => $this->roles->map(fn($role) => $this->transformRole($role)),
             'menus' => $this->getMenusForRole(),
             'account' => $this->persons?->account,
@@ -38,15 +36,9 @@ class UserResource extends JsonApiResource
         return [
             'id' => $role->id,
             'name' => $role->name,
-            // 'guard_name' => $role->guard_name,
-            // 'created_at' => $role->created_at,
-            // 'updated_at' => $role->updated_at,
             'permissions' => $role->permissions->map(fn($permission) => [
                 'id' => $permission->id,
                 'name' => $permission->name,
-                // 'guard_name' => $permission->guard_name,
-                // 'created_at' => $permission->created_at,
-                // 'updated_at' => $permission->updated_at,
             ]),
         ];
     }

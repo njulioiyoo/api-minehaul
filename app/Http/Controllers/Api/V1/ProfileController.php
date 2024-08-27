@@ -1,44 +1,83 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Services\HeaderService;
 use App\Services\UserProfile\ProfileService;
 use Illuminate\Http\Request;
+use LaravelJsonApi\Core\Responses\DataResponse;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
+use LaravelJsonApi\Core\Document\Error;
+use LaravelJsonApi\Core\Responses\ErrorResponse;
 
 class ProfileController extends Controller
 {
-    protected $headerService;
-
     protected $profileService;
 
-    public function __construct(HeaderService $headerService, ProfileService $profileService)
+    public function __construct(ProfileService $profileService)
     {
-        $this->headerService = $headerService;
         $this->profileService = $profileService;
     }
 
     public function readProfile(Request $request)
     {
-        $headers = $this->headerService->prepareHeaders($request);
-        $queryParams = $request->query();
+        $userId = auth()->id(); // Get the authenticated user ID
 
-        return $this->profileService->readProfile(auth()->id(), $queryParams, $headers);
+        try {
+            // Fetch the user profile directly from the service
+            $user = $this->profileService->readProfile($userId);
+
+            // Return a DataResponse with the user data
+            return new DataResponse($user);
+        } catch (\Exception $e) {
+            // Log the error
+            Log::error("Error reading profile: {$e->getMessage()}");
+
+            // Return a generic error response
+            return new ErrorResponse(collect([
+                Error::fromArray([
+                    'status' => '404',
+                    'title' => 'Not Found',
+                    'detail' => 'The user profile could not be found.'
+                ])
+            ]));
+        }
     }
 
+    /**
+     * Update the authenticated user's profile.
+     *
+     * @param Request $request
+     * @return DataResponse|ErrorResponse
+     */
     public function updateProfile(Request $request)
     {
-        $headers = $this->headerService->prepareHeaders($request);
+        try {
+            // Validate and update the profile through the service
+            $user = $this->profileService->updateProfile($request->all());
 
-        $input = $request->json()->all();
-        $input['data']['id'] = (string) auth()->id();
-        $input['data']['type'] = 'users';
+            // Return a DataResponse with the updated user data
+            return new DataResponse($user);
+        } catch (ValidationException $e) {
+            // Log the error
+            Log::error("ValidationException: {$e->getMessage()}");
 
-        $queryParams = $request->query();
+            // Return JSON:API Error Response using the service method
+            return $this->profileService->formatValidationErrors($e->validator);
+        } catch (\Exception $e) {
+            // Log unexpected errors
+            Log::error("Unexpected Exception: {$e->getMessage()}");
 
-        return $this->profileService->updateProfile(auth()->id(), $input, $headers, $queryParams);
+            // Return a generic error response
+            return new ErrorResponse(collect([
+                Error::fromArray([
+                    'status' => '500',
+                    'title' => 'Unexpected Error',
+                    'detail' => 'An unexpected error occurred.'
+                ])
+            ]));
+        }
     }
 }

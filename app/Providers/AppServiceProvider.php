@@ -12,7 +12,9 @@ use App\Policies\MenuPolicy;
 use App\Policies\PermissionPolicy;
 use App\Policies\RolePolicy;
 use App\Policies\UserPolicy;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passport\Passport;
 use Spatie\Permission\Models\Permission;
@@ -33,6 +35,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        DB::listen(function ($query) {
+            Log::info($query->sql, $query->bindings);
+        });
+
         Passport::enablePasswordGrant();
 
         // Mengatur masa berlaku token access dan refresh token menjadi sebulan
@@ -42,10 +48,10 @@ class AppServiceProvider extends ServiceProvider
         // Mengatur masa berlaku token personal menjadi sebulan
         Passport::personalAccessTokensExpireIn(now()->addMonths(1)); // Personal Access Token expired in 1 month
 
-        Gate::policy(Device::class, DevicePolicy::class);
-        Gate::policy(Menu::class, MenuPolicy::class);
-        Gate::policy(Permission::class, PermissionPolicy::class);
-        Gate::policy(Role::class, RolePolicy::class);
-        Gate::policy(User::class, UserPolicy::class);
+        // Gate::policy(Device::class, DevicePolicy::class);
+        // Gate::policy(Menu::class, MenuPolicy::class);
+        // Gate::policy(Permission::class, PermissionPolicy::class);
+        // Gate::policy(Role::class, RolePolicy::class);
+        // Gate::policy(User::class, UserPolicy::class);
     }
 }
