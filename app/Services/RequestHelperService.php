@@ -9,7 +9,7 @@ class RequestHelperService
     public function getInputAndId($request, $type, $includeId = false)
     {
         $input = $request->json()->all();
-        $dataId = $includeId && isset($input['data']['uid']) ? $input['data']['uid'] : null;
+        $dataId = $includeId && isset($input['data']['id']) ? $input['data']['id'] : null;
         $input['data']['type'] = $type;
 
         $queryParams = $request->query();

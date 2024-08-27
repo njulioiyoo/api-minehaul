@@ -19,8 +19,8 @@ use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 |
 */
 
-JsonApiRoute::server('v1')->middleware('validate.api')->resources(function (ResourceRegistrar $server) {
-    $server->resource('devices', JsonApiController::class);
+JsonApiRoute::server('v1')->middleware('validate.api', 'json.api')->resources(function (ResourceRegistrar $server) {
+    // $server->resource('devices', JsonApiController::class);
 
     Route::middleware('verify.user.role')->group(function () {
         // Routes for devices
