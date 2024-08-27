@@ -25,7 +25,7 @@ class ProfileController extends Controller
     {
         $headers = $this->headerService->prepareHeaders($request);
         $queryParams = $request->query();
-
+        dd(auth()->id());
         return $this->profileService->readProfile(auth()->id(), $queryParams, $headers);
     }
 
