@@ -20,12 +20,21 @@ class JsonApi
         // Get JSON body
         $input = $request->json()->all();
 
-        // Check if the input has the 'data' key and 'attributes'
-        if (isset($input['data']['attributes'])) {
-            $attributes = $input['data']['attributes'];
+        // Check if the input has the 'data' key
+        if (isset($input['data'])) {
+            $attributes = $input['data']['attributes'] ?? [];
+            $id = $input['data']['id'] ?? null;
 
-            // Replace request data with attributes
-            $request->replace($attributes);
+            // Merge attributes with the original request data
+            $requestData = $attributes;
+
+            // If there's an id, include it in the request data
+            if ($id) {
+                $requestData['id'] = $id;
+            }
+
+            // Replace request data with attributes and id
+            $request->merge($requestData);
         }
 
         return $next($request);

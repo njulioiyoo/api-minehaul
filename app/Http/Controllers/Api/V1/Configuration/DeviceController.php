@@ -9,14 +9,16 @@ use App\Services\Configuration\Device\DeviceService;
 use App\Services\HeaderService;
 use App\Services\RequestHelperService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use LaravelJsonApi\Core\Document\Error;
+use LaravelJsonApi\Core\Responses\ErrorResponse;
+use LaravelJsonApi\Core\Responses\DataResponse;
+use Illuminate\Validation\ValidationException;
 
 class DeviceController extends Controller
 {
     protected $deviceService;
-
     protected $headerService;
-
     protected $requestHelperService;
 
     public function __construct(DeviceService $deviceService, HeaderService $headerService, RequestHelperService $requestHelperService)
@@ -29,9 +31,40 @@ class DeviceController extends Controller
     public function createDevice(Request $request)
     {
         $headers = $this->headerService->prepareHeaders($request);
-        [$input, $deviceId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'devices');
+        // Extract input and queryParams
+        $input = $request->input(); // This should now be the full request payload
 
-        return $this->deviceService->createDevice($input, $headers, $queryParams);
+        try {
+            // Validate the input data
+            $device = $this->deviceService->createDevice($input);
+
+            // Return a DataResponse with the created device
+            return new DataResponse($device);
+        } catch (ValidationException $e) {
+            // Log the validation error
+            Log::error("ValidationException: {$e->getMessage()}");
+
+            // Return JSON:API Error Response with validation errors
+            return new ErrorResponse(collect($e->errors())->map(function ($error) {
+                return Error::fromArray([
+                    'status' => '422',
+                    'title' => 'Validation Error',
+                    'detail' => $error[0],
+                ]);
+            }));
+        } catch (\Exception $e) {
+            // Log unexpected errors
+            Log::error("Unexpected Exception: {$e->getMessage()}");
+
+            // Return a generic error response
+            return new ErrorResponse(collect([
+                Error::fromArray([
+                    'status' => '500',
+                    'title' => 'Internal Server Error',
+                    'detail' => 'An unexpected error occurred while creating the device.'
+                ])
+            ]));
+        }
     }
 
     public function readDevice(Request $request)
@@ -39,16 +72,53 @@ class DeviceController extends Controller
         $headers = $this->headerService->prepareHeaders($request);
         $queryParams = $request->query();
 
-        return $this->deviceService->readDevice($queryParams, $headers);
+        try {
+            $response = $this->deviceService->readDevice($queryParams, $headers);
+            return response()->json($response);
+        } catch (\Exception $e) {
+            Log::error("Error reading devices: {$e->getMessage()}");
+            return new ErrorResponse(collect([
+                Error::fromArray([
+                    'status' => '500',
+                    'title' => 'Internal Server Error',
+                    'detail' => 'An error occurred while reading the devices.'
+                ])
+            ]));
+        }
     }
 
     public function updateDevice(Request $request)
     {
-        $headers = $this->headerService->prepareHeaders($request);
         [$input, $deviceUid, $queryParams] = $this->requestHelperService->getInputAndId($request, 'devices', true);
 
-        // Panggil metode updateDevice dengan ID yang diperoleh
-        return $this->deviceService->updateDevice($deviceUid, $input, $headers, $queryParams);
+        try {
+            $device = $this->deviceService->updateDevice($deviceUid, $input);
+            return new DataResponse($device);
+        } catch (ValidationException $e) {
+            // Log the validation error
+            Log::error("ValidationException: {$e->getMessage()}");
+
+            // Return JSON:API Error Response with validation errors
+            return new ErrorResponse(collect($e->errors())->map(function ($error) {
+                return Error::fromArray([
+                    'status' => '422',
+                    'title' => 'Validation Error',
+                    'detail' => $error[0],
+                ]);
+            }));
+        } catch (\Exception $e) {
+            // Log unexpected errors
+            Log::error("Unexpected Exception: {$e->getMessage()}");
+
+            // Return a generic error response
+            return new ErrorResponse(collect([
+                Error::fromArray([
+                    'status' => '500',
+                    'title' => 'Internal Server Error',
+                    'detail' => 'An unexpected error occurred while creating the device.'
+                ])
+            ]));
+        }
     }
 
     public function deleteDevice(Request $request)
@@ -56,7 +126,18 @@ class DeviceController extends Controller
         $headers = $this->headerService->prepareHeaders($request);
         [$input, $deviceUid, $queryParams] = $this->requestHelperService->getInputAndId($request, 'devices', true);
 
-        // Panggil metode deleteDevice dengan ID yang diperoleh
-        return $this->deviceService->deleteDevice($deviceUid, $input, $headers, $queryParams);
+        try {
+            $this->deviceService->deleteDevice($deviceUid, $input, $headers, $queryParams);
+            return response()->json(['message' => 'Device deleted successfully.']);
+        } catch (\Exception $e) {
+            Log::error("Error deleting device: {$e->getMessage()}");
+            return new ErrorResponse(collect([
+                Error::fromArray([
+                    'status' => '500',
+                    'title' => 'Internal Server Error',
+                    'detail' => 'An error occurred while deleting the device.'
+                ])
+            ]));
+        }
     }
 }
