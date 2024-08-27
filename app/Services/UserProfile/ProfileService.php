@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services\UserProfile;
 
+use App\Models\User;
 use App\Services\HttpService;
+use LaravelJsonApi\Core\Responses\DataResponse;
 
 class ProfileService
 {
@@ -17,12 +19,9 @@ class ProfileService
 
     public function readProfile($userId, $queryParams, $headers)
     {
-        $data = [
-            'headers' => $headers,
-            'query' => $queryParams,
-        ];
+        $user = User::findOrFail($userId);
 
-        return $this->httpService->handleRequest('get', route('v1.users.show', ['user' => '1']), $data);
+        return new DataResponse($user);
     }
 
     public function updateProfile($userId, $inputData, $headers, $queryParams)
