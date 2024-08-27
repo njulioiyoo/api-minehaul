@@ -21,6 +21,7 @@ class HttpService
 
     public function handleRequest($method, $url, $data)
     {
+        // dd($method, $url, $data);
         try {
             $response = $this->httpClient->$method($url, array_merge($data, ['timeout' => 60]));
             $responseBody = json_decode((string) $response->getBody(), true);

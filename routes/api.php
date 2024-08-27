@@ -23,7 +23,7 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::post('/api-token', [ApiTokenController::class, 'generateToken']);
-
-    require base_path('routes/api/configuration.php');
-    require base_path('routes/api/system.php');
 });
+
+require base_path('routes/api/configuration.php');
+require base_path('routes/api/system.php');
