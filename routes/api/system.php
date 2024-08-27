@@ -24,7 +24,7 @@ use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 |
 */
 
-JsonApiRoute::server('v1')->middleware('validate.api')->resources(function (ResourceRegistrar $server) {
+JsonApiRoute::server('v1')->resources(function (ResourceRegistrar $server) {
     $server->resource('users', JsonApiController::class);
     $server->resource('menus', JsonApiController::class);
     $server->resource('roles', JsonApiController::class);
