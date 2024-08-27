@@ -24,20 +24,17 @@ use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 |
 */
 
-JsonApiRoute::server('v1')->resources(function (ResourceRegistrar $server) {
+JsonApiRoute::server('v1')->middleware('validate.api')->resources(function (ResourceRegistrar $server) {
     $server->resource('users', JsonApiController::class);
-    $server->resource('menus', JsonApiController::class);
-    $server->resource('roles', JsonApiController::class);
-    $server->resource('permissions', JsonApiController::class);
-
     Route::get('me', [ProfileController::class, 'readProfile']);
     Route::patch('me', [ProfileController::class, 'updateProfile']);
 
     Route::patch('users/{user}/roles', [AccessController::class, 'updateUserRoles']);
     Route::patch('roles/{role}/permissions', [AccessController::class, 'updateRolePermissions']);
 
-    Route::middleware('verify.user.role')->group(function () {
+    Route::middleware('verify.user.role')->group(function () use ($server) {
         // Routes for roles
+        $server->resource('roles', JsonApiController::class);
         Route::prefix('role')->group(function () {
             Route::get('/', [RoleController::class, 'readRole'])->name('role.index')->middleware('verify.user.permission:View Roles');
             Route::post('/', [RoleController::class, 'createRole'])->name('role.create')->middleware('verify.user.permission:Create Roles');
@@ -46,6 +43,7 @@ JsonApiRoute::server('v1')->resources(function (ResourceRegistrar $server) {
         });
 
         // Routes for permissions
+        $server->resource('permissions', JsonApiController::class);
         Route::prefix('permission')->group(function () {
             Route::get('/', [PermissionController::class, 'readPermission'])->name('permission.index')->middleware('verify.user.permission:View Permissions');
             Route::post('/', [PermissionController::class, 'createPermission'])->name('permission.create')->middleware('verify.user.permission:View Permissions');
@@ -54,6 +52,7 @@ JsonApiRoute::server('v1')->resources(function (ResourceRegistrar $server) {
         });
 
         // Routes for users
+        $server->resource('users', JsonApiController::class);
         Route::prefix('user')->group(function () {
             Route::get('/', [UserController::class, 'readUser'])->name('user.index')->middleware('verify.user.permission:View Users');
             Route::post('/', [UserController::class, 'createUser'])->name('user.create')->middleware('verify.user.permission:Create Users');
@@ -62,6 +61,7 @@ JsonApiRoute::server('v1')->resources(function (ResourceRegistrar $server) {
         });
 
         // Routes for menus
+        $server->resource('menus', JsonApiController::class);
         Route::prefix('menu')->group(function () {
             Route::get('/', [MenuController::class, 'index'])->name('menu.index')->middleware('verify.user.permission:View Menus');
             Route::post('/', [MenuController::class, 'createMenu'])->name('menu.create')->middleware('verify.user.permission:View Menus');
