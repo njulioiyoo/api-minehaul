@@ -9,6 +9,9 @@ use App\Services\HeaderService;
 use App\Services\RequestHelperService;
 use App\Services\System\User\UserService;
 use Illuminate\Http\Request;
+use LaravelJsonApi\Core\Responses\ErrorResponse;
+use Illuminate\Support\Facades\Log;
+use LaravelJsonApi\Core\Document\Error;
 
 class UserController extends Controller
 {
@@ -35,10 +38,27 @@ class UserController extends Controller
 
     public function readUser(Request $request)
     {
-        $headers = $this->headerService->prepareHeaders($request);
+        // $headers = $this->headerService->prepareHeaders($request);
+        // $queryParams = $request->query();
+
+        // return $this->userService->readUserV2($queryParams, $headers);
+
         $queryParams = $request->query();
 
-        return $this->userService->readUser($queryParams, $headers);
+        try {
+            $response = $this->userService->readUser($queryParams);
+            return response()->json($response);
+        } catch (\Exception $e) {
+            dd($e);
+            Log::error("Error reading user: {$e->getMessage()}");
+            return new ErrorResponse(collect([
+                Error::fromArray([
+                    'status' => '500',
+                    'title' => 'Internal Server Error',
+                    'detail' => 'An error occurred while reading the user.'
+                ])
+            ]));
+        }
     }
 
     public function updateUser(Request $request)
