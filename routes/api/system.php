@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\ProfileController;
+use App\Http\Controllers\Api\V1\System\AccessController;
 use App\Http\Controllers\Api\V1\System\MenuController;
 use App\Http\Controllers\Api\V1\System\PermissionController;
 use App\Http\Controllers\Api\V1\System\RoleController;
@@ -31,6 +32,9 @@ JsonApiRoute::server('v1')->middleware('validate.api')->resources(function (Reso
 
     Route::get('me', [ProfileController::class, 'readProfile']);
     Route::patch('me', [ProfileController::class, 'updateProfile']);
+
+    Route::patch('users/{user}/roles', [AccessController::class, 'updateUserRoles']);
+    Route::patch('roles/{role}/permissions', [AccessController::class, 'updateRolePermissions']);
 
     Route::middleware('verify.user.role')->group(function () {
         // Routes for roles
