@@ -12,14 +12,13 @@ use App\Services\RequestHelperService;
 use App\Services\System\Menu\MenuService;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Responses\DataResponse;
-use Illuminate\Support\Facades\Log;
-use LaravelJsonApi\Core\Responses\ErrorResponse;
-use LaravelJsonApi\Core\Document\Error;
+use App\Traits\ExceptionHandlerTrait;
 
 class MenuController extends Controller
 {
-    protected $requestHelperService;
+    use ExceptionHandlerTrait;
 
+    protected $requestHelperService;
     protected $menuService;
 
     public function __construct(RequestHelperService $requestHelperService, MenuService $menuService)
@@ -30,24 +29,36 @@ class MenuController extends Controller
 
     public function createMenu(StoreMenuRequest $request)
     {
-        $validatedData = $request->validated();
-        $menu = $this->menuService->createMenu($validatedData);
+        try {
+            $validatedData = $request->validated();
+            $menu = $this->menuService->createMenu($validatedData);
 
-        return new DataResponse($menu);
+            return new DataResponse($menu);
+        } catch (\Exception $e) {
+            return $this->handleException($e, 'Error creating menu');
+        }
     }
 
     public function readMenu()
     {
-        return new DataResponse((new Menu)->getTree());
+        try {
+            return new DataResponse((new Menu)->getTree());
+        } catch (\Exception $e) {
+            return $this->handleException($e, 'Error reading menu');
+        }
     }
 
     public function updateMenu(UpdateMenuRequest $request)
     {
-        $validatedData = $request->validated();
-        [$input, $menuId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'menus', true);
-        $menu = $this->menuService->updateMenu($menuId, $validatedData);
+        try {
+            $validatedData = $request->validated();
+            [$input, $menuId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'menus', true);
+            $menu = $this->menuService->updateMenu($menuId, $validatedData);
 
-        return new DataResponse($menu);
+            return new DataResponse($menu);
+        } catch (\Exception $e) {
+            return $this->handleException($e, 'Error updating menu');
+        }
     }
 
     public function deleteMenu(Request $request)
@@ -58,14 +69,7 @@ class MenuController extends Controller
             $this->menuService->deleteMenu($menuId);
             return response()->json(['message' => 'Menu deleted successfully.']);
         } catch (\Exception $e) {
-            Log::error("Error deleting menu: {$e->getMessage()}");
-            return new ErrorResponse(collect([
-                Error::fromArray([
-                    'status' => '500',
-                    'title' => 'Internal Server Error',
-                    'detail' => $e->getMessage()
-                ])
-            ]));
+            return $this->handleException($e, 'Error deleting menu');
         }
     }
 }

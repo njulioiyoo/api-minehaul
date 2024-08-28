@@ -24,6 +24,8 @@ class StoreUserRequest extends FormRequest
         return [
             'username' => ['required', 'string', 'regex:/^[a-zA-Z0-9._-]{3,20}$/'],
             'person_id' => ['required', 'string', 'regex:/^\d+$/'],
+            'roles' => ['required', 'array'],
+            'roles.*' => ['integer'],
             'email' => [
                 'required',
                 'email',

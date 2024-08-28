@@ -9,6 +9,7 @@ use App\Services\HttpService;
 use App\Helpers\PaginationHelper;
 use App\Transformers\UserTransformer;
 use Illuminate\Support\Facades\Log;
+use Spatie\Permission\Models\Role;
 
 class UserService
 {
@@ -21,12 +22,27 @@ class UserService
         $this->transformer = $transformer;
     }
 
-    public function createUser(array $inputData)
+    public function createUser(array $inputData, array $roles = [])
     {
         $user = User::create($inputData);
 
         if (!$user) {
             throw new \Exception('Failed to create user');
+        }
+
+        if (!empty($roles)) {
+            $user->syncRoles($roles);
+
+            $permissions = Role::whereIn('id', $roles)
+                ->with('permissions:id,name')
+                ->get()
+                ->pluck('permissions')
+                ->flatten()
+                ->pluck('name')
+                ->unique()
+                ->toArray();
+
+            $user->syncPermissions($permissions);
         }
 
         return $user;
@@ -54,7 +70,7 @@ class UserService
         return PaginationHelper::format($users, $data);
     }
 
-    public function updateUser(string $userId, array $inputData)
+    public function updateUser(string $userId, array $inputData, array $roles = [])
     {
         $user = User::find($userId);
 
@@ -63,6 +79,21 @@ class UserService
         }
 
         $user->update($inputData);
+
+        if (!empty($roles)) {
+            $user->syncRoles($roles);
+
+            $permissions = Role::whereIn('id', $roles)
+                ->with('permissions:id,name')
+                ->get()
+                ->pluck('permissions')
+                ->flatten()
+                ->pluck('name')
+                ->unique()
+                ->toArray();
+
+            $user->syncPermissions($permissions);
+        }
 
         return $user;
     }

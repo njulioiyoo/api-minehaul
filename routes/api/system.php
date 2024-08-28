@@ -28,7 +28,6 @@ JsonApiRoute::server('v1')->middleware('json.api')->resources(function () {
 
     Route::middleware('verify.user.role', 'validate.api')->group(function () {
 
-        Route::patch('users/{user}/roles', [AccessController::class, 'updateUserRoles']);
         Route::patch('roles/{role}/permissions', [AccessController::class, 'updateRolePermissions']);
 
         // Routes for roles
