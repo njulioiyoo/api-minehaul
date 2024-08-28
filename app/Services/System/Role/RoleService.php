@@ -18,12 +18,16 @@ class RoleService
         $this->transformer = $transformer;
     }
 
-    public function createRole(array $inputData)
+    public function createRole(array $inputData, array $permissions = [])
     {
         $role = Role::create($inputData);
 
         if (!$role) {
             throw new \Exception('Failed to create role');
+        }
+
+        if (!empty($permissions)) {
+            $role->syncPermissions($permissions);
         }
 
         return $role;
@@ -51,7 +55,7 @@ class RoleService
         return PaginationHelper::format($roles, $data);
     }
 
-    public function updateRole(string $roleId, array $inputData)
+    public function updateRole(string $roleId, array $inputData, array $permissions = [])
     {
         $role = Role::find($roleId);
 
@@ -60,6 +64,10 @@ class RoleService
         }
 
         $role->update($inputData);
+
+        if (!empty($permissions)) {
+            $role->syncPermissions($permissions);
+        }
 
         return $role;
     }

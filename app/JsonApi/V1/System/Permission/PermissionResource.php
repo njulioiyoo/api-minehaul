@@ -18,6 +18,7 @@ class PermissionResource extends JsonApiResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'permissions' => $this->permissions,
         ];
     }
 }

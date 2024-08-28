@@ -23,6 +23,8 @@ class StoreRoleRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'regex:/^[\p{L}0-9 ]+$/u'],
+            'permissions' => ['nullable', 'array'],
+            'permissions.*' => ['integer'],
         ];
     }
 }

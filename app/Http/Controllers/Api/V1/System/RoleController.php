@@ -30,7 +30,8 @@ class RoleController extends Controller
     {
         try {
             $validatedData = $request->validated();
-            $role = $this->roleService->createRole($validatedData);
+            $permissions = $validatedData['permissions'] ?? [];
+            $role = $this->roleService->createRole($validatedData, $permissions);
 
             return new DataResponse($role);
         } catch (\Exception $e) {
@@ -54,7 +55,9 @@ class RoleController extends Controller
         try {
             $validatedData = $request->validated();
             [$input, $roleId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'roles', true);
-            $role = $this->roleService->updateRole($roleId, $validatedData);
+            $permissions = $validatedData['permissions'] ?? [];
+
+            $role = $this->roleService->updateRole($roleId, $validatedData, $permissions);
 
             return new DataResponse($role);
         } catch (\Exception $e) {
