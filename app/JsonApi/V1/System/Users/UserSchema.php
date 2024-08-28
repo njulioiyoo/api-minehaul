@@ -13,6 +13,7 @@ use LaravelJsonApi\Eloquent\Fields\Str;
 use LaravelJsonApi\Eloquent\Filters\WhereIdIn;
 use LaravelJsonApi\Eloquent\Pagination\PagePagination;
 use LaravelJsonApi\Eloquent\Schema;
+use LaravelJsonApi\Eloquent\Filters\Where;
 
 class UserSchema extends Schema
 {
@@ -20,6 +21,13 @@ class UserSchema extends Schema
      * The model the schema corresponds to.
      */
     public static string $model = User::class;
+
+    /**
+     * Whether resources of this type have a self link.
+     *
+     * @var bool
+     */
+    protected bool $selfLink = false;
 
     protected ?array $defaultPagination = ['number' => 1];
 
@@ -36,11 +44,11 @@ class UserSchema extends Schema
             Str::make('password')->hidden(),
             Str::make('password_confirmation')->hidden(),
             DateTime::make('created_at')
-                ->serializeUsing(static fn (?Carbon $value) => $value?->format('Y-m-d H:i:s'))
+                ->serializeUsing(static fn(?Carbon $value) => $value?->format('Y-m-d H:i:s'))
                 ->sortable()
                 ->readOnly(),
             DateTime::make('updated_at')
-                ->serializeUsing(static fn (?Carbon $value) => $value?->format('Y-m-d H:i:s'))
+                ->serializeUsing(static fn(?Carbon $value) => $value?->format('Y-m-d H:i:s'))
                 ->readOnly(),
         ];
     }
@@ -52,6 +60,8 @@ class UserSchema extends Schema
     {
         return [
             WhereIdIn::make($this),
+            Where::make('username'),
+            Where::make('email'),
         ];
     }
 

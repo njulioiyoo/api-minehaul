@@ -12,7 +12,7 @@ class DeviceTransformer
     {
         return [
             'type' => 'devices',
-            'id' => $device->uid, // Assuming 'uid' is used as the ID in the response
+            'id' => $device->uid,
             'attributes' => [
                 'id' => $device->id,
                 'account' => $device->account ? [
@@ -43,10 +43,7 @@ class DeviceTransformer
                 'year' => $device->year,
                 'status' => $device->status,
                 'uid' => $device->uid,
-            ],
-            'links' => [
-                'self' => url("/api/v1/devices/{$device->uid}"),
-            ],
+            ]
         ];
     }
 }

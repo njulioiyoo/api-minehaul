@@ -6,137 +6,76 @@ namespace App\Services\System\User;
 
 use App\Models\User;
 use App\Services\HttpService;
+use App\Helpers\PaginationHelper;
+use App\Transformers\UserTransformer;
+use Illuminate\Support\Facades\Log;
 
 class UserService
 {
     protected $httpService;
+    protected $transformer;
 
-    public function __construct(HttpService $httpService)
+    public function __construct(HttpService $httpService, UserTransformer $transformer)
     {
         $this->httpService = $httpService;
+        $this->transformer = $transformer;
     }
 
-    public function createUser($inputData, $headers, $queryParams)
+    public function createUser(array $inputData)
     {
-        $data = [
-            'headers' => $headers,
-            'json' => $inputData,
-            'query' => $queryParams,
-        ];
+        $device = User::create($inputData);
 
-        return $this->httpService->handleRequest('post', route('v1.users.store'), $data);
+        if (!$device) {
+            throw new \Exception('Failed to create user');
+        }
+
+        return $device;
     }
 
     public function readUser(array $queryParams)
     {
-        // Define default pagination parameters
-        $perPage = $queryParams['page']['size'] ?? 15;
+        $perPage = $queryParams['page']['size'] ?? 10;
         $page = $queryParams['page']['number'] ?? 1;
 
-        // Fetch devices with relations
-        $query = User::with('userRoles');
+        $query = User::query();
 
-        // Apply filters if needed
         if (isset($queryParams['filter'])) {
             foreach ($queryParams['filter'] as $field => $value) {
                 $query->where($field, $value);
             }
         }
 
-        // Apply pagination
-        $user = $query->paginate($perPage, ['*'], 'page[number]', $page);
+        $devices = $query->paginate($perPage, ['*'], 'page[number]', $page);
 
-        // Transform data to include relations
-        $data = $user->map(function ($user) {
-            return [
-                'type' => 'users',
-                'id' => $user->id,
-                'attributes' => [
-                    'id' => $user->id,
-                    // 'roles' => $user?->roles ? [
-                    //     'id' => $user?->roles->id,
-                    //     'name' => $user?->roles->name,
-                    // ] : null,
-                    // 'pit' => $user->pit ? [
-                    //     'id' => $user->pit->id,
-                    //     'name' => $user->pit->name,
-                    //     'description' => $user->pit->description,
-                    // ] : null,
-                    // 'device_type' => $user->deviceType ? [
-                    //     'id' => $user->deviceType->id,
-                    //     'name' => $user->deviceType->name,
-                    // ] : null,
-                    // 'device_make' => $user->deviceMake ? [
-                    //     'id' => $user->deviceMake->id,
-                    //     'name' => $user->deviceMake->name,
-                    // ] : null,
-                    // 'device_model' => $user->deviceModel ? [
-                    //     'id' => $user->deviceModel->id,
-                    //     'name' => $user->deviceModel->name,
-                    // ] : null,
-                    'username' => $user->username,
-                    'person_id' => $user->person_id,
-                    'email' => $user->email,
-                ],
-                'links' => [
-                    'self' => url("/api/v1/users/{$user->uid}"),
-                ],
-            ];
-        });
+        $data = $devices->map(function ($device) {
+            return $this->transformer->transform($device);
+        })->values()->all(); // Convert to array
 
-        return [
-            'meta' => [
-                'page' => [
-                    'currentPage' => $user->currentPage(),
-                    'from' => $user->firstItem(),
-                    'lastPage' => $user->lastPage(),
-                    'perPage' => $user->perPage(),
-                    'to' => $user->lastItem(),
-                    'total' => $user->total(),
-                ]
-            ],
-            'jsonapi' => [
-                'version' => '1.0'
-            ],
-            'links' => [
-                'first' => $user->url(1),
-                'last' => $user->url($user->lastPage()),
-                'next' => $user->nextPageUrl(),
-                'prev' => $user->previousPageUrl(),
-            ],
-            'data' => $data->values()->all() // Convert to array
-        ];
+        return PaginationHelper::format($devices, $data);
     }
 
-    public function readUserV2($queryParams, $headers)
+    public function updateUser(string $userId, array $inputData)
     {
-        $data = [
-            'headers' => $headers,
-            'query' => $queryParams,
-        ];
+        $user = User::find($userId);
 
-        return $this->httpService->handleRequest('get', route('v1.users.index'), $data);
+        if (!$user) {
+            throw new \Exception('User not found');
+        }
+
+        $user->update($inputData);
+
+        return $user;
     }
 
-    public function updateUser($userId, $inputData, $headers, $queryParams)
+    public function deleteUser($userId)
     {
-        $data = [
-            'headers' => $headers,
-            'json' => $inputData,
-            'query' => $queryParams,
-        ];
+        $user = User::find($userId);
 
-        return $this->httpService->handleRequest('patch', route('v1.users.update', ['user' => $userId]), $data);
-    }
+        if (!$user) {
+            Log::info('User not found with ID: ' . $userId);
+            throw new \Exception('User not found');
+        }
 
-    public function deleteUser($userId, $inputData, $headers, $queryParams)
-    {
-        $data = [
-            'headers' => $headers,
-            'json' => $inputData,
-            'query' => $queryParams,
-        ];
-
-        return $this->httpService->handleRequest('delete', route('v1.users.destroy', ['user' => $userId]), $data);
+        $user->delete();
     }
 }
