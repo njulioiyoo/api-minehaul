@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services\System\Menu;
 
+use App\Models\Menu;
 use App\Services\HttpService;
+use Illuminate\Support\Facades\Log;
 
 class MenuService
 {
@@ -15,46 +17,39 @@ class MenuService
         $this->httpService = $httpService;
     }
 
-    public function createMenu($inputData, $headers, $queryParams)
+    public function createMenu(array $inputData)
     {
-        $data = [
-            'headers' => $headers,
-            'json' => $inputData,
-            'query' => $queryParams,
-        ];
+        $menu = Menu::create($inputData);
 
-        return $this->httpService->handleRequest('post', route('v1.menus.store'), $data);
+        if (!$menu) {
+            throw new \Exception('Failed to create menu');
+        }
+
+        return $menu;
     }
 
-    public function readMenu($queryParams, $headers)
+    public function updateMenu(string $menuId, array $inputData)
     {
-        $data = [
-            'headers' => $headers,
-            'query' => $queryParams,
-        ];
+        $menu = Menu::find($menuId);
 
-        return $this->httpService->handleRequest('get', route('v1.menus.index'), $data);
+        if (!$menu) {
+            throw new \Exception('Menu not found');
+        }
+
+        $menu->update($inputData);
+
+        return $menu;
     }
 
-    public function updateMenu($menuId, $inputData, $headers, $queryParams)
+    public function deleteMenu($menuId)
     {
-        $data = [
-            'headers' => $headers,
-            'json' => $inputData,
-            'query' => $queryParams,
-        ];
+        $menu = Menu::find($menuId);
 
-        return $this->httpService->handleRequest('patch', route('v1.menus.update', ['menu' => $menuId]), $data);
-    }
+        if (!$menu) {
+            Log::info('Menu not found with ID: ' . $menuId);
+            throw new \Exception('Role not found');
+        }
 
-    public function deleteMenu($menuId, $inputData, $headers, $queryParams)
-    {
-        $data = [
-            'headers' => $headers,
-            'json' => $inputData,
-            'query' => $queryParams,
-        ];
-
-        return $this->httpService->handleRequest('delete', route('v1.menus.destroy', ['menu' => $menuId]), $data);
+        $menu->delete();
     }
 }

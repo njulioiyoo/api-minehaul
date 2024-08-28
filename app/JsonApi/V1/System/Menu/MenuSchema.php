@@ -22,6 +22,13 @@ class MenuSchema extends Schema
     public static string $model = Menu::class;
 
     /**
+     * Whether resources of this type have a self link.
+     *
+     * @var bool
+     */
+    protected bool $selfLink = false;
+
+    /**
      * Get the resource fields.
      */
     public function fields(): array
@@ -37,26 +44,6 @@ class MenuSchema extends Schema
             ArrayList::make('roles')->sortable(),
         ];
 
-        Log::info('MenuSchema fields:', $fields);
-
         return $fields;
-    }
-
-    /**
-     * Get the resource filters.
-     */
-    public function filters(): array
-    {
-        return [
-            WhereIdIn::make($this),
-        ];
-    }
-
-    /**
-     * Get the resource paginator.
-     */
-    public function pagination(): ?PagePagination
-    {
-        return PagePagination::make();
     }
 }

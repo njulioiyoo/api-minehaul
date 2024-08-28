@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\System\Role;
+namespace App\Http\Requests\System\Menu;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateRoleRequest extends FormRequest
+class UpdateMenuRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,15 +22,20 @@ class UpdateRoleRequest extends FormRequest
      */
     public function rules(): array
     {
-        $roleId = $this->route('roles');
+        $menuId = $this->route('menus');
 
         return [
             'name' => [
                 'required',
                 'string',
                 'regex:/^[\p{L}0-9 ]+$/u',
-                Rule::unique('roles', 'name')->ignore($roleId)
+                Rule::unique('menus', 'name')->ignore($menuId),
             ],
+            'icon' => ['nullable', 'string'],
+            'url' => ['nullable', 'string', 'regex:/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/'],
+            'parent_id' => ['nullable', 'integer', 'exists:menus,id'],
+            'position' => ['required', 'integer'],
+            'roles' => ['nullable', 'array'],
         ];
     }
 
