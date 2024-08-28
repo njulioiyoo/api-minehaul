@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1\System;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\System\Role\CreateRoleRequest;
+use App\Http\Requests\System\Role\StoreRoleRequest;
 use App\Http\Requests\System\Role\UpdateRoleRequest;
 use App\Services\RequestHelperService;
 use App\Services\System\Role\RoleService;
@@ -27,12 +27,12 @@ class RoleController extends Controller
         $this->requestHelperService = $requestHelperService;
     }
 
-    public function createRole(CreateRoleRequest $request)
+    public function createRole(StoreRoleRequest $request)
     {
         $validatedData = $request->validated();
-        $device = $this->roleService->createRole($validatedData);
+        $role = $this->roleService->createRole($validatedData);
 
-        return new DataResponse($device);
+        return new DataResponse($role);
     }
 
     public function readRole(Request $request)

@@ -5,57 +5,81 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1\System;
 
 use App\Http\Controllers\Controller;
-use App\Services\HeaderService;
+use App\Http\Requests\System\Permission\StorePermissionRequest;
+use App\Http\Requests\System\Permission\UpdatePermissionRequest;
 use App\Services\RequestHelperService;
 use App\Services\System\Permission\PermissionService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use LaravelJsonApi\Core\Responses\ErrorResponse;
+use LaravelJsonApi\Core\Document\Error;
+use LaravelJsonApi\Core\Responses\DataResponse;
+
 
 class PermissionController extends Controller
 {
-    protected $headerService;
-
     protected $permissionService;
 
     protected $requestHelperService;
 
-    public function __construct(HeaderService $headerService, PermissionService $permissionService, RequestHelperService $requestHelperService)
+    public function __construct(PermissionService $permissionService, RequestHelperService $requestHelperService)
     {
-        $this->headerService = $headerService;
         $this->permissionService = $permissionService;
         $this->requestHelperService = $requestHelperService;
     }
 
-    public function createPermission(Request $request)
+    public function createPermission(StorePermissionRequest $request)
     {
-        $headers = $this->headerService->prepareHeaders($request);
-        [$input, $permissionId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'permissions');
+        $validatedData = $request->validated();
+        $device = $this->permissionService->createPermission($validatedData);
 
-        return $this->permissionService->createPermission($input, $headers, $queryParams);
+        return new DataResponse($device);
     }
 
     public function readPermission(Request $request)
     {
-        $headers = $this->headerService->prepareHeaders($request);
         $queryParams = $request->query();
 
-        return $this->permissionService->readPermission($queryParams, $headers);
+        try {
+            $response = $this->permissionService->readPermission($queryParams);
+            return response()->json($response);
+        } catch (\Exception $e) {
+            Log::error("Error reading role: {$e->getMessage()}");
+            return new ErrorResponse(collect([
+                Error::fromArray([
+                    'status' => '500',
+                    'title' => 'Internal Server Error',
+                    'detail' => 'An error occurred while reading the role.'
+                ])
+            ]));
+        }
     }
 
-    public function updatePermission(Request $request)
+    public function updatePermission(UpdatePermissionRequest $request)
     {
-        $headers = $this->headerService->prepareHeaders($request);
+        $validatedData = $request->validated();
         [$input, $permissionId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'permissions', true);
+        $role = $this->permissionService->updatePermission($permissionId, $validatedData);
 
-        // Panggil metode updateDevice dengan ID yang diperoleh
-        return $this->permissionService->updatePermission($permissionId, $input, $headers, $queryParams);
+        return new DataResponse($role);
     }
 
     public function deletePermission(Request $request)
     {
-        $headers = $this->headerService->prepareHeaders($request);
         [$input, $permissionId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'permissions', true);
 
-        // Panggil metode deleteDevice dengan ID yang diperoleh
-        return $this->permissionService->deletePermission($permissionId, $input, $headers, $queryParams);
+        try {
+            $this->permissionService->deletePermission($permissionId);
+            return response()->json(['message' => 'Permission deleted successfully.']);
+        } catch (\Exception $e) {
+            Log::error("Error deleting permission: {$e->getMessage()}");
+            return new ErrorResponse(collect([
+                Error::fromArray([
+                    'status' => '500',
+                    'title' => 'Internal Server Error',
+                    'detail' => $e->getMessage()
+                ])
+            ]));
+        }
     }
 }

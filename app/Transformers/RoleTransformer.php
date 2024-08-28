@@ -12,7 +12,7 @@ class RoleTransformer
     public function transform(Role $role): array
     {
         return [
-            'type' => 'users',
+            'type' => 'roles',
             'id' => $role->id,
             'attributes' => [
                 'id' => $role->id,

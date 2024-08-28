@@ -24,11 +24,8 @@ use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 |
 */
 
-JsonApiRoute::server('v1')->middleware('json.api')->resources(function (ResourceRegistrar $server) {
-    // $server->resource('users', JsonApiController::class);
+JsonApiRoute::server('v1')->middleware('json.api')->resources(function () {
     // $server->resource('menus', JsonApiController::class);
-    // $server->resource('roles', JsonApiController::class);
-    // $server->resource('permissions', JsonApiController::class);
 
     Route::get('me', [ProfileController::class, 'readProfile']);
     Route::patch('me', [ProfileController::class, 'updateProfile']);
@@ -46,13 +43,13 @@ JsonApiRoute::server('v1')->middleware('json.api')->resources(function (Resource
             Route::delete('/', [RoleController::class, 'deleteRole'])->name('role.delete')->middleware('verify.user.permission:Delete Roles');
         });
 
-        //     // Routes for permissions
-        //     Route::prefix('permission')->group(function () {
-        //         Route::get('/', [PermissionController::class, 'readPermission'])->name('permission.index')->middleware('verify.user.permission:View Permissions');
-        //         Route::post('/', [PermissionController::class, 'createPermission'])->name('permission.create')->middleware('verify.user.permission:View Permissions');
-        //         Route::patch('/', [PermissionController::class, 'updatePermission'])->name('permission.update')->middleware('verify.user.permission:View Permissions');
-        //         Route::delete('/', [PermissionController::class, 'deletePermission'])->name('permission.delete')->middleware('verify.user.permission:View Permissions');
-        //     });
+        // Routes for permissions
+        Route::prefix('permission')->group(function () {
+            Route::get('/', [PermissionController::class, 'readPermission'])->name('permission.index')->middleware('verify.user.permission:View Permissions');
+            Route::post('/', [PermissionController::class, 'createPermission'])->name('permission.create')->middleware('verify.user.permission:View Permissions');
+            Route::patch('/', [PermissionController::class, 'updatePermission'])->name('permission.update')->middleware('verify.user.permission:View Permissions');
+            Route::delete('/', [PermissionController::class, 'deletePermission'])->name('permission.delete')->middleware('verify.user.permission:View Permissions');
+        });
 
         // Routes for users
         Route::prefix('user')->group(function () {
