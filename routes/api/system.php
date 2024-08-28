@@ -38,13 +38,13 @@ JsonApiRoute::server('v1')->middleware('json.api')->resources(function (Resource
         Route::patch('users/{user}/roles', [AccessController::class, 'updateUserRoles']);
         Route::patch('roles/{role}/permissions', [AccessController::class, 'updateRolePermissions']);
 
-        //     // Routes for roles
-        //     Route::prefix('role')->group(function () {
-        //         Route::get('/', [RoleController::class, 'readRole'])->name('role.index')->middleware('verify.user.permission:View Roles');
-        //         Route::post('/', [RoleController::class, 'createRole'])->name('role.create')->middleware('verify.user.permission:Create Roles');
-        //         Route::patch('/', [RoleController::class, 'updateRole'])->name('role.update')->middleware('verify.user.permission:Edit Roles');
-        //         Route::delete('/', [RoleController::class, 'deleteRole'])->name('role.delete')->middleware('verify.user.permission:Delete Roles');
-        //     });
+        // Routes for roles
+        Route::prefix('role')->group(function () {
+            Route::get('/', [RoleController::class, 'readRole'])->name('role.index')->middleware('verify.user.permission:View Roles');
+            Route::post('/', [RoleController::class, 'createRole'])->name('role.create')->middleware('verify.user.permission:Create Roles');
+            Route::patch('/', [RoleController::class, 'updateRole'])->name('role.update')->middleware('verify.user.permission:Edit Roles');
+            Route::delete('/', [RoleController::class, 'deleteRole'])->name('role.delete')->middleware('verify.user.permission:Delete Roles');
+        });
 
         //     // Routes for permissions
         //     Route::prefix('permission')->group(function () {
@@ -54,7 +54,7 @@ JsonApiRoute::server('v1')->middleware('json.api')->resources(function (Resource
         //         Route::delete('/', [PermissionController::class, 'deletePermission'])->name('permission.delete')->middleware('verify.user.permission:View Permissions');
         //     });
 
-        //     // Routes for users
+        // Routes for users
         Route::prefix('user')->group(function () {
             Route::get('/', [UserController::class, 'readUser'])->name('users.index')->middleware('verify.user.permission:View Users');
             Route::post('/', [UserController::class, 'createUser'])->name('users.create')->middleware('verify.user.permission:Create Users');

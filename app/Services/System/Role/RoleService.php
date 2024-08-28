@@ -4,57 +4,75 @@ declare(strict_types=1);
 
 namespace App\Services\System\Role;
 
-use App\Services\HttpService;
+use App\Transformers\RoleTransformer;
+use App\Helpers\PaginationHelper;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Log;
 
 class RoleService
 {
-    protected $httpService;
+    protected $transformer;
 
-    public function __construct(HttpService $httpService)
+    public function __construct(RoleTransformer $transformer)
     {
-        $this->httpService = $httpService;
+        $this->transformer = $transformer;
     }
 
-    public function createRole($inputData, $headers, $queryParams)
+    public function createRole(array $inputData)
     {
-        $data = [
-            'headers' => $headers,
-            'json' => $inputData,
-            'query' => $queryParams,
-        ];
+        $role = Role::create($inputData);
 
-        return $this->httpService->handleRequest('post', route('v1.roles.store'), $data);
+        if (!$role) {
+            throw new \Exception('Failed to create role');
+        }
+
+        return $role;
     }
 
-    public function readRole($queryParams, $headers)
+    public function readRole(array $queryParams)
     {
-        $data = [
-            'headers' => $headers,
-            'query' => $queryParams,
-        ];
+        $perPage = $queryParams['page']['size'] ?? 10;
+        $page = $queryParams['page']['number'] ?? 1;
 
-        return $this->httpService->handleRequest('get', route('v1.roles.index'), $data);
+        $query = Role::query();
+
+        if (isset($queryParams['filter'])) {
+            foreach ($queryParams['filter'] as $field => $value) {
+                $query->where($field, $value);
+            }
+        }
+
+        $roles = $query->paginate($perPage, ['*'], 'page[number]', $page);
+
+        $data = $roles->map(function ($role) {
+            return $this->transformer->transform($role);
+        })->values()->all(); // Convert to array
+
+        return PaginationHelper::format($roles, $data);
     }
 
-    public function updateRole($roleId, $inputData, $headers, $queryParams)
+    public function updateRole(string $roleId, array $inputData)
     {
-        $data = [
-            'headers' => $headers,
-            'json' => $inputData,
-            'query' => $queryParams,
-        ];
+        $role = Role::find($roleId);
 
-        return $this->httpService->handleRequest('patch', route('v1.roles.update', ['role' => $roleId]), $data);
+        if (!$role) {
+            throw new \Exception('Role not found');
+        }
+
+        $role->update($inputData);
+
+        return $role;
     }
 
-    public function deleteRole($roleId, $inputData, $headers, $queryParams)
+    public function deleteRole($roleId)
     {
-        $data = [
-            'headers' => $headers,
-            'json' => $inputData,
-            'query' => $queryParams,
-        ];
+        $role = Role::find($roleId);
 
-        return $this->httpService->handleRequest('delete', route('v1.roles.destroy', ['role' => $roleId]), $data);
+        if (!$role) {
+            Log::info('Role not found with ID: ' . $roleId);
+            throw new \Exception('Role not found');
+        }
+
+        $role->delete();
     }
 }

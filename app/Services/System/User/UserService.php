@@ -23,13 +23,13 @@ class UserService
 
     public function createUser(array $inputData)
     {
-        $device = User::create($inputData);
+        $user = User::create($inputData);
 
-        if (!$device) {
+        if (!$user) {
             throw new \Exception('Failed to create user');
         }
 
-        return $device;
+        return $user;
     }
 
     public function readUser(array $queryParams)
@@ -45,13 +45,13 @@ class UserService
             }
         }
 
-        $devices = $query->paginate($perPage, ['*'], 'page[number]', $page);
+        $users = $query->paginate($perPage, ['*'], 'page[number]', $page);
 
-        $data = $devices->map(function ($device) {
-            return $this->transformer->transform($device);
+        $data = $users->map(function ($user) {
+            return $this->transformer->transform($user);
         })->values()->all(); // Convert to array
 
-        return PaginationHelper::format($devices, $data);
+        return PaginationHelper::format($users, $data);
     }
 
     public function updateUser(string $userId, array $inputData)

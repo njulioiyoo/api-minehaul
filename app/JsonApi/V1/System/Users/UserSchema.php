@@ -52,24 +52,4 @@ class UserSchema extends Schema
                 ->readOnly(),
         ];
     }
-
-    /**
-     * Get the resource filters.
-     */
-    public function filters(): array
-    {
-        return [
-            WhereIdIn::make($this),
-            Where::make('username'),
-            Where::make('email'),
-        ];
-    }
-
-    /**
-     * Get the resource paginator.
-     */
-    public function pagination(): ?Paginator
-    {
-        return PagePagination::make();
-    }
 }

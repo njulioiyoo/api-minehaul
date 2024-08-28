@@ -11,6 +11,7 @@ use LaravelJsonApi\Eloquent\Filters\WhereIdIn;
 use LaravelJsonApi\Eloquent\Pagination\PagePagination;
 use LaravelJsonApi\Eloquent\Schema;
 use Spatie\Permission\Models\Role;
+use LaravelJsonApi\Eloquent\Filters\Where;
 
 class RoleSchema extends Schema
 {
@@ -33,23 +34,5 @@ class RoleSchema extends Schema
             DateTime::make('created_at')->sortable()->readOnly(),
             DateTime::make('updated_at')->sortable()->readOnly(),
         ];
-    }
-
-    /**
-     * Get the resource filters.
-     */
-    public function filters(): array
-    {
-        return [
-            WhereIdIn::make($this),
-        ];
-    }
-
-    /**
-     * Get the resource paginator.
-     */
-    public function pagination(): ?PagePagination
-    {
-        return PagePagination::make();
     }
 }
