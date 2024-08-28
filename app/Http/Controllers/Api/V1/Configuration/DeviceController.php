@@ -75,7 +75,7 @@ class DeviceController extends Controller
                 Error::fromArray([
                     'status' => '500',
                     'title' => 'Internal Server Error',
-                    'detail' => 'An error occurred while deleting the device.'
+                    'detail' => $e->getMessage()
                 ])
             ]));
         }

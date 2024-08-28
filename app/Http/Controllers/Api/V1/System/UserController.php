@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1\System;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\System\User\StoreUserRequest;
+use App\Http\Requests\System\User\UpdateUserRequest;
 use App\Services\HeaderService;
 use App\Services\RequestHelperService;
 use App\Services\System\User\UserService;
@@ -12,6 +14,7 @@ use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Responses\ErrorResponse;
 use Illuminate\Support\Facades\Log;
 use LaravelJsonApi\Core\Document\Error;
+use LaravelJsonApi\Core\Responses\DataResponse;
 
 class UserController extends Controller
 {
@@ -28,28 +31,22 @@ class UserController extends Controller
         $this->requestHelperService = $requestHelperService;
     }
 
-    public function createUser(Request $request)
+    public function createUser(StoreUserRequest $request)
     {
-        $headers = $this->headerService->prepareHeaders($request);
-        [$input, $userId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'users');
+        $validatedData = $request->validated();
+        $device = $this->userService->createUser($validatedData);
 
-        return $this->userService->createUser($input, $headers, $queryParams);
+        return new DataResponse($device);
     }
 
     public function readUser(Request $request)
     {
-        // $headers = $this->headerService->prepareHeaders($request);
-        // $queryParams = $request->query();
-
-        // return $this->userService->readUserV2($queryParams, $headers);
-
         $queryParams = $request->query();
 
         try {
             $response = $this->userService->readUser($queryParams);
             return response()->json($response);
         } catch (\Exception $e) {
-            dd($e);
             Log::error("Error reading user: {$e->getMessage()}");
             return new ErrorResponse(collect([
                 Error::fromArray([
@@ -61,21 +58,31 @@ class UserController extends Controller
         }
     }
 
-    public function updateUser(Request $request)
+    public function updateUser(UpdateUserRequest $request)
     {
-        $headers = $this->headerService->prepareHeaders($request);
+        $validatedData = $request->validated();
         [$input, $userId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'users', true);
+        $user = $this->userService->updateUser($userId, $validatedData);
 
-        // Panggil metode updateDevice dengan ID yang diperoleh
-        return $this->userService->updateUser($userId, $input, $headers, $queryParams);
+        return new DataResponse($user);
     }
 
     public function deleteUser(Request $request)
     {
-        $headers = $this->headerService->prepareHeaders($request);
         [$input, $userId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'users', true);
 
-        // Panggil metode deleteDevice dengan ID yang diperoleh
-        return $this->userService->deleteUser($userId, $input, $headers, $queryParams);
+        try {
+            $this->userService->deleteUser($userId);
+            return response()->json(['message' => 'User deleted successfully.']);
+        } catch (\Exception $e) {
+            Log::error("Error deleting user: {$e->getMessage()}");
+            return new ErrorResponse(collect([
+                Error::fromArray([
+                    'status' => '500',
+                    'title' => 'Internal Server Error',
+                    'detail' => $e->getMessage()
+                ])
+            ]));
+        }
     }
 }
