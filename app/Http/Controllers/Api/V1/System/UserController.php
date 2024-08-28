@@ -7,7 +7,6 @@ namespace App\Http\Controllers\Api\V1\System;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\System\User\StoreUserRequest;
 use App\Http\Requests\System\User\UpdateUserRequest;
-use App\Services\HeaderService;
 use App\Services\RequestHelperService;
 use App\Services\System\User\UserService;
 use Illuminate\Http\Request;
@@ -18,15 +17,12 @@ use LaravelJsonApi\Core\Responses\DataResponse;
 
 class UserController extends Controller
 {
-    protected $headerService;
-
     protected $userService;
 
     protected $requestHelperService;
 
-    public function __construct(HeaderService $headerService, UserService $userService, RequestHelperService $requestHelperService)
+    public function __construct(UserService $userService, RequestHelperService $requestHelperService)
     {
-        $this->headerService = $headerService;
         $this->userService = $userService;
         $this->requestHelperService = $requestHelperService;
     }
