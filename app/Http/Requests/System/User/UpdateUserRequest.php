@@ -22,7 +22,7 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules(): array
     {
-        $userId = $this->route('user');
+        $userId = $this->route('users');
 
         return [
             'username' => ['required', 'string', 'regex:/^[a-zA-Z0-9._-]{3,20}$/'],

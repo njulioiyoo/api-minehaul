@@ -22,7 +22,7 @@ class UpdatePermissionRequest extends FormRequest
      */
     public function rules(): array
     {
-        $permissionId = $this->route('permission');
+        $permissionId = $this->route('permissions');
 
         return [
             'name' => [

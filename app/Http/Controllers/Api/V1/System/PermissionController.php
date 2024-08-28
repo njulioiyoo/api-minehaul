@@ -31,9 +31,9 @@ class PermissionController extends Controller
     public function createPermission(StorePermissionRequest $request)
     {
         $validatedData = $request->validated();
-        $device = $this->permissionService->createPermission($validatedData);
+        $permission = $this->permissionService->createPermission($validatedData);
 
-        return new DataResponse($device);
+        return new DataResponse($permission);
     }
 
     public function readPermission(Request $request)

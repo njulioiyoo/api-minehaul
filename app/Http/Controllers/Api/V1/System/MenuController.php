@@ -5,56 +5,67 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1\System;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\System\Menu\StoreMenuRequest;
+use App\Http\Requests\System\Menu\UpdateMenuRequest;
 use App\Models\Menu;
-use App\Services\HeaderService;
 use App\Services\RequestHelperService;
 use App\Services\System\Menu\MenuService;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Responses\DataResponse;
+use Illuminate\Support\Facades\Log;
+use LaravelJsonApi\Core\Responses\ErrorResponse;
+use LaravelJsonApi\Core\Document\Error;
 
 class MenuController extends Controller
 {
-    protected $headerService;
-
     protected $requestHelperService;
 
     protected $menuService;
 
-    public function __construct(HeaderService $headerService, RequestHelperService $requestHelperService, MenuService $menuService)
+    public function __construct(RequestHelperService $requestHelperService, MenuService $menuService)
     {
-        $this->headerService = $headerService;
         $this->requestHelperService = $requestHelperService;
         $this->menuService = $menuService;
     }
 
-    public function createMenu(Request $request)
+    public function createMenu(StoreMenuRequest $request)
     {
-        $headers = $this->headerService->prepareHeaders($request);
-        [$input, $menuId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'menus');
+        $validatedData = $request->validated();
+        $menu = $this->menuService->createMenu($validatedData);
 
-        return $this->menuService->createMenu($input, $headers, $queryParams);
+        return new DataResponse($menu);
     }
 
-    public function index()
+    public function readMenu()
     {
         return new DataResponse((new Menu)->getTree());
     }
 
-    public function updateMenu(Request $request)
+    public function updateMenu(UpdateMenuRequest $request)
     {
-        $headers = $this->headerService->prepareHeaders($request);
+        $validatedData = $request->validated();
         [$input, $menuId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'menus', true);
+        $menu = $this->menuService->updateMenu($menuId, $validatedData);
 
-        // Panggil metode updateDevice dengan ID yang diperoleh
-        return $this->menuService->updateMenu($menuId, $input, $headers, $queryParams);
+        return new DataResponse($menu);
     }
 
     public function deleteMenu(Request $request)
     {
-        $headers = $this->headerService->prepareHeaders($request);
         [$input, $menuId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'menus', true);
 
-        // Panggil metode deleteDevice dengan ID yang diperoleh
-        return $this->menuService->deleteMenu($menuId, $input, $headers, $queryParams);
+        try {
+            $this->menuService->deleteMenu($menuId);
+            return response()->json(['message' => 'Menu deleted successfully.']);
+        } catch (\Exception $e) {
+            Log::error("Error deleting menu: {$e->getMessage()}");
+            return new ErrorResponse(collect([
+                Error::fromArray([
+                    'status' => '500',
+                    'title' => 'Internal Server Error',
+                    'detail' => $e->getMessage()
+                ])
+            ]));
+        }
     }
 }

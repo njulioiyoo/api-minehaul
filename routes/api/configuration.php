@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\Configuration\DeviceController;
 use Illuminate\Support\Facades\Route;
-use LaravelJsonApi\Laravel\Routing\ResourceRegistrar;
-use LaravelJsonApi\Laravel\Http\Controllers\JsonApiController;
 use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 
 /*
