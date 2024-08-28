@@ -19,6 +19,13 @@ class PermissionSchema extends Schema
      */
     public static string $model = Permission::class;
 
+    /**
+     * Whether resources of this type have a self link.
+     *
+     * @var bool
+     */
+    protected bool $selfLink = false;
+
     protected ?array $defaultPagination = ['number' => 1];
 
     /**
@@ -33,23 +40,5 @@ class PermissionSchema extends Schema
             DateTime::make('created_at')->sortable()->readOnly(),
             DateTime::make('updated_at')->sortable()->readOnly(),
         ];
-    }
-
-    /**
-     * Get the resource filters.
-     */
-    public function filters(): array
-    {
-        return [
-            WhereIdIn::make($this),
-        ];
-    }
-
-    /**
-     * Get the resource paginator.
-     */
-    public function pagination(): ?PagePagination
-    {
-        return PagePagination::make();
     }
 }

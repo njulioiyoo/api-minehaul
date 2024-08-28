@@ -20,6 +20,13 @@ class RoleSchema extends Schema
      */
     public static string $model = Role::class;
 
+    /**
+     * Whether resources of this type have a self link.
+     *
+     * @var bool
+     */
+    protected bool $selfLink = false;
+
     protected ?array $defaultPagination = ['number' => 1];
 
     /**
