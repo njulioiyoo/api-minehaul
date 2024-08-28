@@ -47,27 +47,4 @@ class DeviceSchema extends Schema
             Str::make('status')->sortable(),
         ];
     }
-
-    /**
-     * Get the resource filters.
-     */
-    public function filters(): array
-    {
-        return [
-            WhereIdIn::make($this),
-            Where::make('display_id'),
-            Where::make('status'),
-            Where::make('year'),
-            Where::make('device_type_id'),
-            Where::make('device_make_id'),
-        ];
-    }
-
-    /**
-     * Get the resource paginator.
-     */
-    public function pagination(): ?PagePagination
-    {
-        return PagePagination::make();
-    }
 }

@@ -5,57 +5,80 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1\System;
 
 use App\Http\Controllers\Controller;
-use App\Services\HeaderService;
+use App\Http\Requests\System\Role\CreateRoleRequest;
+use App\Http\Requests\System\Role\UpdateRoleRequest;
 use App\Services\RequestHelperService;
 use App\Services\System\Role\RoleService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use LaravelJsonApi\Core\Responses\ErrorResponse;
+use LaravelJsonApi\Core\Document\Error;
+use LaravelJsonApi\Core\Responses\DataResponse;
 
 class RoleController extends Controller
 {
-    protected $headerService;
-
     protected $roleService;
 
     protected $requestHelperService;
 
-    public function __construct(HeaderService $headerService, RoleService $roleService, RequestHelperService $requestHelperService)
+    public function __construct(RoleService $roleService, RequestHelperService $requestHelperService)
     {
-        $this->headerService = $headerService;
         $this->roleService = $roleService;
         $this->requestHelperService = $requestHelperService;
     }
 
-    public function createRole(Request $request)
+    public function createRole(CreateRoleRequest $request)
     {
-        $headers = $this->headerService->prepareHeaders($request);
-        [$input, $roleId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'roles');
+        $validatedData = $request->validated();
+        $device = $this->roleService->createRole($validatedData);
 
-        return $this->roleService->createRole($input, $headers, $queryParams);
+        return new DataResponse($device);
     }
 
     public function readRole(Request $request)
     {
-        $headers = $this->headerService->prepareHeaders($request);
         $queryParams = $request->query();
 
-        return $this->roleService->readRole($queryParams, $headers);
+        try {
+            $response = $this->roleService->readRole($queryParams);
+            return response()->json($response);
+        } catch (\Exception $e) {
+            Log::error("Error reading role: {$e->getMessage()}");
+            return new ErrorResponse(collect([
+                Error::fromArray([
+                    'status' => '500',
+                    'title' => 'Internal Server Error',
+                    'detail' => 'An error occurred while reading the role.'
+                ])
+            ]));
+        }
     }
 
-    public function updateRole(Request $request)
+    public function updateRole(UpdateRoleRequest $request)
     {
-        $headers = $this->headerService->prepareHeaders($request);
-        [$input, $roleId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'roles');
+        $validatedData = $request->validated();
+        [$input, $roleId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'roles', true);
+        $role = $this->roleService->updateRole($roleId, $validatedData);
 
-        // Panggil metode updateDevice dengan ID yang diperoleh
-        return $this->roleService->updateRole($roleId, $input, $headers, $queryParams);
+        return new DataResponse($role);
     }
 
     public function deleteRole(Request $request)
     {
-        $headers = $this->headerService->prepareHeaders($request);
-        [$input, $roleId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'roles');
+        [$input, $roleId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'roles', true);
 
-        // Panggil metode deleteDevice dengan ID yang diperoleh
-        return $this->roleService->deleteRole($roleId, $input, $headers, $queryParams);
+        try {
+            $this->roleService->deleteRole($roleId);
+            return response()->json(['message' => 'Role deleted successfully.']);
+        } catch (\Exception $e) {
+            Log::error("Error deleting role: {$e->getMessage()}");
+            return new ErrorResponse(collect([
+                Error::fromArray([
+                    'status' => '500',
+                    'title' => 'Internal Server Error',
+                    'detail' => $e->getMessage()
+                ])
+            ]));
+        }
     }
 }
