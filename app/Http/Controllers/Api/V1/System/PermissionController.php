@@ -44,12 +44,12 @@ class PermissionController extends Controller
             $response = $this->permissionService->readPermission($queryParams);
             return response()->json($response);
         } catch (\Exception $e) {
-            Log::error("Error reading role: {$e->getMessage()}");
+            Log::error("Error reading permissions: {$e->getMessage()}");
             return new ErrorResponse(collect([
                 Error::fromArray([
                     'status' => '500',
                     'title' => 'Internal Server Error',
-                    'detail' => 'An error occurred while reading the role.'
+                    'detail' => 'An error occurred while reading the permissions.'
                 ])
             ]));
         }
@@ -59,9 +59,9 @@ class PermissionController extends Controller
     {
         $validatedData = $request->validated();
         [$input, $permissionId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'permissions', true);
-        $role = $this->permissionService->updatePermission($permissionId, $validatedData);
+        $permission = $this->permissionService->updatePermission($permissionId, $validatedData);
 
-        return new DataResponse($role);
+        return new DataResponse($permission);
     }
 
     public function deletePermission(Request $request)

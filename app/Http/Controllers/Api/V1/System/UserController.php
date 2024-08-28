@@ -30,9 +30,9 @@ class UserController extends Controller
     public function createUser(StoreUserRequest $request)
     {
         $validatedData = $request->validated();
-        $device = $this->userService->createUser($validatedData);
+        $user = $this->userService->createUser($validatedData);
 
-        return new DataResponse($device);
+        return new DataResponse($user);
     }
 
     public function readUser(Request $request)
