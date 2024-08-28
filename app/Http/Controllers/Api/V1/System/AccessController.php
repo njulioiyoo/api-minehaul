@@ -13,35 +13,6 @@ use Spatie\Permission\Models\Role;
 class AccessController extends Controller
 {
     /**
-     * Update roles for a user.
-     *
-     * @param  int  $userId
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function updateUserRoles(Request $request, $userId)
-    {
-        $input = $request->json()->all();
-        $roleId = $input['data']['attributes']['roles'] ?? [];
-
-        $user = User::findOrFail($userId);
-
-        $user->syncRoles($roleId);
-
-        $permissions = Role::whereIn('id', $roleId)
-            ->with('permissions:id,name')
-            ->get()
-            ->pluck('permissions')
-            ->flatten()
-            ->pluck('name')
-            ->unique()
-            ->toArray();
-
-        $user->syncPermissions($permissions);
-
-        return new DataResponse($user);
-    }
-
-    /**
      * Update permissions for a role.
      *
      * @param  int  $roleId

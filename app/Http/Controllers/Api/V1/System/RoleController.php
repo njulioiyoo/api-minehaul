@@ -10,15 +10,14 @@ use App\Http\Requests\System\Role\UpdateRoleRequest;
 use App\Services\RequestHelperService;
 use App\Services\System\Role\RoleService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use LaravelJsonApi\Core\Responses\ErrorResponse;
-use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Responses\DataResponse;
+use App\Traits\ExceptionHandlerTrait;
 
 class RoleController extends Controller
 {
-    protected $roleService;
+    use ExceptionHandlerTrait;
 
+    protected $roleService;
     protected $requestHelperService;
 
     public function __construct(RoleService $roleService, RequestHelperService $requestHelperService)
@@ -29,56 +28,48 @@ class RoleController extends Controller
 
     public function createRole(StoreRoleRequest $request)
     {
-        $validatedData = $request->validated();
-        $role = $this->roleService->createRole($validatedData);
+        try {
+            $validatedData = $request->validated();
+            $role = $this->roleService->createRole($validatedData);
 
-        return new DataResponse($role);
+            return new DataResponse($role);
+        } catch (\Exception $e) {
+            return $this->handleException($e, 'Error creating role');
+        }
     }
 
     public function readRole(Request $request)
     {
-        $queryParams = $request->query();
-
         try {
+            $queryParams = $request->query();
             $response = $this->roleService->readRole($queryParams);
             return response()->json($response);
         } catch (\Exception $e) {
-            Log::error("Error reading role: {$e->getMessage()}");
-            return new ErrorResponse(collect([
-                Error::fromArray([
-                    'status' => '500',
-                    'title' => 'Internal Server Error',
-                    'detail' => 'An error occurred while reading the role.'
-                ])
-            ]));
+            return $this->handleException($e, 'Error reading role');
         }
     }
 
     public function updateRole(UpdateRoleRequest $request)
     {
-        $validatedData = $request->validated();
-        [$input, $roleId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'roles', true);
-        $role = $this->roleService->updateRole($roleId, $validatedData);
+        try {
+            $validatedData = $request->validated();
+            [$input, $roleId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'roles', true);
+            $role = $this->roleService->updateRole($roleId, $validatedData);
 
-        return new DataResponse($role);
+            return new DataResponse($role);
+        } catch (\Exception $e) {
+            return $this->handleException($e, 'Error updating role');
+        }
     }
 
     public function deleteRole(Request $request)
     {
-        [$input, $roleId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'roles', true);
-
         try {
+            [$input, $roleId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'roles', true);
             $this->roleService->deleteRole($roleId);
             return response()->json(['message' => 'Role deleted successfully.']);
         } catch (\Exception $e) {
-            Log::error("Error deleting role: {$e->getMessage()}");
-            return new ErrorResponse(collect([
-                Error::fromArray([
-                    'status' => '500',
-                    'title' => 'Internal Server Error',
-                    'detail' => $e->getMessage()
-                ])
-            ]));
+            return $this->handleException($e, 'Error deleting role');
         }
     }
 }
