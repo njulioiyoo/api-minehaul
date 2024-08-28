@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services\System\User;
 
 use App\Models\User;
-use App\Services\HttpService;
 use App\Helpers\PaginationHelper;
 use App\Transformers\UserTransformer;
 use Illuminate\Support\Facades\Log;
@@ -13,12 +12,10 @@ use Spatie\Permission\Models\Role;
 
 class UserService
 {
-    protected $httpService;
     protected $transformer;
 
-    public function __construct(HttpService $httpService, UserTransformer $transformer)
+    public function __construct(UserTransformer $transformer)
     {
-        $this->httpService = $httpService;
         $this->transformer = $transformer;
     }
 

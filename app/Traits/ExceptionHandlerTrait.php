@@ -23,7 +23,7 @@ trait ExceptionHandlerTrait
             Error::fromArray([
                 'status' => '500',
                 'title' => 'Internal Server Error',
-                'detail' => $message
+                'detail' => $e->getMessage()
             ])
         ]));
     }

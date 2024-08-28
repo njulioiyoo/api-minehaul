@@ -5,18 +5,10 @@ declare(strict_types=1);
 namespace App\Services\System\Menu;
 
 use App\Models\Menu;
-use App\Services\HttpService;
 use Illuminate\Support\Facades\Log;
 
 class MenuService
 {
-    protected $httpService;
-
-    public function __construct(HttpService $httpService)
-    {
-        $this->httpService = $httpService;
-    }
-
     public function createMenu(array $inputData)
     {
         $menu = Menu::create($inputData);
