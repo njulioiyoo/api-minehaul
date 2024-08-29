@@ -21,6 +21,8 @@ class UpdateDeviceRequest extends FormRequest
      */
     public function rules(): array
     {
+        $deviceId = $this->getDeviceId();
+
         return [
             'name' => ['sometimes', 'string', 'max:255'],
             'account_id' => ['sometimes', 'string', 'regex:/^\d+$/'],
@@ -32,7 +34,7 @@ class UpdateDeviceRequest extends FormRequest
             'sim_id' => ['nullable', 'string', 'regex:/^[a-zA-Z0-9-]+$/'],
             'year' => ['nullable', 'integer', 'min:1900', 'max:2100'],
             'status' => ['nullable', 'string', 'in:active,inactive'],
-            'uid' => ['sometimes', 'string', 'unique:devices,uid,' . $this->route('devices')],
+            'uid' => ['sometimes', 'string', 'unique:devices,uid,' . $deviceId],
         ];
     }
 
@@ -43,6 +45,6 @@ class UpdateDeviceRequest extends FormRequest
      */
     public function getDeviceId(): ?string
     {
-        return $this->input('data.id');
+        return $this->input('data.id') ?? $this->route('devices');;
     }
 }

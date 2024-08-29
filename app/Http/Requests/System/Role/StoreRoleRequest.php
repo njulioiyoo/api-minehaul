@@ -3,6 +3,7 @@
 namespace App\Http\Requests\System\Role;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreRoleRequest extends FormRequest
 {
@@ -22,7 +23,12 @@ class StoreRoleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'regex:/^[\p{L}0-9 ]+$/u'],
+            'name' => [
+                'required',
+                'string',
+                'regex:/^[\p{L}0-9 ]+$/u',
+                Rule::unique('roles', 'name')
+            ],
             'permissions' => ['nullable', 'array'],
             'permissions.*' => ['integer'],
         ];
