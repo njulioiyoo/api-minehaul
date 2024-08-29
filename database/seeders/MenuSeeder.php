@@ -49,9 +49,9 @@ class MenuSeeder extends Seeder
 
         // Insert submenus for 'Configuration'
         $configurationSubmenus = [
-            ['name' => 'Vehicle', 'icon' => 'vehicle_icon', 'url' => 'api/vehicle', 'position' => 1, 'parent_id' => $menuIds['Configuration']],
-            ['name' => 'Device', 'icon' => 'device_icon', 'url' => 'api/device', 'position' => 2, 'parent_id' => $menuIds['Configuration']],
-            ['name' => 'Driver', 'icon' => 'driver_icon', 'url' => 'api/driver', 'position' => 3, 'parent_id' => $menuIds['Configuration']],
+            ['name' => 'Vehicle', 'icon' => 'vehicle_icon', 'url' => 'api/vehicles', 'position' => 1, 'parent_id' => $menuIds['Configuration']],
+            ['name' => 'Device', 'icon' => 'device_icon', 'url' => 'api/devices', 'position' => 2, 'parent_id' => $menuIds['Configuration']],
+            ['name' => 'Driver', 'icon' => 'driver_icon', 'url' => 'api/drivers', 'position' => 3, 'parent_id' => $menuIds['Configuration']],
         ];
 
         $configurationSubmenuIds = [];
@@ -64,10 +64,10 @@ class MenuSeeder extends Seeder
 
         // Insert submenus for 'System'
         $systemSubmenus = [
-            ['name' => 'Permission', 'icon' => 'permission_icon', 'url' => 'api/permission', 'position' => 1, 'parent_id' => $menuIds['System']],
-            ['name' => 'Role', 'icon' => 'role_icon', 'url' => 'api/role', 'position' => 2, 'parent_id' => $menuIds['System']],
-            ['name' => 'User', 'icon' => 'user_icon', 'url' => 'api/user', 'position' => 3, 'parent_id' => $menuIds['System']],
-            ['name' => 'Menu', 'icon' => 'menu_icon', 'url' => 'api/menu', 'position' => 4, 'parent_id' => $menuIds['System']],
+            ['name' => 'Permission', 'icon' => 'permission_icon', 'url' => 'api/permissions', 'position' => 1, 'parent_id' => $menuIds['System']],
+            ['name' => 'Role', 'icon' => 'role_icon', 'url' => 'api/roles', 'position' => 2, 'parent_id' => $menuIds['System']],
+            ['name' => 'User', 'icon' => 'user_icon', 'url' => 'api/users', 'position' => 3, 'parent_id' => $menuIds['System']],
+            ['name' => 'Menu', 'icon' => 'menu_icon', 'url' => 'api/menus', 'position' => 4, 'parent_id' => $menuIds['System']],
         ];
 
         $systemSubmenuIds = [];
