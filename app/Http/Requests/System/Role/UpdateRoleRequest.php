@@ -4,6 +4,7 @@ namespace App\Http\Requests\System\Role;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Spatie\Permission\Models\Role;
 
 class UpdateRoleRequest extends FormRequest
 {
@@ -22,14 +23,14 @@ class UpdateRoleRequest extends FormRequest
      */
     public function rules(): array
     {
-        $roleId = $this->route('roles');
+        $roleId = $this->getRoleId();
 
         return [
             'name' => [
-                'required',
+                'nullable',
                 'string',
                 'regex:/^[\p{L}0-9 ]+$/u',
-                Rule::unique('roles', 'name')->ignore($roleId)
+                Rule::unique('roles', 'name')->ignore($roleId) // Ignore the unique check for the current role
             ],
             'permissions' => ['nullable', 'array'],
             'permissions.*' => ['integer'],
@@ -37,12 +38,13 @@ class UpdateRoleRequest extends FormRequest
     }
 
     /**
-     * Get the role ID from the request body.
+     * Get the role ID from the request body or route.
      *
      * @return string|null
      */
     public function getRoleId(): ?string
     {
-        return $this->input('data.id');
+        // Ambil ID dari body request terlebih dahulu, jika tidak ada gunakan ID dari route
+        return $this->input('data.id') ?? $this->route('roles');
     }
 }

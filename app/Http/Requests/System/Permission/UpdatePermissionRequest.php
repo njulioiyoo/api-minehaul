@@ -26,7 +26,7 @@ class UpdatePermissionRequest extends FormRequest
 
         return [
             'name' => [
-                'required',
+                'nullable',
                 'string',
                 'regex:/^[\p{L}0-9 ]+$/u',
                 Rule::unique('permissions', 'name')->ignore($permissionId)

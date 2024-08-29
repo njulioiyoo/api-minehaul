@@ -22,19 +22,32 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules(): array
     {
+        $userId = $this->getUserId();
+
         return [
             'username' => ['required', 'string', 'regex:/^[a-zA-Z0-9._-]{3,20}$/'],
             'person_id' => ['required', 'string', 'regex:/^\d+$/'],
             'roles' => ['nullable', 'array'],
             'roles.*' => ['integer'],
-            // 'email' => [
-            //     'required',
-            //     'email',
-            //     'max:255',
-            //     'regex:/^[\w\.-]+@[\w\.-]+\.[a-zA-Z]{2,6}$/',
-            //     Rule::unique('users', 'email')->ignore($userId),
-            // ],
+            'email' => [
+                'nullable',
+                'email',
+                'max:255',
+                'regex:/^[\w\.-]+@[\w\.-]+\.[a-zA-Z]{2,6}$/',
+                Rule::unique('users', 'email')->ignore($userId),
+            ],
             'password' => ['nullable', 'confirmed', 'string', 'min:8'],
         ];
+    }
+
+    /**
+     * Get the role ID from the request body or route.
+     *
+     * @return string|null
+     */
+    public function getUserId(): ?string
+    {
+        // Ambil ID dari body request terlebih dahulu, jika tidak ada gunakan ID dari route
+        return $this->input('data.id') ?? $this->route('users');
     }
 }

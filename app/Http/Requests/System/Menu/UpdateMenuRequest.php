@@ -26,7 +26,7 @@ class UpdateMenuRequest extends FormRequest
 
         return [
             'name' => [
-                'required',
+                'nullable',
                 'string',
                 'regex:/^[\p{L}0-9 ]+$/u',
                 Rule::unique('menus', 'name')->ignore($menuId),
