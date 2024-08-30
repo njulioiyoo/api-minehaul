@@ -12,4 +12,9 @@ class DeviceMake extends Model
     use SoftDeletes;
 
     protected $table = 'device_makes';
+
+    public function deviceType()
+    {
+        return $this->belongsTo(DeviceType::class, 'device_type_id', 'id');
+    }
 }

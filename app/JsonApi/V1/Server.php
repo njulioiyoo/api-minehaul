@@ -36,7 +36,7 @@ class Server extends BaseServer
             DeviceSchema::class,
             PermissionSchema::class,
             RoleSchema::class,
-            MenuSchema::class,
+            MenuSchema::class
         ];
     }
 }

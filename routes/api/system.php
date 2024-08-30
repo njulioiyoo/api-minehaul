@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\System\MenuController;
 use App\Http\Controllers\Api\V1\System\PermissionController;
 use App\Http\Controllers\Api\V1\System\RoleController;
@@ -22,9 +21,6 @@ use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 */
 
 JsonApiRoute::server('v1')->middleware('json.api')->resources(function () {
-    Route::get('me', [ProfileController::class, 'readProfile']);
-    Route::patch('me', [ProfileController::class, 'updateProfile']);
-
     Route::middleware('verify.user.role', 'validate.api')->group(function () {
         // Routes for roles
         Route::prefix('roles')->group(function () {
