@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\UserProfile\ProfileService;
+use App\Services\ProfileService;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Responses\DataResponse;
 use Illuminate\Support\Facades\Log;
