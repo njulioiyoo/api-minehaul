@@ -19,6 +19,7 @@ class DeviceService
 
     public function createDevice(array $inputData)
     {
+        dd($inputData);
         $device = Device::create($inputData);
 
         if (!$device) {
