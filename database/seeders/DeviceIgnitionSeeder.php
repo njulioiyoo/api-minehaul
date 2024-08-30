@@ -15,16 +15,16 @@ class DeviceIgnitionSeeder extends Seeder
     public function run()
     {
         $data = [
-            ['id' => 0, 'name' => 'Normal'],
-            ['id' => 1, 'name' => 'Spark Ignition (SI)'],
-            ['id' => 2, 'name' => 'Compression Ignition (CI)'],
-            ['id' => 3, 'name' => 'Piezoelectric Ignition'],
-            ['id' => 4, 'name' => 'Hot Surface Ignition'],
-            ['id' => 5, 'name' => 'Electronic Ignition System'],
-            ['id' => 6, 'name' => 'Manual Ignition'],
-            ['id' => 7, 'name' => 'Pilot Light Ignition'],
-            ['id' => 8, 'name' => 'Glow Plug Ignition'],
-            ['id' => 9, 'name' => 'Flint Ignition'],
+            ['name' => 'Normal'],
+            ['name' => 'Spark Ignition (SI)'],
+            ['name' => 'Compression Ignition (CI)'],
+            ['name' => 'Piezoelectric Ignition'],
+            ['name' => 'Hot Surface Ignition'],
+            ['name' => 'Electronic Ignition System'],
+            ['name' => 'Manual Ignition'],
+            ['name' => 'Pilot Light Ignition'],
+            ['name' => 'Glow Plug Ignition'],
+            ['name' => 'Flint Ignition'],
         ];
 
         DB::table('device_ignition_types')->insert($data);
