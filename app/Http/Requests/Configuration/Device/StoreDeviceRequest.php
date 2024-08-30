@@ -14,16 +14,17 @@ class StoreDeviceRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['required', 'string', 'regex:/^[\p{L}0-9 ]+$/u'],
             'pit_id' => ['nullable', 'integer', 'regex:/^\d+$/'],
             'device_type_id' => ['required', 'integer', 'regex:/^\d+$/'],
             'device_make_id' => ['required', 'integer', 'regex:/^\d+$/'],
             'device_model_id' => ['nullable', 'integer', 'regex:/^\d+$/'],
-            'display_id' => ['required', 'string', 'regex:/^[A-Za-z0-9_-]+$/'],
-            'sim_id' => ['nullable', 'string', 'regex:/^[0-9]{10,20}$/'],
             'year' => ['nullable', 'integer', 'min:1900', 'max:2100'],
-            'device_immobilizitation_type_id' => ['nullable', 'integer', 'regex:/^\d+$/'],
-            'device_ignition_type_id' => ['nullable', 'integer', 'regex:/^\d+$/'],
+            'display_id' => ['required', 'string', 'regex:/^[A-Za-z0-9_-]+$/'],
+            'name' => ['required', 'string', 'regex:/^[\p{L}0-9 ]+$/u'],
+            'sim_id' => ['nullable', 'string', 'regex:/^[0-9]{10,20}$/'],
+            'device_immobilizitation_type_id' => ['required', 'integer', 'regex:/^\d+$/'],
+            'device_ignition_type_id' => ['required', 'integer', 'regex:/^\d+$/'],
+            'vehicle_id' => ['nullable', 'integer', 'regex:/^\d+$/'],
         ];
     }
 }

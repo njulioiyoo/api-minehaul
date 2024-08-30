@@ -15,6 +15,7 @@ class DeviceStatusSeeder extends Seeder
     public function run(): void
     {
         $data = [
+            ['name' => 'Availble'],
             ['name' => 'Assigned'],
             ['name' => 'Rejected']
         ];
