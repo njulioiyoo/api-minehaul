@@ -10,6 +10,9 @@ use App\Models\Device\DeviceMake;
 use App\Models\Device\DeviceModel;
 use App\Models\Device\DeviceStatus;
 use App\Models\Device\DeviceType;
+use App\Models\Vehicle\VehicleMake;
+use App\Models\Vehicle\VehicleStatus;
+use App\Models\Vehicle\VehicleType;
 use Illuminate\Support\Collection;
 
 class ReferenceModuleTransformer
@@ -44,7 +47,7 @@ class ReferenceModuleTransformer
                     'device_ignition_type' => $ignitionType
                 ]
             ],
-            'vehicle' => [
+            'vehicles' => [
                 'type' => 'vehicles',
                 'attributes' => $this->transformVehicle()
             ],
@@ -78,10 +81,25 @@ class ReferenceModuleTransformer
      */
     protected function transformVehicle(): array
     {
+        $status = VehicleStatus::select('id', 'name')->get();
+        $type = VehicleType::select('id', 'name')->get();
+        $makes = VehicleMake::with('vehicleType')->select('id', 'vehicle_type_id', 'name')->get();
+
+        $transformedMakes = $makes->map(function ($make) {
+            return [
+                'id' => $make->id,
+                'name' => $make->name,
+                'vehicle_type' => $make->vehicleType ? [
+                    'id' => $make->vehicleType->id,
+                    'name' => $make->vehicleType->name,
+                ] : null
+            ];
+        });
+
         return [
-            'vehicle_status' => [],
-            'vehicle_type' => [],
-            'vehicle_make' => []
+            'vehicle_status' => $status,
+            'vehicle_type' => $type,
+            'vehicle_make' => $transformedMakes
         ];
     }
 }
