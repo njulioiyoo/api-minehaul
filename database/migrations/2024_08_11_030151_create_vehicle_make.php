@@ -13,12 +13,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pits', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('account_id')->constrained()->onDelete('cascade');
-            $table->string('name');
-            $table->text('description')->nullable();
-            $table->enum('status', ['active', 'inactive', 'nullified'])->default('active');
+        Schema::create('vehicle_makes', function (Blueprint $table) {
+            $table->id()->bigIncrements()->primary();
+            $table->string('name', 255)->nullable()->default(null);
+            $table->integer('created_by')->nullable()->default(null);
+            $table->integer('updated_by')->nullable()->default(null);
 
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();
@@ -30,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pits');
+        Schema::dropIfExists('vehicle_makes');
     }
 };
