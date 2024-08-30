@@ -27,6 +27,6 @@ class DeviceIgnitionSeeder extends Seeder
             ['id' => 9, 'name' => 'Flint Ignition'],
         ];
 
-        DB::table('device_ignitions')->insert($data);
+        DB::table('device_ignition_types')->insert($data);
     }
 }

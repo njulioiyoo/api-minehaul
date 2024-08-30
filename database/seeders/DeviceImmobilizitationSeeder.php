@@ -25,6 +25,6 @@ class DeviceImmobilizitationSeeder extends Seeder
             ['id' => 7, 'name' => 'Traction Devices']
         ];
 
-        DB::table('device_ignitions')->insert($data);
+        DB::table('device_immobilizitation_types')->insert($data);
     }
 }
