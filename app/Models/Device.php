@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Device\DeviceIgnitionType;
+use App\Models\Device\DeviceImmobilizitationType;
 use App\Models\Device\DeviceMake;
 use App\Models\Device\DeviceModel;
 use App\Models\Device\DeviceType;
@@ -74,5 +76,15 @@ class Device extends Model
     public function deviceModel()
     {
         return $this->belongsTo(DeviceModel::class, 'device_model_id')->select('id', 'name');
+    }
+
+    public function deviceImmobilizitationType()
+    {
+        return $this->belongsTo(DeviceImmobilizitationType::class, 'device_immobilizitation_type_id')->select('id', 'name');
+    }
+
+    public function deviceIgnitionType()
+    {
+        return $this->belongsTo(DeviceIgnitionType::class, 'device_ignition_type_id')->select('id', 'name');
     }
 }
