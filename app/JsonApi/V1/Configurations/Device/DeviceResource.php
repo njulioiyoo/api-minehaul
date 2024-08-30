@@ -22,10 +22,13 @@ class DeviceResource extends JsonApiResource
             'device_type' => $this->deviceType,
             'device_make' => $this->deviceMake,
             'device_model' => $this->deviceModel,
+            'year' => $this->year,
             'display_id' => $this->display_id,
             'name' => $this->name,
             'sim_id' => $this->sim_id,
-            'year' => $this->year,
+            'device_immobilizitation_type_id' => $this->device_immobilizitation_type_id,
+            'device_ignition_type_id' => $this->device_ignition_type_id,
+            'device_status_id' => $this->device_status_id,
             'status' => $this->status
         ];
     }

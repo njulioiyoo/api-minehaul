@@ -15,16 +15,19 @@ return new class extends Migration
     {
         Schema::create('devices', function (Blueprint $table) {
             $table->id()->bigIncrements()->primary();
-            $table->integer('account_id')->nullable()->default(null);
+            $table->foreignId('account_id')->constrained()->onDelete('cascade');
             $table->integer('pit_id')->nullable()->default(null);
-            $table->integer('device_type_id')->nullable()->default(null);
-            $table->integer('device_make_id')->nullable()->default(null);
-            $table->integer('device_model_id')->nullable()->default(null);
+            $table->foreignId('device_type_id')->constrained()->onDelete('cascade');
+            $table->foreignId('device_make_id')->constrained()->onDelete('cascade');
+            $table->foreignId('device_model_id')->constrained()->onDelete('cascade');
+            $table->year('year')->nullable()->default(null);
             $table->string('display_id', 100)->nullable()->default(null);
             $table->string('name', 255)->nullable()->default(null);
             $table->string('sim_id', 255)->nullable()->default(null);
-            $table->year('year')->nullable()->default(null);
-            $table->integer('device_status_id')->nullable()->default(null);
+            $table->foreignId('device_immobilizitation_type_id')->constrained()->onDelete('cascade');
+            $table->foreignId('device_ignition_type_id')->constrained()->onDelete('cascade');
+            $table->foreignId('vehicle_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('device_status_id')->constrained()->onDelete('cascade');
             $table->enum('status', ['active', 'inactive', 'nullified'])->default('nullified');
             $table->integer('created_by')->nullable()->default(null);
             $table->integer('updated_by')->nullable()->default(null);
