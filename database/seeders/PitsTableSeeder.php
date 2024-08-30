@@ -22,7 +22,6 @@ class PitsTableSeeder extends Seeder
                 'account_id' => $account->id,
                 'name' => $faker->word . ' Pit',
                 'description' => $faker->sentence,
-                'status' => $faker->randomElement(['active', 'inactive', 'nullified']),
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ]);

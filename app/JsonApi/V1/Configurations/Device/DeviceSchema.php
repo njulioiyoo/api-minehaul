@@ -38,13 +38,15 @@ class DeviceSchema extends Schema
             ID::make('uid')->uuid(),
             Number::make('pit_id')->sortable(),
             Number::make('device_type_id')->sortable(),
+            Number::make('device_make_id')->sortable(),
+            Number::make('device_model_id')->sortable(),
+            Number::make('year')->sortable(),
             Str::make('display_id')->sortable(),
             Str::make('name')->sortable(),
             Str::make('sim_id')->sortable(),
-            Number::make('year')->sortable(),
-            Number::make('device_make_id')->sortable(),
-            Number::make('device_model_id')->sortable(),
-            Str::make('status')->sortable(),
+            Number::make('device_immobilizitation_type_id')->sortable(),
+            Number::make('device_ignition_type_id')->sortable(),
+            Number::make('vehicle_id')->sortable(),
         ];
     }
 }

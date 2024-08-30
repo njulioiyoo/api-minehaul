@@ -19,7 +19,7 @@ use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 
 JsonApiRoute::server('v1')->middleware('validate.api', 'json.api', 'verify.user.role')->resources(function () {
     // Routes for devices
-    Route::prefix('device')->group(function () {
+    Route::prefix('devices')->group(function () {
         Route::get('/', [DeviceController::class, 'readDevice'])->name('device.index')->middleware('verify.user.permission:View Device');
         Route::post('/', [DeviceController::class, 'createDevice'])->name('device.create')->middleware('verify.user.permission:Create Device');
         Route::patch('/', [DeviceController::class, 'updateDevice'])->name('device.update')->middleware('verify.user.permission:Edit Device');

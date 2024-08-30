@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Device;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class DeviceType extends Model
+class DeviceStatus extends Model
 {
     use HasFactory;
     use SoftDeletes;
 
-    protected $table = 'device_types';
+    protected $table = 'device_statuses';
 }
