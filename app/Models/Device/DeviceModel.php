@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Device;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,6 +15,6 @@ class DeviceModel extends Model
 
     public function deviceMake()
     {
-        return $this->belongsTo(DeviceMake::class, 'device_make_id', 'id');
+        return $this->belongsTo(DeviceMake::class, 'device_make_id', 'id')->select('id', 'name');
     }
 }

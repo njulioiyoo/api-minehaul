@@ -15,14 +15,14 @@ class DeviceImmobilizitationSeeder extends Seeder
     public function run()
     {
         $data = [
-            ['id' => 0, 'name' => 'Normal'],
-            ['id' => 1, 'name' => 'Casts'],
-            ['id' => 2, 'name' => 'Splints'],
-            ['id' => 3, 'name' => 'Braces'],
-            ['id' => 4, 'name' => 'Slings'],
-            ['id' => 5, 'name' => 'Immobilization Boots'],
-            ['id' => 6, 'name' => 'External Fixators'],
-            ['id' => 7, 'name' => 'Traction Devices']
+            ['name' => 'Normal'],
+            ['name' => 'Casts'],
+            ['name' => 'Splints'],
+            ['name' => 'Braces'],
+            ['name' => 'Slings'],
+            ['name' => 'Immobilization Boots'],
+            ['name' => 'External Fixators'],
+            ['name' => 'Traction Devices']
         ];
 
         DB::table('device_immobilizitation_types')->insert($data);

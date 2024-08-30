@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('vehicle_models', function (Blueprint $table) {
             $table->id()->bigIncrements()->primary();
             $table->string('name', 255)->nullable()->default(null);
+            $table->foreignId('vehicle_make_id')->constrained()->onDelete('cascade');
             $table->integer('created_by')->nullable()->default(null);
             $table->integer('updated_by')->nullable()->default(null);
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\DeviceModel;
+use App\Models\Device\DeviceModel;
 use App\Helpers\PaginationHelper;
 use App\Transformers\ReferenceModuleTransformer;
 
