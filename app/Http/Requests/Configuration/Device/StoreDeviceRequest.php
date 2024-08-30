@@ -22,7 +22,8 @@ class StoreDeviceRequest extends FormRequest
             'display_id' => ['required', 'string', 'regex:/^[A-Za-z0-9_-]+$/'],
             'sim_id' => ['nullable', 'string', 'regex:/^[0-9]{10,20}$/'],
             'year' => ['nullable', 'integer', 'min:1900', 'max:2100'],
-            'status' => ['nullable', 'string', 'in:active,inactive'],
+            'device_immobilizitation_type_id' => ['nullable', 'integer', 'regex:/^\d+$/'],
+            'device_ignition_type_id' => ['nullable', 'integer', 'regex:/^\d+$/'],
         ];
     }
 }
