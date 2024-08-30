@@ -15,18 +15,17 @@ return new class extends Migration
     {
         Schema::create('vehicles', function (Blueprint $table) {
             $table->id()->bigIncrements()->primary();
-            $table->integer('account_id');
-            $table->integer('pit_id');
+            $table->foreignId('account_id')->constrained()->onDelete('cascade');
+            $table->foreignId('pit_id')->constrained()->onDelete('cascade');
             $table->string('display_id', 100)->nullable();
             $table->string('name', 255)->nullable();
             $table->string('vin', 255)->nullable();
             $table->string('license_plate', 50)->nullable();
+            $table->foreignId('vehicle_type_id')->constrained()->onDelete('cascade');
+            $table->foreignId('vehicle_make_id')->constrained()->onDelete('cascade');
+            $table->foreignId('vehicle_model_id')->constrained()->onDelete('cascade');
             $table->year('year')->nullable();
-            $table->integer('type_id')->nullable();
-            $table->integer('make_id')->nullable();
-            $table->integer('model_id')->nullable();
-            $table->integer('status_id')->nullable();
-            $table->enum('status', ['active', 'inactive', 'nullified'])->default('active');
+            $table->foreignId('vehicle_status_id')->constrained()->onDelete('cascade');
             $table->integer('created_by')->nullable()->default(null);
             $table->integer('updated_by')->nullable()->default(null);
             $table->string('uid', 100)->nullable()->default(null);
@@ -41,6 +40,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('vehicle');
+        Schema::dropIfExists('vehicles');
     }
 };
