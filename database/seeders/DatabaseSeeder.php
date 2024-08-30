@@ -22,6 +22,9 @@ class DatabaseSeeder extends Seeder
         $this->call(PersonSeeder::class);
         $this->call(AccountSeeder::class);
         $this->call(PitsTableSeeder::class);
+        $this->call(DeviceIgnitionSeeder::class);
+        $this->call(DeviceImmobilizitationSeeder::class);
+        $this->call(DeviceStatusSeeder::class);
         $this->call(DeviceTypeSeeder::class);
         $this->call(DeviceMakeSeeder::class);
         $this->call(DeviceModelSeeder::class);
