@@ -8,42 +8,48 @@ use App\Models\Device;
 
 class DeviceTransformer
 {
+    /**
+     * Transforms a Device model into an array format.
+     *
+     * @param Device $device
+     * @return array
+     */
     public function transform(Device $device): array
     {
         return [
             'type' => 'devices',
             'id' => $device->uid,
             'attributes' => [
-                'id' => $device->id,
-                'account' => $device->account ? [
-                    'id' => $device->account->id,
-                    'company_code' => $device->account->company_code,
-                    'company_name' => $device->account->company_name,
-                ] : null,
-                'pit' => $device->pit ? [
-                    'id' => $device->pit->id,
-                    'name' => $device->pit->name,
-                    'description' => $device->pit->description,
-                ] : null,
-                'device_type' => $device->deviceType ? [
-                    'id' => $device->deviceType->id,
-                    'name' => $device->deviceType->name,
-                ] : null,
-                'device_make' => $device->deviceMake ? [
-                    'id' => $device->deviceMake->id,
-                    'name' => $device->deviceMake->name,
-                ] : null,
-                'device_model' => $device->deviceModel ? [
-                    'id' => $device->deviceModel->id,
-                    'name' => $device->deviceModel->name,
-                ] : null,
+                'id' => $device->uid,
+                'account' => $this->transformRelation($device->account, ['id', 'company_code', 'company_name']),
+                'pit' => $this->transformRelation($device->pit, ['id', 'name', 'description']),
+                'device_type' => $this->transformRelation($device->deviceType, ['id', 'name']),
+                'device_make' => $this->transformRelation($device->deviceMake, ['id', 'name']),
+                'device_model' => $this->transformRelation($device->deviceModel, ['id', 'name']),
+                'year' => $device->year,
                 'display_id' => $device->display_id,
                 'name' => $device->name,
                 'sim_id' => $device->sim_id,
-                'year' => $device->year,
+                'device_immobilizitation_type' => $this->transformRelation($device->deviceImmobilizitationType, ['id', 'name']),
+                'device_ignition_type' => $this->transformRelation($device->deviceIgnitionType, ['id', 'name']),
                 'status' => $device->status,
-                'uid' => $device->uid,
             ]
         ];
+    }
+
+    /**
+     * Transforms a related model into an array format.
+     *
+     * @param mixed $relation
+     * @param array $fields
+     * @return array|null
+     */
+    private function transformRelation($relation, array $fields): ?array
+    {
+        if (!$relation) {
+            return null;
+        }
+
+        return $relation->only($fields);
     }
 }
