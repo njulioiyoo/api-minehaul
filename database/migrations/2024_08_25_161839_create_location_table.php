@@ -23,10 +23,10 @@ return new class extends Migration
             Schema::drop('locations');
         }
 
-        $postgisExists = DB::select("SELECT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'postgis') AS exists");
-        if (!$postgisExists[0]->exists) {
-            DB::statement('CREATE EXTENSION postgis');
-        }
+        // $postgisExists = DB::select("SELECT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'postgis') AS exists");
+        // if (!$postgisExists[0]->exists) {
+        //     DB::statement('CREATE EXTENSION postgis');
+        // }
 
         Schema::create('locations', function (Blueprint $table) {
             $table->id()->bigIncrements()->primary();
