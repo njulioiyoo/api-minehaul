@@ -28,7 +28,7 @@ class DevicesTableSeeder extends Seeder
                 'name' => 'Device ' . $i,
                 'sim_id' => 'SIM' . str_pad((string) $i, 10, '0', STR_PAD_LEFT),
                 'year' => rand(2018, 2024),
-                'status_id' => rand(1, 5),
+                'device_status_id' => rand(1, 5),
                 'status' => ['active', 'inactive', 'nullified'][rand(0, 2)],
                 'created_by' => rand(1, 5),
                 'updated_by' => rand(1, 5),

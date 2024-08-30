@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('name', 255)->nullable()->default(null);
             $table->string('sim_id', 255)->nullable()->default(null);
             $table->year('year')->nullable()->default(null);
-            $table->integer('status_id')->nullable()->default(null);
+            $table->integer('device_status_id')->nullable()->default(null);
             $table->enum('status', ['active', 'inactive', 'nullified'])->default('nullified');
             $table->integer('created_by')->nullable()->default(null);
             $table->integer('updated_by')->nullable()->default(null);
