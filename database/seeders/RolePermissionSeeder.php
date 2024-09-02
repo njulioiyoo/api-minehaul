@@ -69,6 +69,7 @@ class RolePermissionSeeder extends Seeder
             'Delete Permissions',
             'View Menus',
             'Edit Menus',
+            'Delete Menus',
         ]);
 
         $slugAdminPermissions = collect($superAdminPermissions)->map(function ($permission) {
