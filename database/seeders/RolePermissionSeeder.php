@@ -69,7 +69,8 @@ class RolePermissionSeeder extends Seeder
 
         // Create permissions if they don't exist
         foreach (array_unique(array_merge($accountPermissions, $superAdminPermissions)) as $permissionName) {
-            Permission::firstOrCreate(['name' => Str::slug(Str::lower($permissionName), "-"), 'guard_name' => 'api']);
+            Permission::firstOrCreate(['name' => $permissionName, 'guard_name' => 'api']);
+            // Permission::firstOrCreate(['name' => Str::slug($permissionName, "-"), 'guard_name' => 'api']);
         }
 
         // Fetch created permissions from database
