@@ -40,7 +40,8 @@ class DeviceController extends Controller
 
         try {
             $response = $this->deviceService->readDevice($queryParams);
-            return response()->json($response);
+            return new DataResponse((object)$response);
+            // return response()->json($response);
         } catch (\Exception $e) {
             Log::error("Error reading devices: {$e->getMessage()}");
             return new ErrorResponse(collect([

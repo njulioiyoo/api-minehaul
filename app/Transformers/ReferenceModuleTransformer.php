@@ -11,6 +11,7 @@ use App\Models\Device\DeviceModel;
 use App\Models\Device\DeviceStatus;
 use App\Models\Device\DeviceType;
 use App\Models\Vehicle\VehicleMake;
+use App\Models\Vehicle\VehicleModel;
 use App\Models\Vehicle\VehicleStatus;
 use App\Models\Vehicle\VehicleType;
 use Illuminate\Support\Collection;
@@ -26,11 +27,11 @@ class ReferenceModuleTransformer
     {
         // Retrieve all necessary data in a single batch
         $status = DeviceStatus::select('id', 'name', 'status_theme')->get();
-        $type = DeviceType::select('id', 'name')->get();
-        $make = DeviceMake::with('deviceType')->select('id', 'device_type_id', 'name')->get();
+        $types = DeviceType::select('id', 'name')->get();
+        $makes = DeviceMake::with('deviceType')->select('id', 'device_type_id', 'name')->get();
         $models = DeviceModel::with('deviceMake')->select('id', 'device_make_id', 'name')->get();
-        $immobilizitationType = DeviceImmobilizitationType::select('id', 'name')->get();
-        $ignitionType = DeviceIgnitionType::select('id', 'name')->get();
+        $immobilizitationTypes = DeviceImmobilizitationType::select('id', 'name')->get();
+        $ignitionTypes = DeviceIgnitionType::select('id', 'name')->get();
 
         // Transform data model and its relations
         $transformedModels = $this->transformDeviceModels($models);
@@ -40,11 +41,11 @@ class ReferenceModuleTransformer
                 'type' => 'devices',
                 'attributes' => [
                     'device_status' => $status,
-                    'device_type' => $type,
-                    'device_make' => $make,
+                    'device_type' => $types,
+                    'device_make' => $makes,
                     'device_model' => $transformedModels,
-                    'device_immobilizitation_type' => $immobilizitationType,
-                    'device_ignition_type' => $ignitionType
+                    'device_immobilizitation_type' => $immobilizitationTypes,
+                    'device_ignition_type' => $ignitionTypes
                 ]
             ],
             'vehicles' => [
@@ -82,8 +83,9 @@ class ReferenceModuleTransformer
     protected function transformVehicle(): array
     {
         $status = VehicleStatus::select('id', 'name')->get();
-        $type = VehicleType::select('id', 'name')->get();
+        $types = VehicleType::select('id', 'name')->get();
         $makes = VehicleMake::with('vehicleType')->select('id', 'vehicle_type_id', 'name')->get();
+        $models = VehicleModel::with('vehicleMake')->select('id', 'vehicle_make_id', 'name')->get();
 
         $transformedMakes = $makes->map(function ($make) {
             return [
@@ -96,10 +98,22 @@ class ReferenceModuleTransformer
             ];
         });
 
+        $transformedModel = $models->map(function ($model) {
+            return [
+                'id' => $model->id,
+                'name' => $model->name,
+                'vehicle_model' => $model->vehicleMake ? [
+                    'id' => $model->vehicleMake->id,
+                    'name' => $model->vehicleMake->name,
+                ] : null
+            ];
+        });
+
         return [
             'vehicle_status' => $status,
-            'vehicle_type' => $type,
-            'vehicle_make' => $transformedMakes
+            'vehicle_type' => $types,
+            'vehicle_make' => $transformedMakes,
+            'vehicle_model' => $transformedModel
         ];
     }
 }
