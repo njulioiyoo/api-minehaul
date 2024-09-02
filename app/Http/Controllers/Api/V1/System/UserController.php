@@ -29,7 +29,7 @@ class UserController extends Controller
     public function createUser(StoreUserRequest $request)
     {
         try {
-            $validatedData = $request->validated();
+            $validatedData = $request->all();
             $roles = $validatedData['roles'];
             $user = $this->userService->createUser($validatedData, $roles);
 
@@ -53,7 +53,7 @@ class UserController extends Controller
     public function updateUser(UpdateUserRequest $request)
     {
         try {
-            $validatedData = $request->validated();
+            $validatedData = $request->all();
             $roles = $validatedData['roles'] ?? [];
             [$input, $userId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'users', true);
             $user = $this->userService->updateUser($userId, $validatedData, $roles);
