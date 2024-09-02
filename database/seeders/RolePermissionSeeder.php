@@ -8,6 +8,7 @@ use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use App\Models\User;
+use Illuminate\Support\Str;
 
 class RolePermissionSeeder extends Seeder
 {
@@ -68,7 +69,7 @@ class RolePermissionSeeder extends Seeder
 
         // Create permissions if they don't exist
         foreach (array_unique(array_merge($accountPermissions, $superAdminPermissions)) as $permissionName) {
-            Permission::firstOrCreate(['name' => $permissionName, 'guard_name' => 'api']);
+            Permission::firstOrCreate(['name' => Str::slug(Str::lower($permissionName), "-"), 'guard_name' => 'api']);
         }
 
         // Fetch created permissions from database
