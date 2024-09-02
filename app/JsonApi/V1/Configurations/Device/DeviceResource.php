@@ -26,9 +26,8 @@ class DeviceResource extends JsonApiResource
             'display_id' => $this->display_id,
             'name' => $this->name,
             'sim_id' => $this->sim_id,
-            'device_immobilizitation_type_id' => $this->device_immobilizitation_type_id,
-            'device_ignition_type_id' => $this->device_ignition_type_id,
-            'device_status_id' => $this->device_status_id,
+            'device_immobilizitation_type_id' => $this->deviceImmobilizitationType,
+            'device_ignition_type_id' => $this->deviceIgnitionType,
             'status' => $this->status
         ];
     }
