@@ -13,21 +13,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('devices', function (Blueprint $table) {
+        Schema::create('drivers', function (Blueprint $table) {
             $table->id()->bigIncrements()->primary();
             $table->foreignId('account_id')->constrained()->onDelete('cascade');
             $table->integer('pit_id')->nullable()->default(null);
-            $table->foreignId('device_type_id')->constrained()->onDelete('cascade');
-            $table->foreignId('device_make_id')->constrained()->onDelete('cascade');
-            $table->foreignId('device_model_id')->constrained()->onDelete('cascade');
-            $table->year('year')->nullable()->default(null);
             $table->string('display_id', 100)->nullable()->default(null);
             $table->string('name', 255)->nullable()->default(null);
-            $table->string('sim_id', 255)->nullable()->default(null);
-            $table->foreignId('device_immobilizitation_type_id')->constrained()->onDelete('cascade');
-            $table->foreignId('device_ignition_type_id')->constrained()->onDelete('cascade');
-            $table->foreignId('vehicle_id')->nullable()->constrained()->onDelete('cascade');
-            $table->foreignId('device_status_id')->constrained()->onDelete('cascade');
+            $table->string('email', 255)->nullable()->default(null);
+            $table->string('phone_number', 255)->nullable()->default(null);
             $table->integer('created_by')->nullable()->default(null);
             $table->integer('updated_by')->nullable()->default(null);
             $table->string('uid', 100)->nullable()->default(null);
@@ -42,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('devices');
+        Schema::dropIfExists('drivers');
     }
 };
