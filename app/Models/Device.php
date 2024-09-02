@@ -8,6 +8,7 @@ use App\Models\Device\DeviceIgnitionType;
 use App\Models\Device\DeviceImmobilizitationType;
 use App\Models\Device\DeviceMake;
 use App\Models\Device\DeviceModel;
+use App\Models\Device\DeviceStatus;
 use App\Models\Device\DeviceType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -44,6 +45,10 @@ class Device extends Model
                     $device->account_id = $person->account_id;
                 }
             }
+
+            // Set default device_status_id to 1 if it is null
+            $device->device_status_id ??= 1;
+
             $device->uid = $device->exists ? $device->uid : Str::uuid()->toString();
             $device->{$device->exists ? 'updated_by' : 'created_by'} = auth()->user()->id;
         });
@@ -86,5 +91,10 @@ class Device extends Model
     public function deviceIgnitionType()
     {
         return $this->belongsTo(DeviceIgnitionType::class, 'device_ignition_type_id')->select('id', 'name');
+    }
+
+    public function deviceStatus()
+    {
+        return $this->belongsTo(DeviceStatus::class, 'device_status_id')->select('id', 'name');
     }
 }

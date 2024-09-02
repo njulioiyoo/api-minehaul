@@ -32,7 +32,6 @@ class DevicesTableSeeder extends Seeder
                 'device_ignition_type_id' => rand(1, 5),
                 'vehicle_id' => null,
                 'device_status_id' => rand(1, 2),
-                'status' => ['active', 'inactive', 'nullified'][rand(0, 2)],
                 'created_by' => rand(1, 5),
                 'updated_by' => rand(1, 5),
                 'uid' => Str::uuid()->toString(),
