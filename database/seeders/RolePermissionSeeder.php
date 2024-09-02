@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
-use App\Models\User;
-use Illuminate\Support\Str;
 
 class RolePermissionSeeder extends Seeder
 {
@@ -48,7 +48,7 @@ class RolePermissionSeeder extends Seeder
             'View Notifications',
             'View Minehaul AI',
         ];
-        
+
         $slugAccountPermissions = collect($accountPermissions)->map(function ($permission) {
             return Str::slug($permission);
         });
@@ -70,6 +70,7 @@ class RolePermissionSeeder extends Seeder
             'View Menus',
             'Edit Menus',
             'Delete Menus',
+            'Create Menus',
         ]);
 
         $slugAdminPermissions = collect($superAdminPermissions)->map(function ($permission) {
@@ -78,7 +79,7 @@ class RolePermissionSeeder extends Seeder
 
         // Create permissions if they don't exist
         foreach ($slugAccountPermissions->merge($slugAdminPermissions)->unique() as $permissionName) {
-            Permission::firstOrCreate(['name' => Str::slug(Str::lower($permissionName), "-"), 'guard_name' => 'api']);
+            Permission::firstOrCreate(['name' => Str::slug(Str::lower($permissionName), '-'), 'guard_name' => 'api']);
         }
 
         // Fetch created permissions from database
