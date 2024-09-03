@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\JsonApi\V1;
 
 use App\JsonApi\V1\Configurations\Device\DeviceSchema;
+use App\JsonApi\V1\Configurations\Vehicle\VehicleSchema;
 use App\JsonApi\V1\System\Menu\MenuSchema;
 use App\JsonApi\V1\System\Permission\PermissionSchema;
 use App\JsonApi\V1\System\Role\RoleSchema;
@@ -36,7 +37,8 @@ class Server extends BaseServer
             DeviceSchema::class,
             PermissionSchema::class,
             RoleSchema::class,
-            MenuSchema::class
+            MenuSchema::class,
+            VehicleSchema::class
         ];
     }
 }

@@ -17,6 +17,17 @@ class VehicleService
         $this->transformer = $transformer;
     }
 
+    public function createVehicle(array $inputData)
+    {
+        $vehicle = Vehicle::create($inputData);
+
+        if (!$vehicle) {
+            throw new \Exception('Failed to create vehicle');
+        }
+
+        return $vehicle;
+    }
+
     public function readVehicle(array $queryParams)
     {
         $perPage = $queryParams['page']['size'] ?? 10;

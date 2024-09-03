@@ -55,7 +55,7 @@ class ProfileController extends Controller
     {
         try {
             // Validate and update the profile through the service
-            $user = $this->profileService->updateProfile($request->all());
+            $user = $this->profileService->updateProfile($request->validated());
 
             // Return a DataResponse with the updated user data
             return new DataResponse($user);

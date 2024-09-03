@@ -30,7 +30,7 @@ class MenuController extends Controller
     public function createMenu(StoreMenuRequest $request)
     {
         try {
-            $validatedData = $request->all();
+            $validatedData = $request->validated();
             $menu = $this->menuService->createMenu($validatedData);
 
             return new DataResponse($menu);
@@ -51,7 +51,7 @@ class MenuController extends Controller
     public function updateMenu(UpdateMenuRequest $request)
     {
         try {
-            $validatedData = $request->all();
+            $validatedData = $request->validated();
             [$input, $menuId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'menus', true);
             $menu = $this->menuService->updateMenu($menuId, $validatedData);
 

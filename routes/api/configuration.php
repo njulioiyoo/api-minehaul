@@ -30,7 +30,7 @@ JsonApiRoute::server('v1')->middleware('validate.api', 'json.api', 'verify.user.
     // Routes for vehicles
     Route::prefix('vehicles')->group(function () {
         Route::get('/', [VehicleController::class, 'readVehicle'])->name('vehicle.index')->middleware('verify.user.permission:view-vehicle');
-        // Route::post('/', [VehicleController::class, 'createVehicle'])->name('vehicle.create')->middleware('verify.user.permission:Create Vehicle');
+        Route::post('/', [VehicleController::class, 'createVehicle'])->name('vehicle.create')->middleware('verify.user.permission:create-vehicle');
         // Route::patch('/', [VehicleController::class, 'updateVehicle'])->name('vehicle.update')->middleware('verify.user.permission:Edit Vehicle');
         // Route::delete('/', [VehicleController::class, 'deleteVehicle'])->name('vehicle.delete')->middleware('verify.user.permission:Delete Vehicle');
     });

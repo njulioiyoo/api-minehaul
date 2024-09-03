@@ -23,6 +23,7 @@ class StoreVehicleRequest extends FormRequest
     {
         return [
             'pit_id' => ['nullable', 'integer', 'regex:/^\d+$/'],
+            'year' => ['nullable', 'integer', 'min:1900', 'max:2100'],
             'display_id' => ['required', 'string', 'regex:/^[A-Za-z0-9_-]+$/'],
             'name' => ['required', 'string', 'regex:/^[\p{L}0-9 ]+$/u'],
             'vin' => ['required', 'string', 'regex:/^[\p{L}0-9 ]+$/u'],
@@ -30,7 +31,6 @@ class StoreVehicleRequest extends FormRequest
             'vehicle_type_id' => ['required', 'integer', 'regex:/^\d+$/'],
             'vehicle_make_id' => ['required', 'integer', 'regex:/^\d+$/'],
             'vehicle_model_id' => ['required', 'integer', 'regex:/^\d+$/'],
-            'year' => ['nullable', 'integer', 'min:1900', 'max:2100'],
             'vehicle_status_id' => ['nullable', 'integer', 'regex:/^\d+$/'],
         ];
     }
