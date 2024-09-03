@@ -28,7 +28,8 @@ class VehicleController extends Controller
         $validatedData = $request->validated();
         $vehicle = $this->vehicleService->createVehicle($validatedData);
 
-        return new DataResponse($vehicle);
+        // return new DataResponse($vehicle);
+        return response()->json($vehicle);
     }
 
     public function readVehicle(Request $request)

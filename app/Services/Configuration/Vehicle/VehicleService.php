@@ -7,6 +7,7 @@ namespace App\Services\Configuration\Vehicle;
 use App\Helpers\PaginationHelper;
 use App\Models\Vehicle;
 use App\Transformers\VehicleTransformer;
+use Illuminate\Support\Facades\DB;
 
 class VehicleService
 {
@@ -19,11 +20,17 @@ class VehicleService
 
     public function createVehicle(array $inputData)
     {
+        DB::beginTransaction();
         $vehicle = Vehicle::create($inputData);
 
         if (!$vehicle) {
+            DB::rollBack();
             throw new \Exception('Failed to create vehicle');
         }
+
+        $vehicle = $this->transformer->transform($vehicle);
+
+        DB::commit();
 
         return $vehicle;
     }

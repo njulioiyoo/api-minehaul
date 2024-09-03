@@ -29,4 +29,6 @@ return [
     'servers' => [
         'v1' => \App\JsonApi\V1\Server::class,
     ],
+
+    'version' => '1.0',
 ];
