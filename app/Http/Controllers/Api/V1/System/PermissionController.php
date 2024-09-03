@@ -9,15 +9,15 @@ use App\Http\Requests\System\Permission\StorePermissionRequest;
 use App\Http\Requests\System\Permission\UpdatePermissionRequest;
 use App\Services\RequestHelperService;
 use App\Services\System\Permission\PermissionService;
-use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Responses\DataResponse;
 use App\Traits\ExceptionHandlerTrait;
+use Illuminate\Http\Request;
 
 class PermissionController extends Controller
 {
     use ExceptionHandlerTrait;
 
     protected $permissionService;
+
     protected $requestHelperService;
 
     public function __construct(PermissionService $permissionService, RequestHelperService $requestHelperService)
@@ -32,7 +32,7 @@ class PermissionController extends Controller
             $validatedData = $request->validated();
             $permission = $this->permissionService->createPermission($validatedData);
 
-            return new DataResponse($permission);
+            return response()->json($permission);
         } catch (\Exception $e) {
             return $this->handleException($e, 'Error creating permission');
         }
@@ -44,6 +44,7 @@ class PermissionController extends Controller
 
         try {
             $response = $this->permissionService->readPermission($queryParams);
+
             return response()->json($response);
         } catch (\Exception $e) {
             return $this->handleException($e, 'Error reading permissions');
@@ -57,7 +58,7 @@ class PermissionController extends Controller
             [$input, $permissionId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'permissions', true);
             $permission = $this->permissionService->updatePermission($permissionId, $validatedData);
 
-            return new DataResponse($permission);
+            return response()->json($permission);
         } catch (\Exception $e) {
             return $this->handleException($e, 'Error updating permission');
         }
@@ -69,6 +70,7 @@ class PermissionController extends Controller
 
         try {
             $this->permissionService->deletePermission($permissionId);
+
             return response()->json(['message' => 'Permission deleted successfully.']);
         } catch (\Exception $e) {
             return $this->handleException($e, 'Error deleting permission');

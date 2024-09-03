@@ -11,7 +11,6 @@ use App\Services\RequestHelperService;
 use App\Services\System\Role\RoleService;
 use App\Traits\ExceptionHandlerTrait;
 use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Responses\DataResponse;
 
 class RoleController extends Controller
 {
@@ -61,7 +60,7 @@ class RoleController extends Controller
 
             $role = $this->roleService->updateRole($roleId, $validatedData, $permissions);
 
-            return new DataResponse($role);
+            return response()->json($role);
         } catch (\Exception $e) {
             return $this->handleException($e, 'Error updating role');
         }
