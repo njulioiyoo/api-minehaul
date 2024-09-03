@@ -19,3 +19,6 @@ yarn-error.log
 /.idea
 /.vscode
 .htaccess
+Dockerfile.local
+nginx.conf
+docker-compose.local.yml

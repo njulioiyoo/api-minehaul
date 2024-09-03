@@ -48,6 +48,10 @@ class RolePermissionSeeder extends Seeder
             'View Notifications',
             'View Minehaul AI',
         ];
+        
+        $slugAccountPermissions = collect($accountPermissions)->map(function ($permission) {
+            return Str::slug($permission);
+        });
 
         // Define permissions for Super Administrator
         $superAdminPermissions = array_merge($accountPermissions, [
@@ -67,15 +71,18 @@ class RolePermissionSeeder extends Seeder
             'Edit Menus',
         ]);
 
+        $slugAdminPermissions = collect($superAdminPermissions)->map(function ($permission) {
+            return Str::slug($permission);
+        });
+
         // Create permissions if they don't exist
-        foreach (array_unique(array_merge($accountPermissions, $superAdminPermissions)) as $permissionName) {
-            Permission::firstOrCreate(['name' => $permissionName, 'guard_name' => 'api']);
-            // Permission::firstOrCreate(['name' => Str::slug($permissionName, "-"), 'guard_name' => 'api']);
+        foreach ($slugAccountPermissions->merge($slugAdminPermissions)->unique() as $permissionName) {
+            Permission::firstOrCreate(['name' => Str::slug(Str::lower($permissionName), "-"), 'guard_name' => 'api']);
         }
 
         // Fetch created permissions from database
-        $accountPermissions = Permission::whereIn('name', $accountPermissions)->get();
-        $superAdminPermissions = Permission::whereIn('name', $superAdminPermissions)->get();
+        $accountPermissions = Permission::whereIn('name', $slugAccountPermissions)->get();
+        $superAdminPermissions = Permission::whereIn('name', $slugAdminPermissions)->get();
 
         // Sync permissions to roles
         $accountRole->syncPermissions($accountPermissions);

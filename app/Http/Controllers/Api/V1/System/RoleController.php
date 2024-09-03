@@ -29,7 +29,7 @@ class RoleController extends Controller
     public function createRole(StoreRoleRequest $request)
     {
         try {
-            $validatedData = $request->validated();
+            $validatedData = $request->all();
             $permissions = $validatedData['permissions'] ?? [];
             $role = $this->roleService->createRole($validatedData, $permissions);
 
@@ -53,7 +53,7 @@ class RoleController extends Controller
     public function updateRole(UpdateRoleRequest $request)
     {
         try {
-            $validatedData = $request->validated();
+            $validatedData = $request->all();
             [$input, $roleId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'roles', true);
             $permissions = $validatedData['permissions'] ?? [];
 

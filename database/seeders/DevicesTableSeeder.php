@@ -30,13 +30,14 @@ class DevicesTableSeeder extends Seeder
                 'sim_id' => 'SIM' . str_pad((string) $i, 10, '0', STR_PAD_LEFT),
                 'device_immobilizitation_type_id' => rand(1, 5),
                 'device_ignition_type_id' => rand(1, 5),
-                // 'vehicle_id' => null,
+                'vehicle_id' => null,
                 'device_status_id' => rand(1, 2),
                 'created_by' => rand(1, 5),
                 'updated_by' => rand(1, 5),
                 'uid' => Str::uuid()->toString(),
                 'created_at' => now(),
                 'updated_at' => now(),
+                'deleted_at' => null,
             ];
         }
 
