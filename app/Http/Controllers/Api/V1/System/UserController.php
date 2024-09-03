@@ -9,15 +9,15 @@ use App\Http\Requests\System\User\StoreUserRequest;
 use App\Http\Requests\System\User\UpdateUserRequest;
 use App\Services\RequestHelperService;
 use App\Services\System\User\UserService;
-use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Responses\DataResponse;
 use App\Traits\ExceptionHandlerTrait;
+use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
     use ExceptionHandlerTrait;
 
     protected $userService;
+
     protected $requestHelperService;
 
     public function __construct(UserService $userService, RequestHelperService $requestHelperService)
@@ -33,7 +33,7 @@ class UserController extends Controller
             $roles = $validatedData['roles'];
             $user = $this->userService->createUser($validatedData, $roles);
 
-            return new DataResponse($user);
+            return response()->json($user);
         } catch (\Exception $e) {
             return $this->handleException($e, 'Error creating user');
         }
@@ -44,6 +44,7 @@ class UserController extends Controller
         try {
             $queryParams = $request->query();
             $response = $this->userService->readUser($queryParams);
+
             return response()->json($response);
         } catch (\Exception $e) {
             return $this->handleException($e, 'Error reading user');
@@ -58,7 +59,7 @@ class UserController extends Controller
             [$input, $userId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'users', true);
             $user = $this->userService->updateUser($userId, $validatedData, $roles);
 
-            return new DataResponse($user);
+            return response()->json($user);
         } catch (\Exception $e) {
             return $this->handleException($e, 'Error updating user');
         }

@@ -6,8 +6,8 @@ namespace App\Services\System\Permission;
 
 use App\Helpers\PaginationHelper;
 use App\Transformers\PermissionTransformer;
-use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Log;
+use Spatie\Permission\Models\Permission;
 
 class PermissionService
 {
@@ -20,13 +20,19 @@ class PermissionService
 
     public function createPermission(array $inputData)
     {
-        $permission = Permission::create($inputData);
+        try {
+            $permission = Permission::create($inputData);
 
-        if (!$permission) {
-            throw new \Exception('Failed to create permission');
+            if (! $permission) {
+                throw new \Exception('Failed to create permission');
+            }
+
+            $transformedPermission = $this->transformer->transform($permission);
+
+            return $transformedPermission;
+        } catch (\Throwable $th) {
+            throw $th;
         }
-
-        return $permission;
     }
 
     public function readPermission(array $queryParams)
@@ -53,26 +59,36 @@ class PermissionService
 
     public function updatePermission(string $permissionId, array $inputData)
     {
-        $permission = Permission::find($permissionId);
+        try {
+            $permission = Permission::find($permissionId);
 
-        if (!$permission) {
-            throw new \Exception('Permission not found');
+            if (! $permission) {
+                throw new \Exception('Permission not found');
+            }
+
+            $permission->update($inputData);
+
+            $transformedPermission = $this->transformer->transform($permission);
+
+            return $transformedPermission;
+        } catch (\Throwable $th) {
+            throw $th;
         }
-
-        $permission->update($inputData);
-
-        return $permission;
     }
 
     public function deletePermission($permissionId)
     {
-        $permission = Permission::find($permissionId);
+        try {
+            $permission = Permission::find($permissionId);
 
-        if (!$permission) {
-            Log::info('Permission not found with ID: ' . $permissionId);
-            throw new \Exception('Role not found');
+            if (! $permission) {
+                Log::info('Permission not found with ID: '.$permissionId);
+                throw new \Exception('Role not found');
+            }
+
+            $permission->delete();
+        } catch (\Throwable $th) {
+            throw $th;
         }
-
-        $permission->delete();
     }
 }

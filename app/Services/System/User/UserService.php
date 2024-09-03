@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services\System\User;
 
-use App\Models\User;
 use App\Helpers\PaginationHelper;
+use App\Models\User;
 use App\Transformers\UserTransformer;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Role;
 
@@ -21,28 +22,36 @@ class UserService
 
     public function createUser(array $inputData, array $roles = [])
     {
-        $user = User::create($inputData);
+        DB::beginTransaction();
+        try {
+            $user = User::create($inputData);
 
-        if (!$user) {
-            throw new \Exception('Failed to create user');
+            if (! $user) {
+                throw new \Exception('Failed to create user');
+            }
+
+            if (! empty($roles)) {
+                $user->syncRoles($roles);
+
+                $permissions = Role::whereIn('id', $roles)
+                    ->with('permissions:id,name')
+                    ->get()
+                    ->pluck('permissions')
+                    ->flatten()
+                    ->pluck('name')
+                    ->unique()
+                    ->toArray();
+
+                $user->syncPermissions($permissions);
+            }
+
+            DB::commit();
+
+            return $user;
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            throw $th;
         }
-
-        if (!empty($roles)) {
-            $user->syncRoles($roles);
-
-            $permissions = Role::whereIn('id', $roles)
-                ->with('permissions:id,name')
-                ->get()
-                ->pluck('permissions')
-                ->flatten()
-                ->pluck('name')
-                ->unique()
-                ->toArray();
-
-            $user->syncPermissions($permissions);
-        }
-
-        return $user;
     }
 
     public function readUser(array $queryParams)
@@ -69,41 +78,52 @@ class UserService
 
     public function updateUser(string $userId, array $inputData, array $roles = [])
     {
-        $user = User::find($userId);
+        DB::beginTransaction();
+        try {
+            $user = User::find($userId);
 
-        if (!$user) {
-            throw new \Exception('User not found');
+            if (! $user) {
+                throw new \Exception('User not found');
+            }
+
+            $user->update($inputData);
+
+            if (! empty($roles)) {
+                $user->syncRoles($roles);
+
+                $permissions = Role::whereIn('id', $roles)
+                    ->with('permissions:id,name')
+                    ->get()
+                    ->pluck('permissions')
+                    ->flatten()
+                    ->pluck('name')
+                    ->unique()
+                    ->toArray();
+
+                $user->syncPermissions($permissions);
+            }
+            DB::commit();
+
+            return $user;
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            throw $th;
         }
-
-        $user->update($inputData);
-
-        if (!empty($roles)) {
-            $user->syncRoles($roles);
-
-            $permissions = Role::whereIn('id', $roles)
-                ->with('permissions:id,name')
-                ->get()
-                ->pluck('permissions')
-                ->flatten()
-                ->pluck('name')
-                ->unique()
-                ->toArray();
-
-            $user->syncPermissions($permissions);
-        }
-
-        return $user;
     }
 
     public function deleteUser($userId)
     {
-        $user = User::find($userId);
+        try {
+            $user = User::find($userId);
 
-        if (!$user) {
-            Log::info('User not found with ID: ' . $userId);
-            throw new \Exception('User not found');
+            if (! $user) {
+                Log::info('User not found with ID: '.$userId);
+                throw new \Exception('User not found');
+            }
+
+            $user->delete();
+        } catch (\Throwable $th) {
+            throw $th;
         }
-
-        $user->delete();
     }
 }

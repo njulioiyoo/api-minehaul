@@ -6,7 +6,7 @@ namespace App\Services\System\Role;
 
 use App\Helpers\PaginationHelper;
 use App\Transformers\RoleTransformer;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Role;
 
@@ -22,22 +22,27 @@ class RoleService
     public function createRole(array $inputData, array $permissions = [])
     {
         DB::beginTransaction();
-        $role = Role::create($inputData);
 
-        if (! $role) {
+        try {
+            $role = Role::create($inputData);
+
+            if (! $role) {
+                throw new \Exception('Failed to create role');
+            }
+
+            if (! empty($permissions)) {
+                $role->syncPermissions($permissions);
+            }
+
+            $transformedRole = $this->transformer->transform($role);
+
+            DB::commit();
+
+            return $transformedRole;
+        } catch (\Throwable $th) {
             DB::rollBack();
-            throw new \Exception('Failed to create role');
+            throw $th;
         }
-
-        if (! empty($permissions)) {
-            $role->syncPermissions($permissions);
-        }
-
-        $role = $this->transformer->transform($role);
-
-        DB::commit();
-
-        return $role;
     }
 
     public function readRole(array $queryParams)
@@ -64,30 +69,45 @@ class RoleService
 
     public function updateRole(string $roleId, array $inputData, array $permissions = [])
     {
-        $role = Role::find($roleId);
+        DB::beginTransaction();
 
-        if (! $role) {
-            throw new \Exception('Role not found');
+        try {
+            $role = Role::find($roleId);
+
+            if (! $role) {
+                throw new \Exception('Role not found');
+            }
+
+            $role->update($inputData);
+
+            if (! empty($permissions)) {
+                $role->syncPermissions($permissions);
+            }
+
+            $transformedRole = $this->transformer->transform($role);
+
+            DB::commit();
+
+            return $transformedRole;
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            throw $th;
         }
-
-        $role->update($inputData);
-
-        if (! empty($permissions)) {
-            $role->syncPermissions($permissions);
-        }
-
-        return $role;
     }
 
     public function deleteRole($roleId)
     {
-        $role = Role::find($roleId);
+        try {
+            $role = Role::find($roleId);
 
-        if (! $role) {
-            Log::info('Role not found with ID: '.$roleId);
-            throw new \Exception('Role not found');
+            if (! $role) {
+                Log::info('Role not found with ID: '.$roleId);
+                throw new \Exception('Role not found');
+            }
+
+            $role->delete();
+        } catch (\Throwable $th) {
+            throw $th;
         }
-
-        $role->delete();
     }
 }

@@ -7,18 +7,17 @@ namespace App\Http\Controllers\Api\V1\System;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\System\Menu\StoreMenuRequest;
 use App\Http\Requests\System\Menu\UpdateMenuRequest;
-use App\Models\Menu;
 use App\Services\RequestHelperService;
 use App\Services\System\Menu\MenuService;
-use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Responses\DataResponse;
 use App\Traits\ExceptionHandlerTrait;
+use Illuminate\Http\Request;
 
 class MenuController extends Controller
 {
     use ExceptionHandlerTrait;
 
     protected $requestHelperService;
+
     protected $menuService;
 
     public function __construct(RequestHelperService $requestHelperService, MenuService $menuService)
@@ -33,16 +32,20 @@ class MenuController extends Controller
             $validatedData = $request->all();
             $menu = $this->menuService->createMenu($validatedData);
 
-            return new DataResponse($menu);
+            return response()->json($menu);
         } catch (\Exception $e) {
             return $this->handleException($e, 'Error creating menu');
         }
     }
 
-    public function readMenu()
+    public function readMenu(Request $request)
     {
+        $queryParams = $request->query();
+
         try {
-            return new DataResponse((new Menu)->getTree());
+            $response = $this->menuService->readMenu($queryParams);
+
+            return response()->json($response);
         } catch (\Exception $e) {
             return $this->handleException($e, 'Error reading menu');
         }
@@ -55,7 +58,7 @@ class MenuController extends Controller
             [$input, $menuId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'menus', true);
             $menu = $this->menuService->updateMenu($menuId, $validatedData);
 
-            return new DataResponse($menu);
+            return response()->json($menu);
         } catch (\Exception $e) {
             return $this->handleException($e, 'Error updating menu');
         }
@@ -67,6 +70,7 @@ class MenuController extends Controller
 
         try {
             $this->menuService->deleteMenu($menuId);
+
             return response()->json(['message' => 'Menu deleted successfully.']);
         } catch (\Exception $e) {
             return $this->handleException($e, 'Error deleting menu');
