@@ -9,15 +9,16 @@ use App\Http\Requests\System\Role\StoreRoleRequest;
 use App\Http\Requests\System\Role\UpdateRoleRequest;
 use App\Services\RequestHelperService;
 use App\Services\System\Role\RoleService;
+use App\Traits\ExceptionHandlerTrait;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Responses\DataResponse;
-use App\Traits\ExceptionHandlerTrait;
 
 class RoleController extends Controller
 {
     use ExceptionHandlerTrait;
 
     protected $roleService;
+
     protected $requestHelperService;
 
     public function __construct(RoleService $roleService, RequestHelperService $requestHelperService)
@@ -33,7 +34,7 @@ class RoleController extends Controller
             $permissions = $validatedData['permissions'] ?? [];
             $role = $this->roleService->createRole($validatedData, $permissions);
 
-            return new DataResponse($role);
+            return response()->json($role);
         } catch (\Exception $e) {
             return $this->handleException($e, 'Error creating role');
         }
@@ -44,6 +45,7 @@ class RoleController extends Controller
         try {
             $queryParams = $request->query();
             $response = $this->roleService->readRole($queryParams);
+
             return response()->json($response);
         } catch (\Exception $e) {
             return $this->handleException($e, 'Error reading role');
@@ -70,6 +72,7 @@ class RoleController extends Controller
         try {
             [$input, $roleId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'roles', true);
             $this->roleService->deleteRole($roleId);
+
             return response()->json(['message' => 'Role deleted successfully.']);
         } catch (\Exception $e) {
             return $this->handleException($e, 'Error deleting role');

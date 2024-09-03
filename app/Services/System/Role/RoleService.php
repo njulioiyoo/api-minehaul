@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Services\System\Role;
 
-use App\Transformers\RoleTransformer;
 use App\Helpers\PaginationHelper;
-use Spatie\Permission\Models\Role;
+use App\Transformers\RoleTransformer;
+use DB;
 use Illuminate\Support\Facades\Log;
+use Spatie\Permission\Models\Role;
 
 class RoleService
 {
@@ -20,15 +21,21 @@ class RoleService
 
     public function createRole(array $inputData, array $permissions = [])
     {
+        DB::beginTransaction();
         $role = Role::create($inputData);
 
-        if (!$role) {
+        if (! $role) {
+            DB::rollBack();
             throw new \Exception('Failed to create role');
         }
 
-        if (!empty($permissions)) {
+        if (! empty($permissions)) {
             $role->syncPermissions($permissions);
         }
+
+        $role = $this->transformer->transform($role);
+
+        DB::commit();
 
         return $role;
     }
@@ -59,13 +66,13 @@ class RoleService
     {
         $role = Role::find($roleId);
 
-        if (!$role) {
+        if (! $role) {
             throw new \Exception('Role not found');
         }
 
         $role->update($inputData);
 
-        if (!empty($permissions)) {
+        if (! empty($permissions)) {
             $role->syncPermissions($permissions);
         }
 
@@ -76,8 +83,8 @@ class RoleService
     {
         $role = Role::find($roleId);
 
-        if (!$role) {
-            Log::info('Role not found with ID: ' . $roleId);
+        if (! $role) {
+            Log::info('Role not found with ID: '.$roleId);
             throw new \Exception('Role not found');
         }
 
