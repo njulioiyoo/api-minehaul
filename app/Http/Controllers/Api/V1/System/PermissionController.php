@@ -29,7 +29,7 @@ class PermissionController extends Controller
     public function createPermission(StorePermissionRequest $request)
     {
         try {
-            $validatedData = $request->all();
+            $validatedData = $request->validated();
             $permission = $this->permissionService->createPermission($validatedData);
 
             return response()->json($permission);
@@ -54,7 +54,7 @@ class PermissionController extends Controller
     public function updatePermission(UpdatePermissionRequest $request)
     {
         try {
-            $validatedData = $request->all();
+            $validatedData = $request->validated();
             [$input, $permissionId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'permissions', true);
             $permission = $this->permissionService->updatePermission($permissionId, $validatedData);
 

@@ -28,7 +28,7 @@ class DeviceController extends Controller
 
     public function createDevice(StoreDeviceRequest $request)
     {
-        $validatedData = $request->all();
+        $validatedData = $request->validated();
         $device = $this->deviceService->createDevice($validatedData);
 
         return new DataResponse($device);
@@ -55,7 +55,7 @@ class DeviceController extends Controller
 
     public function updateDevice(UpdateDeviceRequest $request)
     {
-        $validatedData = $request->all();
+        $validatedData = $request->validated();
         [$input, $deviceUid, $queryParams] = $this->requestHelperService->getInputAndId($request, 'devices', true);
         $device = $this->deviceService->updateDevice($deviceUid, $validatedData);
 

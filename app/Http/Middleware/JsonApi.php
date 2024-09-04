@@ -28,6 +28,8 @@ class JsonApi
             // Merge attributes with the original request data
             $requestData = $attributes;
 
+            // dd($requestData);
+
             // If there's an id, include it in the request data
             if ($id) {
                 $requestData['id'] = $id;

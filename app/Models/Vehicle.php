@@ -9,6 +9,7 @@ use App\Models\Vehicle\VehicleType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Vehicle extends Model
 {
@@ -21,6 +22,37 @@ class Vehicle extends Model
 
     protected $table = 'vehicles';
     protected $guarded = [];
+
+    public function getRouteKeyName(): string
+    {
+        return 'uid';
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($vehicle) {
+            $user = auth()->user();
+
+            if ($user) {
+                $person = $user->persons;
+                if ($person) {
+                    $vehicle->account_id = $person->account_id;
+                }
+            }
+
+            // Set default vehicle_status to 1 if it is null
+            $vehicle->vehicle_status_id ??= 1;
+
+            $vehicle->uid = $vehicle->exists ? $vehicle->uid : Str::uuid()->toString();
+            $vehicle->{$vehicle->exists ? 'updated_by' : 'created_by'} = auth()->user()->id;
+        });
+
+        static::saved(function ($vehicle) {
+            // Logic tambahan setelah disimpan, jika diperlukan
+        });
+    }
 
     public function account()
     {
