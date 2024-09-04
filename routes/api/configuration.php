@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\Http\Controllers\Api\V1\Configuration\DeviceController;
 use App\Http\Controllers\Api\V1\Configuration\VehicleController;
 use Illuminate\Support\Facades\Route;
-use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,7 +17,7 @@ use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 |
 */
 
-JsonApiRoute::server('v1')->middleware('validate.api', 'json.api', 'verify.user.role')->resources(function () {
+Route::middleware(['validate.api', 'json.api', 'verify.user.role'])->group(function () {
     // Routes for devices
     Route::prefix('devices')->group(function () {
         Route::get('/', [DeviceController::class, 'readDevice'])->name('device.index')->middleware('verify.user.permission:view-device');
@@ -31,7 +30,7 @@ JsonApiRoute::server('v1')->middleware('validate.api', 'json.api', 'verify.user.
     Route::prefix('vehicles')->group(function () {
         Route::get('/', [VehicleController::class, 'readVehicle'])->name('vehicle.index')->middleware('verify.user.permission:view-vehicle');
         Route::post('/', [VehicleController::class, 'createVehicle'])->name('vehicle.create')->middleware('verify.user.permission:create-vehicle');
-        // Route::patch('/', [VehicleController::class, 'updateVehicle'])->name('vehicle.update')->middleware('verify.user.permission:Edit Vehicle');
-        // Route::delete('/', [VehicleController::class, 'deleteVehicle'])->name('vehicle.delete')->middleware('verify.user.permission:Delete Vehicle');
+        Route::patch('/', [VehicleController::class, 'updateVehicle'])->name('vehicle.update')->middleware('verify.user.permission:edit-vehicle');
+        Route::delete('/', [VehicleController::class, 'deleteVehicle'])->name('vehicle.delete')->middleware('verify.user.permission:delete-vehicle');
     });
 });

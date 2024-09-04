@@ -7,7 +7,6 @@ use App\Http\Controllers\Api\V1\System\PermissionController;
 use App\Http\Controllers\Api\V1\System\RoleController;
 use App\Http\Controllers\Api\V1\System\UserController;
 use Illuminate\Support\Facades\Route;
-use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,8 +19,8 @@ use LaravelJsonApi\Laravel\Facades\JsonApiRoute;
 |
 */
 
-JsonApiRoute::server('v1')->middleware('json.api')->resources(function () {
-    Route::middleware('verify.user.role', 'validate.api')->group(function () {
+Route::middleware(['json.api'])->group(function () {
+    Route::middleware(['verify.user.role', 'validate.api'])->group(function () {
         // Routes for roles
         Route::prefix('roles')->group(function () {
             Route::get('/', [RoleController::class, 'readRole'])->name('roles.index')->middleware('verify.user.permission:view-roles');

@@ -8,6 +8,7 @@ use App\Helpers\PaginationHelper;
 use App\Models\Vehicle;
 use App\Transformers\VehicleTransformer;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class VehicleService
 {
@@ -20,19 +21,11 @@ class VehicleService
 
     public function createVehicle(array $inputData)
     {
-        DB::beginTransaction();
-        $vehicle = Vehicle::create($inputData);
+        return DB::transaction(function () use ($inputData) {
+            $vehicle = Vehicle::create($inputData);
 
-        if (!$vehicle) {
-            DB::rollBack();
-            throw new \Exception('Failed to create vehicle');
-        }
-
-        $vehicle = $this->transformer->transform($vehicle);
-
-        DB::commit();
-
-        return $vehicle;
+            return $this->transformer->transform($vehicle);
+        });
     }
 
     public function readVehicle(array $queryParams)
@@ -48,12 +41,35 @@ class VehicleService
             }
         }
 
-        $devices = $query->paginate($perPage, ['*'], 'page[number]', $page);
+        $vehicle = $query->paginate($perPage, ['*'], 'page[number]', $page);
 
-        $data = $devices->map(function ($device) {
-            return $this->transformer->transform($device);
+        $data = $vehicle->map(function ($vehicle) {
+            return $this->transformer->transform($vehicle);
         })->values()->all(); // Convert to array
 
-        return PaginationHelper::format($devices, $data);
+        return PaginationHelper::format($vehicle, $data);
+    }
+
+    public function updateVehicle(string $vehicleId, array $inputData)
+    {
+        return DB::transaction(function () use ($vehicleId, $inputData) {
+            $vehicle = Vehicle::findOrFail($vehicleId);
+
+            $vehicle->update($inputData);
+
+            return $this->transformer->transform($vehicle);
+        });
+    }
+
+    public function deleteVehicle($vehicleId)
+    {
+        try {
+            $vehicle = Vehicle::findOrFail($vehicleId);
+
+            $vehicle->delete();
+        } catch (\Throwable $th) {
+            Log::error("Error deleting vehicle with ID: {$vehicleId}, Error: {$th->getMessage()}");
+            throw $th;
+        }
     }
 }
