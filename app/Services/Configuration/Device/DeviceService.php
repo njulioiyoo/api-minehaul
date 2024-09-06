@@ -7,6 +7,8 @@ namespace App\Services\Configuration\Device;
 use App\Models\Device;
 use App\Transformers\DeviceTransformer;
 use App\Helpers\PaginationHelper;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class DeviceService
 {
@@ -19,13 +21,11 @@ class DeviceService
 
     public function createDevice(array $inputData)
     {
-        $device = Device::create($inputData);
+        return DB::transaction(function () use ($inputData) {
+            $device = Device::create($inputData);
 
-        if (!$device) {
-            throw new \Exception('Failed to create device');
-        }
-
-        return $device;
+            return $this->transformer->transform($device);
+        });
     }
 
     public function readDevice(array $queryParams)
@@ -52,25 +52,24 @@ class DeviceService
 
     public function updateDevice(string $deviceUid, array $inputData)
     {
-        $device = Device::find($deviceUid);
+        return DB::transaction(function () use ($deviceUid, $inputData) {
+            $device = Device::findOrFail($deviceUid);
 
-        if (!$device) {
-            throw new \Exception('Device not found');
-        }
+            $device->update($inputData);
 
-        $device->update($inputData);
-
-        return $device;
+            return $this->transformer->transform($device);
+        });
     }
 
     public function deleteDevice(string $deviceUid)
     {
-        $device = Device::find($deviceUid);
+        try {
+            $device = Device::findOrFail($deviceUid);
 
-        if (!$device) {
-            throw new \Exception('Device not found');
+            $device->delete();
+        } catch (\Throwable $th) {
+            Log::error("Error deleting device with ID: {$deviceUid}, Error: {$th->getMessage()}");
+            throw $th;
         }
-
-        $device->delete();
     }
 }

@@ -10,13 +10,12 @@ use App\Http\Requests\Configuration\Device\UpdateDeviceRequest;
 use App\Services\Configuration\Device\DeviceService;
 use App\Services\RequestHelperService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use LaravelJsonApi\Core\Document\Error;
-use LaravelJsonApi\Core\Responses\ErrorResponse;
-use LaravelJsonApi\Core\Responses\DataResponse;
+use App\Traits\ExceptionHandlerTrait;
 
 class DeviceController extends Controller
 {
+    use ExceptionHandlerTrait;
+
     protected $deviceService;
     protected $requestHelperService;
 
@@ -28,56 +27,52 @@ class DeviceController extends Controller
 
     public function createDevice(StoreDeviceRequest $request)
     {
-        $validatedData = $request->validated();
-        $device = $this->deviceService->createDevice($validatedData);
+        try {
+            $validatedData = $request->validated();
+            $device = $this->deviceService->createDevice($validatedData);
 
-        return new DataResponse($device);
+            return response()->json($device);
+        } catch (\Exception $e) {
+            return $this->handleException($e, 'Error creating devices');
+        }
     }
 
     public function readDevice(Request $request)
     {
-        $queryParams = $request->query();
-
         try {
+            $queryParams = $request->query();
             $response = $this->deviceService->readDevice($queryParams);
+
             return response()->json($response);
         } catch (\Exception $e) {
-            Log::error("Error reading devices: {$e->getMessage()}");
-            return new ErrorResponse(collect([
-                Error::fromArray([
-                    'status' => '500',
-                    'title' => 'Internal Server Error',
-                    'detail' => 'An error occurred while reading the devices.'
-                ])
-            ]));
+            return $this->handleException($e, 'Error reading devices');
         }
     }
 
     public function updateDevice(UpdateDeviceRequest $request)
     {
-        $validatedData = $request->validated();
-        [$input, $deviceUid, $queryParams] = $this->requestHelperService->getInputAndId($request, 'devices', true);
-        $device = $this->deviceService->updateDevice($deviceUid, $validatedData);
+        try {
+            $validatedData = $request->validated();
+            [$input, $deviceUid, $queryParams] = $this->requestHelperService->getInputAndId($request, 'devices', true);
 
-        return new DataResponse($device);
+            $device = $this->deviceService->updateDevice($deviceUid, $validatedData);
+
+            return response()->json($device);
+        } catch (\Exception $e) {
+            return $this->handleException($e, 'Error updating devices');
+        }
     }
 
     public function deleteDevice(Request $request)
     {
-        [$input, $deviceUid, $queryParams] = $this->requestHelperService->getInputAndId($request, 'devices', true);
-
         try {
+            [$input, $deviceUid, $queryParams] = $this->requestHelperService->getInputAndId($request, 'devices', true);
             $this->deviceService->deleteDevice($deviceUid);
-            return response()->json(['message' => 'Device deleted successfully.']);
+
+            // Jika tidak ada data lain yang perlu dikembalikan maka kembalikan status 204 No Content
+            return response()->json(null, 204);
         } catch (\Exception $e) {
-            Log::error("Error deleting device: {$e->getMessage()}");
-            return new ErrorResponse(collect([
-                Error::fromArray([
-                    'status' => '500',
-                    'title' => 'Internal Server Error',
-                    'detail' => $e->getMessage()
-                ])
-            ]));
+            return $this->handleException($e, 'Error deleting devices');
         }
     }
 }

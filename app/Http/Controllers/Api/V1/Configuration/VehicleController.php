@@ -31,7 +31,7 @@ class VehicleController extends Controller
 
             return response()->json($vehicle);
         } catch (\Exception $e) {
-            return $this->handleException($e, 'Error creating vehicle');
+            return $this->handleException($e, 'Error creating vehicles');
         }
     }
 
@@ -43,7 +43,7 @@ class VehicleController extends Controller
 
             return response()->json($response);
         } catch (\Exception $e) {
-            return $this->handleException($e, 'Error reading vehicle');
+            return $this->handleException($e, 'Error reading vehicles');
         }
     }
 
@@ -57,7 +57,7 @@ class VehicleController extends Controller
 
             return response()->json($vehicle);
         } catch (\Exception $e) {
-            return $this->handleException($e, 'Error updating vehicle');
+            return $this->handleException($e, 'Error updating vehicles');
         }
     }
 
@@ -70,7 +70,7 @@ class VehicleController extends Controller
             // Jika tidak ada data lain yang perlu dikembalikan maka kembalikan status 204 No Content
             return response()->json(null, 204);
         } catch (\Exception $e) {
-            return $this->handleException($e, 'Error deleting vehicle');
+            return $this->handleException($e, 'Error deleting vehicles');
         }
     }
 }

@@ -24,16 +24,18 @@ class UpdateDeviceRequest extends FormRequest
         $deviceId = $this->getDeviceId();
 
         return [
-            'name' => ['sometimes', 'string', 'max:255'],
-            'account_id' => ['sometimes', 'string', 'regex:/^\d+$/'],
-            'pit_id' => ['nullable', 'string', 'regex:/^\d+$/'],
-            'device_type_id' => ['sometimes', 'string', 'regex:/^\d+$/'],
-            'device_make_id' => ['sometimes', 'string', 'regex:/^\d+$/'],
-            'device_model_id' => ['nullable', 'string', 'regex:/^\d+$/'],
-            'display_id' => ['sometimes', 'string', 'regex:/^[a-zA-Z0-9-]+$/'],
-            'sim_id' => ['nullable', 'string', 'regex:/^[a-zA-Z0-9-]+$/'],
+            'pit_id' => ['nullable', 'integer', 'regex:/^\d+$/'],
+            'device_type_id' => ['required', 'integer', 'regex:/^\d+$/'],
+            'device_make_id' => ['required', 'integer', 'regex:/^\d+$/'],
+            'device_model_id' => ['nullable', 'integer', 'regex:/^\d+$/'],
             'year' => ['nullable', 'integer', 'min:1900', 'max:2100'],
-            'status' => ['nullable', 'string', 'in:active,inactive'],
+            'display_id' => ['required', 'string', 'regex:/^[A-Za-z0-9_-]+$/'],
+            'name' => ['required', 'string', 'regex:/^[\p{L}0-9 ]+$/u'],
+            'sim_id' => ['nullable', 'string', 'regex:/^[0-9]{10,20}$/'],
+            'device_immobilizitation_type_id' => ['required', 'integer', 'regex:/^\d+$/'],
+            'device_ignition_type_id' => ['required', 'integer', 'regex:/^\d+$/'],
+            'device_status_id' => ['nullable', 'integer', 'regex:/^\d+$/'],
+            'vehicle_id' => ['required', 'string', 'uuid'],
             'uid' => ['sometimes', 'string', 'unique:devices,uid,' . $deviceId],
         ];
     }
