@@ -25,7 +25,7 @@ class StoreDeviceRequest extends FormRequest
             'device_immobilizitation_type_id' => ['required', 'integer', 'regex:/^\d+$/'],
             'device_ignition_type_id' => ['required', 'integer', 'regex:/^\d+$/'],
             'device_status_id' => ['nullable', 'integer', 'regex:/^\d+$/'],
-            'vehicle_id' => ['nullable', 'integer', 'regex:/^\d+$/'],
+            'vehicle_id' => ['required', 'string', 'uuid'],
         ];
     }
 }

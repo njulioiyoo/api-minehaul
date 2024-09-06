@@ -25,6 +25,14 @@ class DatabaseSeeder extends Seeder
         $this->call(AccountSeeder::class);
         $this->call(PitsTableSeeder::class);
 
+        $this->call(VehicleTypeSeeder::class);
+        $this->call(VehicleMakeSeeder::class);
+        $this->call(VehicleModelSeeder::class);
+        $this->call(VehicleStatusSeeder::class);
+        $this->call(VehicleMakeSeeder::class);
+        $this->call(VehicleModelSeeder::class);
+        $this->call(VehicleSeeder::class);
+
         $this->call(DeviceTypeSeeder::class);
         $this->call(DeviceMakeSeeder::class);
         $this->call(DeviceModelSeeder::class);
@@ -32,13 +40,5 @@ class DatabaseSeeder extends Seeder
         $this->call(DeviceIgnitionSeeder::class);
         $this->call(DeviceStatusSeeder::class);
         $this->call(DevicesTableSeeder::class);
-
-        $this->call(VehicleTypeSeeder::class);
-        $this->call(VehicleMakeSeeder::class);
-        $this->call(VehicleModelSeeder::class);
-        $this->call(VehicleStatusSeeder::class);
-        $this->call(VehicleMakeSeeder::class);
-        $this->call(VehicleModelsSeeder::class);
-        $this->call(VehicleSeeder::class);
     }
 }

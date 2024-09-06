@@ -97,4 +97,9 @@ class Device extends Model
     {
         return $this->belongsTo(DeviceStatus::class, 'device_status_id')->select('id', 'name');
     }
+
+    public function vehicleId()
+    {
+        return $this->belongsTo(Vehicle::class, 'vehicle_id')->select('uid as id', 'name');
+    }
 }

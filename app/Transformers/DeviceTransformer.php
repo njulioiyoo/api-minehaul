@@ -32,7 +32,8 @@ class DeviceTransformer
                 'sim_id' => $device->sim_id,
                 'device_immobilizitation_type' => $this->transformRelation($device->deviceImmobilizitationType, ['id', 'name']),
                 'device_ignition_type' => $this->transformRelation($device->deviceIgnitionType, ['id', 'name']),
-                'status' => $device->status,
+                'device_status' => $this->transformRelation($device->deviceStatus, ['id', 'name']),
+                'vehicle' => $this->transformRelation($device->vehicleId, ['id', 'name']),
             ]
         ];
     }

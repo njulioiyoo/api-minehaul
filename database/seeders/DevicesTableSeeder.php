@@ -15,6 +15,8 @@ class DevicesTableSeeder extends Seeder
      */
     public function run(): void
     {
+        $vehicleUids = DB::table('vehicles')->pluck('uid')->toArray();
+
         $devices = [];
 
         for ($i = 1; $i <= 10; $i++) {
@@ -30,7 +32,7 @@ class DevicesTableSeeder extends Seeder
                 'sim_id' => 'SIM' . str_pad((string) $i, 10, '0', STR_PAD_LEFT),
                 'device_immobilizitation_type_id' => rand(1, 5),
                 'device_ignition_type_id' => rand(1, 5),
-                'vehicle_id' => null,
+                'vehicle_id' => $vehicleUids[array_rand($vehicleUids)],
                 'device_status_id' => rand(1, 2),
                 'created_by' => rand(1, 5),
                 'updated_by' => rand(1, 5),
