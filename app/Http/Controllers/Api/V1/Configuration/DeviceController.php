@@ -49,6 +49,18 @@ class DeviceController extends Controller
         }
     }
 
+    public function showDevice(Request $request)
+    {
+        try {
+            [$input, $deviceUid, $queryParams] = $this->requestHelperService->getInputAndId($request, 'devices', true);
+            $response = $this->deviceService->showDevice($deviceUid);
+
+            return response()->json($response);
+        } catch (\Exception $e) {
+            return $this->handleException($e, 'Error show devices');
+        }
+    }
+
     public function updateDevice(UpdateDeviceRequest $request)
     {
         try {

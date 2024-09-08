@@ -47,6 +47,18 @@ class VehicleController extends Controller
         }
     }
 
+    public function showVehicle(Request $request)
+    {
+        try {
+            [$input, $vehicleUid, $queryParams] = $this->requestHelperService->getInputAndId($request, 'vehicles', true);
+            $response = $this->vehicleService->showVehicle($vehicleUid);
+
+            return response()->json($response);
+        } catch (\Exception $e) {
+            return $this->handleException($e, 'Error show vehicles');
+        }
+    }
+
     public function updateVehicle(UpdateVehicleRequest $request)
     {
         try {
