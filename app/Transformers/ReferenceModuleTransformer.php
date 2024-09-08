@@ -14,18 +14,17 @@ use App\Models\Vehicle\VehicleMake;
 use App\Models\Vehicle\VehicleModel;
 use App\Models\Vehicle\VehicleStatus;
 use App\Models\Vehicle\VehicleType;
-use Illuminate\Support\Collection;
 
 class ReferenceModuleTransformer
 {
     /**
-     * Transforms the given models into a grouped array format.
+     * Transforms the requested device data or returns all data if no type is specified.
      *
+     * @param string|null $type
      * @return array
      */
-    public function transform(): array
+    public function transformDevice($type = null): array
     {
-        // Retrieve all necessary data in a single batch
         $status = DeviceStatus::select('id', 'name', 'status_theme')->get();
         $types = DeviceType::select('id', 'name')->get();
         $makes = DeviceMake::with('deviceType')->select('id', 'device_type_id', 'name')->get();
@@ -33,37 +32,7 @@ class ReferenceModuleTransformer
         $immobilizitationTypes = DeviceImmobilizitationType::select('id', 'name')->get();
         $ignitionTypes = DeviceIgnitionType::select('id', 'name')->get();
 
-        // Transform data model and its relations
-        $transformedModels = $this->transformDeviceModels($models);
-
-        return [
-            'devices' => [
-                'type' => 'devices',
-                'attributes' => [
-                    'device_status' => $status,
-                    'device_type' => $types,
-                    'device_make' => $makes,
-                    'device_model' => $transformedModels,
-                    'device_immobilizitation_type' => $immobilizitationTypes,
-                    'device_ignition_type' => $ignitionTypes
-                ]
-            ],
-            'vehicles' => [
-                'type' => 'vehicles',
-                'attributes' => $this->transformVehicle()
-            ],
-        ];
-    }
-
-    /**
-     * Transforms DeviceModel into an array format.
-     *
-     * @param Collection $models
-     * @return array
-     */
-    protected function transformDeviceModels(Collection $models): array
-    {
-        return $models->map(function ($model) {
+        $transformedModels = $models->map(function ($model) {
             return [
                 'id' => $model->id,
                 'name' => $model->name,
@@ -72,15 +41,29 @@ class ReferenceModuleTransformer
                     'name' => $model->deviceMake->name,
                 ] : null
             ];
-        })->toArray(); // Convert collection to array for return
+        })->toArray();
+
+        // Data lengkap yang akan dikembalikan
+        $data = [
+            'device_status' => $status,
+            'device_type' => $types,
+            'device_make' => $makes,
+            'device_model' => $transformedModels,
+            'device_immobilizitation_type' => $immobilizitationTypes,
+            'device_ignition_type' => $ignitionTypes
+        ];
+
+        // Jika ada tipe yang diminta, kembalikan data tersebut saja
+        return $type ? [$type => $data[$type]] : $data;
     }
 
     /**
-     * Transforms Vehicle data into an array format.
+     * Transforms the requested vehicle data or returns all data if no type is specified.
      *
+     * @param string|null $type
      * @return array
      */
-    protected function transformVehicle(): array
+    public function transformVehicle($type = null): array
     {
         $status = VehicleStatus::select('id', 'name')->get();
         $types = VehicleType::select('id', 'name')->get();
@@ -96,7 +79,7 @@ class ReferenceModuleTransformer
                     'name' => $make->vehicleType->name,
                 ] : null
             ];
-        });
+        })->toArray();
 
         $transformedModel = $models->map(function ($model) {
             return [
@@ -107,13 +90,17 @@ class ReferenceModuleTransformer
                     'name' => $model->vehicleMake->name,
                 ] : null
             ];
-        });
+        })->toArray();
 
-        return [
+        // Data lengkap yang akan dikembalikan
+        $data = [
             'vehicle_status' => $status,
             'vehicle_type' => $types,
             'vehicle_make' => $transformedMakes,
             'vehicle_model' => $transformedModel
         ];
+
+        // Jika ada tipe yang diminta, kembalikan data tersebut saja
+        return $type ? [$type => $data[$type]] : $data;
     }
 }
