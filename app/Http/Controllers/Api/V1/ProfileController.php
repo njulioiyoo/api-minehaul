@@ -3,80 +3,62 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\ProfileService;
+use App\Models\User;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Responses\DataResponse;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\ValidationException;
-use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Responses\ErrorResponse;
+use App\Traits\ExceptionHandlerTrait;
+use App\Http\Requests\System\User\UpdateUserRequest;
+use App\Services\System\User\UserService;
+use App\Services\RequestHelperService;
 
 class ProfileController extends Controller
 {
-    protected $profileService;
+    use ExceptionHandlerTrait;
 
-    public function __construct(ProfileService $profileService)
+    protected $userService;
+    protected $requestHelperService;
+
+    public function __construct(UserService $userService, RequestHelperService $requestHelperService)
     {
-        $this->profileService = $profileService;
+        $this->userService = $userService;
+        $this->requestHelperService = $requestHelperService;
     }
 
     public function readProfile(Request $request)
     {
-        $userId = auth()->id(); // Get the authenticated user ID
-
         try {
-            // Fetch the user profile directly from the service
-            $user = $this->profileService->readProfile($userId);
+            $userId = auth()->id();
+            // Fetch the user profile directly
+            $user = User::find($userId);
 
-            // Return a DataResponse with the user data
-            return new DataResponse($user);
+            // Transform the user data if needed
+            $transformedUser = app('App\Transformers\UserTransformer')->transform($user);
+
+            return response()->json($transformedUser);
         } catch (\Exception $e) {
-            // Log the error
-            Log::error("Error reading profile: {$e->getMessage()}");
-
-            // Return a generic error response
-            return new ErrorResponse(collect([
-                Error::fromArray([
-                    'status' => '404',
-                    'title' => 'Not Found',
-                    'detail' => 'The user profile could not be found.'
-                ])
-            ]));
+            return $this->handleException($e, 'Error reading user profile');
         }
     }
 
     /**
      * Update the authenticated user's profile.
      *
-     * @param Request $request
+     * @param UpdateUserRequest $request
      * @return DataResponse|ErrorResponse
      */
-    public function updateProfile(Request $request)
+    public function updateProfile(UpdateUserRequest $request)
     {
         try {
-            // Validate and update the profile through the service
-            $user = $this->profileService->updateProfile($request->validated());
+            $validatedData = $request->validated();
+            [$input, $userId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'users', true);
+            // Jika ID pengguna tidak ada dalam permintaan, ambil dari ID otentikasi
+            $userId = $userId ?? auth()->id();
+            $user = $this->userService->updateUser($userId, $validatedData, []);
 
-            // Return a DataResponse with the updated user data
-            return new DataResponse($user);
-        } catch (ValidationException $e) {
-            // Log the error
-            Log::error("ValidationException: {$e->getMessage()}");
-
-            // Return JSON:API Error Response using the service method
-            return $this->profileService->formatValidationErrors($e->validator);
+            return response()->json($user);
         } catch (\Exception $e) {
-            // Log unexpected errors
-            Log::error("Unexpected Exception: {$e->getMessage()}");
-
-            // Return a generic error response
-            return new ErrorResponse(collect([
-                Error::fromArray([
-                    'status' => '500',
-                    'title' => 'Unexpected Error',
-                    'detail' => 'An unexpected error occurred.'
-                ])
-            ]));
+            return $this->handleException($e, 'Error updating user');
         }
     }
 }

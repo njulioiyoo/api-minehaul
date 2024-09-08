@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\Configuration\DeviceController;
 use App\Http\Controllers\Api\V1\Configuration\VehicleController;
-use App\Http\Controllers\ReferenceModuleController;
 use Illuminate\Support\Facades\Route;
 
 /*
