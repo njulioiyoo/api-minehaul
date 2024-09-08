@@ -21,7 +21,10 @@ Route::middleware('auth:api')->group(function () {
         Route::get('me', [ProfileController::class, 'readProfile']);
         Route::patch('me', [ProfileController::class, 'updateProfile']);
 
-        Route::get('/reference', [ReferenceModuleController::class, 'readReference']);
+        Route::prefix('reference')->group(function () {
+            Route::post('/devices', [ReferenceModuleController::class, 'getDeviceData']);
+            Route::post('/vehicles', [ReferenceModuleController::class, 'getVehicleData']);
+        });
     });
 
     require base_path('routes/api/configuration.php');
