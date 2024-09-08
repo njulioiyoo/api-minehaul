@@ -24,6 +24,7 @@ Route::middleware(['validate.api', 'json.api', 'verify.user.role'])->group(funct
         Route::post('/', [DeviceController::class, 'createDevice'])->name('device.create')->middleware('verify.user.permission:create-device');
         Route::patch('/', [DeviceController::class, 'updateDevice'])->name('device.update')->middleware('verify.user.permission:edit-device');
         Route::delete('/', [DeviceController::class, 'deleteDevice'])->name('device.delete')->middleware('verify.user.permission:delete-device');
+        Route::post('/', [DeviceController::class, 'showDevice'])->name('device.show');
     });
 
     // Routes for vehicles
@@ -32,5 +33,6 @@ Route::middleware(['validate.api', 'json.api', 'verify.user.role'])->group(funct
         Route::post('/', [VehicleController::class, 'createVehicle'])->name('vehicle.create')->middleware('verify.user.permission:create-vehicle');
         Route::patch('/', [VehicleController::class, 'updateVehicle'])->name('vehicle.update')->middleware('verify.user.permission:edit-vehicle');
         Route::delete('/', [VehicleController::class, 'deleteVehicle'])->name('vehicle.delete')->middleware('verify.user.permission:delete-vehicle');
+        Route::post('/', [VehicleController::class, 'showVehicle'])->name('vehicle.show');
     });
 });
