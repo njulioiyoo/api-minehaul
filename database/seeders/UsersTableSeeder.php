@@ -17,16 +17,28 @@ class UsersTableSeeder extends Seeder
     {
         $users = [
             [
-                'username' => 'super_administrator',
+                'username' => 'administrator_user',
                 'person_id' => '1',
-                'email' => 'admin@admin.com',
+                'email' => 'administrator_user@admin.com',
                 'password' => Hash::make('password'),
             ],
             [
-                'username' => 'accountan',
+                'username' => 'regular_user',
                 'person_id' => '2',
-                'email' => 'accountan@company.com',
-                'password' => Hash::make('accountan_password'),
+                'email' => 'regular_user@company.com',
+                'password' => Hash::make('password'),
+            ],
+            [
+                'username' => 'super_account',
+                'person_id' => '1',
+                'email' => 'super_account@company.com',
+                'password' => Hash::make('password'),
+            ],
+            [
+                'username' => 'super_user',
+                'person_id' => '2',
+                'email' => 'super_user@company.com',
+                'password' => Hash::make('password'),
             ],
         ];
 

@@ -18,11 +18,13 @@ class RolePermissionSeeder extends Seeder
     public function run(): void
     {
         // Fetch or create roles
-        $accountRole = Role::firstOrCreate(['name' => 'Account', 'guard_name' => 'api']);
-        $superAdminRole = Role::firstOrCreate(['name' => 'Super Administrator', 'guard_name' => 'api']);
+        $administratorUser = Role::firstOrCreate(['name' => 'Administrator User', 'guard_name' => 'api']);
+        $regularUser = Role::firstOrCreate(['name' => 'Regular User', 'guard_name' => 'api']);
+        $superAccount = Role::firstOrCreate(['name' => 'Super Account', 'guard_name' => 'api']);
+        $superUser = Role::firstOrCreate(['name' => 'Super User', 'guard_name' => 'api']);
 
-        // Define permissions for Account
-        $accountPermissions = [
+        // Define permissions for Regular User
+        $regularUserPermissions = [
             'View Dashboard',
             'View Tracking',
             'View Navigation',
@@ -33,10 +35,12 @@ class RolePermissionSeeder extends Seeder
             'View Reports',
             'View Reports History',
             'View Vehicle',
+            'Show Vehicle',
             'Create Vehicle',
             'Edit Vehicle',
             'Delete Vehicle',
             'View Device',
+            'Show Device',
             'Create Device',
             'Edit Device',
             'Delete Device',
@@ -49,12 +53,12 @@ class RolePermissionSeeder extends Seeder
             'View Minehaul AI',
         ];
 
-        $slugAccountPermissions = collect($accountPermissions)->map(function ($permission) {
+        $slugRegularUserPermissions = collect($regularUserPermissions)->map(function ($permission) {
             return Str::slug($permission);
         });
 
-        // Define permissions for Super Administrator
-        $superAdminPermissions = array_merge($accountPermissions, [
+        // Define permissions for Administrator User (includes all regular user permissions)
+        $administratorPermissions = array_merge($regularUserPermissions, [
             'View Users',
             'Create Users',
             'Edit Users',
@@ -68,41 +72,70 @@ class RolePermissionSeeder extends Seeder
             'Edit Permissions',
             'Delete Permissions',
             'View Menus',
+            'Create Menus',
             'Edit Menus',
             'Delete Menus',
-            'Create Menus',
         ]);
 
-        $slugAdminPermissions = collect($superAdminPermissions)->map(function ($permission) {
+        $slugAdminPermissions = collect($administratorPermissions)->map(function ($permission) {
+            return Str::slug($permission);
+        });
+
+        // Define permissions for Super Account role
+        $superAccountPermissions = [
+            'View Account Onboarding',
+            'Manage All Accounts',
+            'Activate All Features',
+            'Manage Account Billing',
+        ];
+
+        $slugSuperAccountPermissions = collect($superAccountPermissions)->map(function ($permission) {
+            return Str::slug($permission);
+        });
+
+        // Define permissions for Super User role (same as Super Account role)
+        $superUserPermissions = $superAccountPermissions;
+
+        $slugSuperUserPermissions = collect($superUserPermissions)->map(function ($permission) {
             return Str::slug($permission);
         });
 
         // Create permissions if they don't exist
-        foreach ($slugAccountPermissions->merge($slugAdminPermissions)->unique() as $permissionName) {
-            Permission::firstOrCreate(['name' => Str::slug(Str::lower($permissionName), '-'), 'guard_name' => 'api']);
+        foreach (
+            $slugRegularUserPermissions
+                ->merge($slugAdminPermissions)
+                ->merge($slugSuperAccountPermissions)
+                ->merge($slugSuperUserPermissions)
+                ->unique() as $permissionName
+        ) {
+            Permission::firstOrCreate(['name' => $permissionName, 'guard_name' => 'api']);
         }
 
-        // Fetch created permissions from database
-        $accountPermissions = Permission::whereIn('name', $slugAccountPermissions)->get();
-        $superAdminPermissions = Permission::whereIn('name', $slugAdminPermissions)->get();
+        // Fetch created permissions from the database
+        $regularPermissions = Permission::whereIn('name', $slugRegularUserPermissions)->get();
+        $adminPermissions = Permission::whereIn('name', $slugAdminPermissions)->get();
+        $superAccountPermissions = Permission::whereIn('name', $slugSuperAccountPermissions)->get();
+        $superUserPermissions = Permission::whereIn('name', $slugSuperUserPermissions)->get();
 
         // Sync permissions to roles
-        $accountRole->syncPermissions($accountPermissions);
-        $superAdminRole->syncPermissions($superAdminPermissions);
+        $regularUser->syncPermissions($regularPermissions);
+        $administratorUser->syncPermissions($adminPermissions);
+        $superAccount->syncPermissions($superAccountPermissions);
+        $superUser->syncPermissions($superUserPermissions);
 
-        // Define an associative array of users and their corresponding roles
+        // Assign users to roles
         $usersWithRoles = [
-            'super_administrator' => $superAdminRole,
-            'accountan' => $accountRole,
+            'administrator_user' => $administratorUser,
+            'regular_user' => $regularUser,
+            'super_account' => $superAccount,
+            'super_user' => $superUser,
         ];
 
-        // Loop through each user and assign the corresponding role
         foreach ($usersWithRoles as $username => $role) {
             $user = User::where('username', $username)->first();
 
             if ($user) {
-                $user->syncRoles([$role]); // Sync roles
-                // Optionally sync permissions as well
+                $user->syncRoles([$role]);
                 $user->syncPermissions($role->permissions); // Ensure permissions are also synced
             }
         }
