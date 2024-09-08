@@ -48,6 +48,6 @@ class UpdateUserRequest extends FormRequest
     public function getUserId(): ?string
     {
         // Ambil ID dari body request terlebih dahulu, jika tidak ada gunakan ID dari route
-        return $this->input('data.id') ?? $this->route('users');
+        return $this->input('data.id') ?? auth()->id();
     }
 }

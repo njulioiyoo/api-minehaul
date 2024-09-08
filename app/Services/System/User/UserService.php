@@ -47,7 +47,7 @@ class UserService
 
             DB::commit();
 
-            return $user;
+            return $this->transformer->transform($user);
         } catch (\Throwable $th) {
             DB::rollBack();
             throw $th;
@@ -81,7 +81,6 @@ class UserService
         DB::beginTransaction();
         try {
             $user = User::find($userId);
-
             if (! $user) {
                 throw new \Exception('User not found');
             }
@@ -104,7 +103,7 @@ class UserService
             }
             DB::commit();
 
-            return $user;
+            return $this->transformer->transform($user);
         } catch (\Throwable $th) {
             DB::rollBack();
             throw $th;
@@ -117,7 +116,7 @@ class UserService
             $user = User::find($userId);
 
             if (! $user) {
-                Log::info('User not found with ID: '.$userId);
+                Log::info('User not found with ID: ' . $userId);
                 throw new \Exception('User not found');
             }
 
