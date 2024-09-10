@@ -17,24 +17,29 @@ class DeviceTransformer
     public function transform(Device $device): array
     {
         return [
-            'type' => 'devices',
-            'id' => $device->uid,
-            'attributes' => [
+            'jsonapi' => [
+                'version' => '1.0',
+            ],
+            'data' => [
+                'type' => 'devices',
                 'id' => $device->uid,
-                'account' => $this->transformRelation($device->account, ['id', 'company_code', 'company_name']),
-                'pit' => $this->transformRelation($device->pit, ['id', 'name', 'description']),
-                'device_type' => $this->transformRelation($device->deviceType, ['id', 'name']),
-                'device_make' => $this->transformRelation($device->deviceMake, ['id', 'name']),
-                'device_model' => $this->transformRelation($device->deviceModel, ['id', 'name']),
-                'year' => $device->year,
-                'display_id' => $device->display_id,
-                'name' => $device->name,
-                'sim_id' => $device->sim_id,
-                'device_immobilizitation_type' => $this->transformRelation($device->deviceImmobilizitationType, ['id', 'name']),
-                'device_ignition_type' => $this->transformRelation($device->deviceIgnitionType, ['id', 'name']),
-                'device_status' => $this->transformRelation($device->deviceStatus, ['id', 'name']),
-                'vehicle' => $this->transformRelation($device->vehicleId, ['id', 'name']),
-            ]
+                'attributes' => [
+                    'id' => $device->uid,
+                    'account' => $this->transformRelation($device->account, ['id', 'company_code', 'company_name']),
+                    'pit' => $this->transformRelation($device->pit, ['id', 'name', 'description']),
+                    'device_type' => $this->transformRelation($device->deviceType, ['id', 'name']),
+                    'device_make' => $this->transformRelation($device->deviceMake, ['id', 'name']),
+                    'device_model' => $this->transformRelation($device->deviceModel, ['id', 'name']),
+                    'year' => $device->year,
+                    'display_id' => $device->display_id,
+                    'name' => $device->name,
+                    'sim_id' => $device->sim_id,
+                    'device_immobilizitation_type' => $this->transformRelation($device->deviceImmobilizitationType, ['id', 'name']),
+                    'device_ignition_type' => $this->transformRelation($device->deviceIgnitionType, ['id', 'name']),
+                    'device_status' => $this->transformRelation($device->deviceStatus, ['id', 'name']),
+                    'vehicle' => $this->transformRelation($device->vehicleId, ['id', 'name']),
+                ]
+            ],
         ];
     }
 
