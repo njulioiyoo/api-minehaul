@@ -12,15 +12,20 @@ class RoleTransformer
     public function transform(Role $role): array
     {
         return [
-            'type' => 'roles',
-            'id' => $role->id,
-            'attributes' => [
+            'jsonapi' => [
+                'version' => '1.0',
+            ],
+            'data' => [
+                'type' => 'roles',
                 'id' => $role->id,
-                'name' => $role->name,
-                'guard_name' => $role->guard_name,
-                'created_at' => $role->created_at,
-                'updated_at' => $role->updated_at,
-                'permissions' => $role->permissions,
+                'attributes' => [
+                    'id' => $role->id,
+                    'name' => $role->name,
+                    'guard_name' => $role->guard_name,
+                    'created_at' => $role->created_at,
+                    'updated_at' => $role->updated_at,
+                    'permissions' => $role->permissions,
+                ],
             ],
         ];
     }
