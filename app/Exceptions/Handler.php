@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Neomerx\JsonApi\Exceptions\JsonApiException;
 
 class Handler extends ExceptionHandler
 {
@@ -24,7 +23,7 @@ class Handler extends ExceptionHandler
      * @var array<int, class-string<\Throwable>>
      */
     protected $dontReport = [
-        JsonApiException::class,
+        //
     ];
 
     /**
@@ -45,8 +44,6 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        $this->renderable(
-            \LaravelJsonApi\Exceptions\ExceptionParser::make()->renderable()
-        );
+        //
     }
 }

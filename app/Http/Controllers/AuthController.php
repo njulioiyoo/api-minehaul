@@ -72,6 +72,9 @@ class AuthController extends Controller
     private function createError(string $title, string $detail, int $status): Response
     {
         return response()->json([
+            'jsonapi' => [
+                'version' => '1.0',
+            ],
             'errors' => [
                 'title' => $title,
                 'detail' => $detail,
