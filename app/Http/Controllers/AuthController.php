@@ -9,12 +9,11 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use LaravelJsonApi\Core\Document\Error;
 use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
 {
-    public function login(LoginRequest $request): Response|Error
+    public function login(LoginRequest $request): Response
     {
         // Ambil client password dari database
         $client = DB::table('oauth_clients')->where('password_client', 1)->first();
@@ -70,12 +69,14 @@ class AuthController extends Controller
         return response()->json(['message' => 'Successfully logged out']);
     }
 
-    private function createError(string $title, string $detail, int $status): Error
+    private function createError(string $title, string $detail, int $status): Response
     {
-        return Error::fromArray([
-            'title' => $title,
-            'detail' => $detail,
-            'status' => $status,
-        ]);
+        return response()->json([
+            'errors' => [
+                'title' => $title,
+                'detail' => $detail,
+                'status' => $status,
+            ]
+        ], $status);
     }
 }
