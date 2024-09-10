@@ -22,4 +22,14 @@ trait ExceptionHandlerTrait
             'detail' => $e->getMessage(),
         ], 500);
     }
+
+    public function formatJsonApiResponse(array $data): array
+    {
+        return [
+            'jsonapi' => [
+                'version' => '1.0',
+            ],
+            'data' => $data,
+        ];
+    }
 }

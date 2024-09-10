@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace App\Transformers;
 
 use App\Models\Menu;
+use App\Traits\ExceptionHandlerTrait;
 
 class MenuTransformer
 {
+    use ExceptionHandlerTrait;
+
     public function transform(Menu $menu): array
     {
-        return [
+        $data = [
             'type' => 'menus',
             'id' => $menu->id,
             'attributes' => [
@@ -20,5 +23,7 @@ class MenuTransformer
                 'updated_at' => $menu->updated_at,
             ],
         ];
+
+        return $this->formatJsonApiResponse($data);
     }
 }

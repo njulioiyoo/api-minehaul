@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\Transformers;
 
 use App\Models\Vehicle;
+use App\Traits\ExceptionHandlerTrait;
 
 class VehicleTransformer
 {
+    use ExceptionHandlerTrait;
+
     /**
      * Transforms a Device model into an array format.
      *
@@ -16,29 +19,26 @@ class VehicleTransformer
      */
     public function transform(Vehicle $vehicle): array
     {
-        return [
-            'jsonapi' => [
-                'version' => '1.0',
-            ],
-            'data' => [
-                'type' => 'vehicles',
+        $data = [
+            'type' => 'vehicles',
+            'id' => $vehicle->uid,
+            'attributes' => [
                 'id' => $vehicle->uid,
-                'attributes' => [
-                    'id' => $vehicle->uid,
-                    'account' => $this->transformRelation($vehicle->account, ['id', 'company_code', 'company_name']),
-                    'pit' => $this->transformRelation($vehicle->pit, ['id', 'name', 'description']),
-                    'display_id' => $vehicle->display_id,
-                    'name' => $vehicle->name,
-                    'vin' => $vehicle->vin,
-                    'license_plate' => $vehicle->license_plate,
-                    'vehicle_type' => $this->transformRelation($vehicle->vehicleType, ['id', 'name']),
-                    'vehicle_make' => $this->transformRelation($vehicle->vehicleMake, ['id', 'name']),
-                    'vehicle_model' => $this->transformRelation($vehicle->vehicleModel, ['id', 'name']),
-                    'year' => $vehicle->year,
-                    'vehicle_status' => $this->transformRelation($vehicle->vehicleStatus, ['id', 'name']),
-                ]
+                'account' => $this->transformRelation($vehicle->account, ['id', 'company_code', 'company_name']),
+                'pit' => $this->transformRelation($vehicle->pit, ['id', 'name', 'description']),
+                'display_id' => $vehicle->display_id,
+                'name' => $vehicle->name,
+                'vin' => $vehicle->vin,
+                'license_plate' => $vehicle->license_plate,
+                'vehicle_type' => $this->transformRelation($vehicle->vehicleType, ['id', 'name']),
+                'vehicle_make' => $this->transformRelation($vehicle->vehicleMake, ['id', 'name']),
+                'vehicle_model' => $this->transformRelation($vehicle->vehicleModel, ['id', 'name']),
+                'year' => $vehicle->year,
+                'vehicle_status' => $this->transformRelation($vehicle->vehicleStatus, ['id', 'name']),
             ]
         ];
+
+        return $this->formatJsonApiResponse($data);
     }
 
     /**
