@@ -39,5 +39,12 @@ class DatabaseSeeder extends Seeder
         $this->call(DeviceIgnitionSeeder::class);
         $this->call(DeviceStatusSeeder::class);
         $this->call(DevicesTableSeeder::class);
+
+        $this->call(LocationTypeSeeder::class);
+
+        $this->call(AlertStatusSeeder::class);
+        $this->call(AlertTypesSeeder::class);
+        $this->call(AlertActionTypesSeeder::class);
+        $this->call(UnitOfMeasurementsSeeder::class);
     }
 }
