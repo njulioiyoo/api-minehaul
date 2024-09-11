@@ -13,13 +13,10 @@ class DeviceTransformer
 
     /**
      * Transforms a Device model into an array format.
-     *
-     * @param Device $device
-     * @return array
      */
     public function transform(Device $device): array
     {
-        $data = [
+        return [
             'type' => 'devices',
             'id' => $device->uid,
             'attributes' => [
@@ -37,22 +34,18 @@ class DeviceTransformer
                 'device_ignition_type' => $this->transformRelation($device->deviceIgnitionType, ['id', 'name']),
                 'device_status' => $this->transformRelation($device->deviceStatus, ['id', 'name']),
                 'vehicle' => $this->transformRelation($device->vehicleId, ['id', 'name']),
-            ]
+            ],
         ];
-
-        return $this->formatJsonApiResponse($data);
     }
 
     /**
      * Transforms a related model into an array format.
      *
-     * @param mixed $relation
-     * @param array $fields
-     * @return array|null
+     * @param  mixed  $relation
      */
     private function transformRelation($relation, array $fields): ?array
     {
-        if (!$relation) {
+        if (! $relation) {
             return null;
         }
 
