@@ -5,12 +5,9 @@ declare(strict_types=1);
 namespace App\Transformers;
 
 use App\Models\Device;
-use App\Traits\ExceptionHandlerTrait;
 
 class DeviceTransformer
 {
-    use ExceptionHandlerTrait;
-
     /**
      * Transforms a Device model into an array format.
      */

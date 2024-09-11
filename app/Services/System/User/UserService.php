@@ -6,6 +6,7 @@ namespace App\Services\System\User;
 
 use App\Helpers\PaginationHelper;
 use App\Models\User;
+use App\Traits\ExceptionHandlerTrait;
 use App\Transformers\UserTransformer;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +15,8 @@ use Spatie\Permission\Models\Role;
 
 class UserService
 {
+    use ExceptionHandlerTrait;
+
     protected $transformer;
 
     protected $userModel;
@@ -47,7 +50,9 @@ class UserService
                 $user->syncPermissions($permissions);
             }
 
-            return $this->transformer->transform($user);
+            return $this->formatJsonApiResponse(
+                $this->transformer->transform($user)
+            );
         });
     }
 
@@ -98,7 +103,10 @@ class UserService
                 $user->syncPermissions($permissions);
             }
 
-            return $this->transformer->transform($user);
+            // Menggunakan transformer untuk format response JSON API
+            return $this->formatJsonApiResponse(
+                $this->transformer->transform($user)
+            );
         });
     }
 
@@ -114,5 +122,17 @@ class UserService
             Log::error("Error deleting user with ID: {$userId}, Error: {$e->getMessage()}");
             throw $e;
         }
+    }
+
+    public function showUser(string $userId)
+    {
+        $user = Cache::remember("device_$userId", 60, function () use ($userId) {
+            return $this->userModel->where('id', $userId)->firstOrFail();
+        });
+
+        // Menggunakan transformer untuk format response JSON API
+        return $this->formatJsonApiResponse(
+            $this->transformer->transform($user)
+        );
     }
 }

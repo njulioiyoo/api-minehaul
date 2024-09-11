@@ -5,34 +5,39 @@ declare(strict_types=1);
 namespace App\Services\System\Permission;
 
 use App\Helpers\PaginationHelper;
+use App\Traits\ExceptionHandlerTrait;
 use App\Transformers\PermissionTransformer;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Permission;
 
 class PermissionService
 {
+    use ExceptionHandlerTrait;
+
     protected $transformer;
 
-    public function __construct(PermissionTransformer $transformer)
+    protected $permissionModel;
+
+    public function __construct(PermissionTransformer $transformer, Permission $permission)
     {
         $this->transformer = $transformer;
+        $this->permissionModel = $permission;
     }
 
     public function createPermission(array $inputData)
     {
-        try {
-            $permission = Permission::create($inputData);
+        return DB::transaction(function () use ($inputData) {
+            $permission = $this->permissionModel->create($inputData);
 
-            if (! $permission) {
-                throw new \Exception('Failed to create permission');
-            }
+            // Clear cache related to permissions
+            Cache::forget('permission_'.$permission->id);
 
-            $transformedPermission = $this->transformer->transform($permission);
-
-            return $transformedPermission;
-        } catch (\Throwable $th) {
-            throw $th;
-        }
+            return $this->formatJsonApiResponse(
+                $this->transformer->transform($permission)
+            );
+        });
     }
 
     public function readPermission(array $queryParams)
@@ -59,36 +64,32 @@ class PermissionService
 
     public function updatePermission(string $permissionId, array $inputData)
     {
-        try {
-            $permission = Permission::find($permissionId);
-
-            if (! $permission) {
-                throw new \Exception('Permission not found');
-            }
+        return DB::transaction(function () use ($permissionId, $inputData) {
+            $permission = $this->permissionModel->findOrFail($permissionId);
 
             $permission->update($inputData);
 
-            $transformedPermission = $this->transformer->transform($permission);
+            // Update cache
+            Cache::put("permission_$permissionId", $permission, 60);
 
-            return $transformedPermission;
-        } catch (\Throwable $th) {
-            throw $th;
-        }
+            // Menggunakan transformer untuk format response JSON API
+            return $this->formatJsonApiResponse(
+                $this->transformer->transform($permission)
+            );
+        });
     }
 
     public function deletePermission($permissionId)
     {
         try {
-            $permission = Permission::find($permissionId);
-
-            if (! $permission) {
-                Log::info('Permission not found with ID: '.$permissionId);
-                throw new \Exception('Role not found');
-            }
-
+            $permission = $this->permissionModel->findOrFail($permissionId);
             $permission->delete();
-        } catch (\Throwable $th) {
-            throw $th;
+
+            // Clear cache
+            Cache::forget("permission_$permissionId");
+        } catch (\Exception $e) {
+            Log::error("Error deleting permission with ID: {$permissionId}, Error: {$e->getMessage()}");
+            throw $e;
         }
     }
 }

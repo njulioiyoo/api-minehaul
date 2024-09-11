@@ -13,7 +13,7 @@ class MenuTransformer
 
     public function transform(Menu $menu): array
     {
-        $data = [
+        return [
             'type' => 'menus',
             'id' => $menu->id,
             'attributes' => [
@@ -23,7 +23,5 @@ class MenuTransformer
                 'updated_at' => $menu->updated_at,
             ],
         ];
-
-        return $this->formatJsonApiResponse($data);
     }
 }

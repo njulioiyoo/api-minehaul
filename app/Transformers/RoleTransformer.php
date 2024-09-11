@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Transformers;
 
-use Spatie\Permission\Models\Role;
 use App\Traits\ExceptionHandlerTrait;
+use Spatie\Permission\Models\Role;
 
 class RoleTransformer
 {
@@ -13,7 +13,7 @@ class RoleTransformer
 
     public function transform(Role $role): array
     {
-        $data = [
+        return [
             'type' => 'roles',
             'id' => $role->id,
             'attributes' => [
@@ -25,7 +25,5 @@ class RoleTransformer
                 'permissions' => $role->permissions,
             ],
         ];
-
-        return $this->formatJsonApiResponse($data);
     }
 }

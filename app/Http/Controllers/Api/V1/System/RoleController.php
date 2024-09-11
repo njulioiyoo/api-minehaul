@@ -77,4 +77,16 @@ class RoleController extends Controller
             return $this->handleException($e, 'Error deleting role');
         }
     }
+
+    public function showRole(Request $request)
+    {
+        try {
+            [$input, $roleId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'roles', true);
+            $response = $this->roleService->showRole($roleId);
+
+            return response()->json($response);
+        } catch (\Exception $e) {
+            return $this->handleException($e, 'Error show role');
+        }
+    }
 }

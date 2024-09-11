@@ -6,28 +6,30 @@ namespace App\Services\System\Menu;
 
 use App\Helpers\PaginationHelper;
 use App\Models\Menu;
+use App\Traits\ExceptionHandlerTrait;
 use App\Transformers\MenuTransformer;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class MenuService
 {
-    public function __construct(public MenuTransformer $transformer) {}
+    use ExceptionHandlerTrait;
+
+    public function __construct(public MenuTransformer $transformer, public Menu $menu) {}
 
     public function createMenu(array $inputData)
     {
-        try {
-            $menu = Menu::create($inputData);
+        return DB::transaction(function () use ($inputData) {
+            $menu = $this->menu->create($inputData);
 
-            if (! $menu) {
-                throw new \Exception('Failed to create menu');
-            }
+            // Clear cache related to users
+            Cache::forget('menu_'.$menu->id);
 
-            $transformMenu = $this->transformer->transform($menu);
-
-            return $transformMenu;
-        } catch (\Throwable $th) {
-            throw $th;
-        }
+            return $this->formatJsonApiResponse(
+                $this->transformer->transform($menu)
+            );
+        });
     }
 
     public function readMenu(array $queryParams)
@@ -54,36 +56,32 @@ class MenuService
 
     public function updateMenu(string $menuId, array $inputData)
     {
-        try {
-            $menu = Menu::find($menuId);
-
-            if (! $menu) {
-                throw new \Exception('Menu not found');
-            }
+        return DB::transaction(function () use ($menuId, $inputData) {
+            $menu = $this->menu->findOrFail($menuId);
 
             $menu->update($inputData);
 
-            $transformMenu = $this->transformer->transform($menu);
+            // Update cache
+            Cache::put("menu_$menuId", $menu, 60);
 
-            return $transformMenu;
-        } catch (\Throwable $th) {
-            throw $th;
-        }
+            // Menggunakan transformer untuk format response JSON API
+            return $this->formatJsonApiResponse(
+                $this->transformer->transform($menu)
+            );
+        });
     }
 
     public function deleteMenu($menuId)
     {
         try {
-            $menu = Menu::find($menuId);
-
-            if (! $menu) {
-                Log::info('Menu not found with ID: '.$menuId);
-                throw new \Exception('Role not found');
-            }
-
+            $menu = $this->menu->findOrFail($menuId);
             $menu->delete();
-        } catch (\Throwable $th) {
-            throw $th;
+
+            // Clear cache
+            Cache::forget("menu_$menuId");
+        } catch (\Exception $e) {
+            Log::error("Error deleting menu with ID: {$menuId}, Error: {$e->getMessage()}");
+            throw $e;
         }
     }
 }
