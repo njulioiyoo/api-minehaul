@@ -46,5 +46,7 @@ class DatabaseSeeder extends Seeder
         $this->call(AlertTypesSeeder::class);
         $this->call(AlertActionTypesSeeder::class);
         $this->call(UnitOfMeasurementsSeeder::class);
+
+        $this->call(DriverSeeder::class);
     }
 }
