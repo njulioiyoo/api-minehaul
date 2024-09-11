@@ -6,14 +6,18 @@ namespace App\Services\Configuration\Vehicle;
 
 use App\Helpers\PaginationHelper;
 use App\Models\Vehicle;
+use App\Traits\ExceptionHandlerTrait;
 use App\Transformers\VehicleTransformer;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
 
 class VehicleService
 {
+    use ExceptionHandlerTrait;
+
     protected $transformer;
+
     protected $vehicleModel;
 
     public function __construct(VehicleTransformer $transformer, Vehicle $vehicle)
@@ -28,9 +32,12 @@ class VehicleService
             $vehicle = $this->vehicleModel->create($inputData);
 
             // Clear cache setelah membuat kendaraan baru
-            Cache::forget('vehicle_' . $vehicle->id);
+            Cache::forget('vehicle_'.$vehicle->id);
 
-            return $this->transformer->transform($vehicle);
+            // Menggunakan transformer untuk format response JSON API
+            return $this->formatJsonApiResponse(
+                $this->transformer->transform($vehicle)
+            );
         });
     }
 
@@ -63,7 +70,10 @@ class VehicleService
             return $this->vehicleModel->findOrFail($vehicleUid);
         });
 
-        return $this->transformer->transform($vehicle);
+        // Menggunakan transformer untuk format response JSON API
+        return $this->formatJsonApiResponse(
+            $this->transformer->transform($vehicle)
+        );
     }
 
     public function updateVehicle(string $vehicleId, array $inputData)
@@ -78,7 +88,10 @@ class VehicleService
             // Update cache setelah update vehicle
             Cache::put("vehicle_$vehicleId", $vehicle, 60);
 
-            return $this->transformer->transform($vehicle);
+            // Menggunakan transformer untuk format response JSON API
+            return $this->formatJsonApiResponse(
+                $this->transformer->transform($vehicle)
+            );
         });
     }
 

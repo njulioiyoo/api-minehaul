@@ -9,6 +9,7 @@ use App\Models\RoleMenu;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 class VerifyUserRole
@@ -31,8 +32,12 @@ class VerifyUserRole
         // Ambil URL rute saat ini
         $currentUrl = $request->path();
 
+        $baseUrl = Str::before($currentUrl, '/'); // Mengambil segmen awal sebelum parameter kedua
+
         // Cari menu berdasarkan URL
-        $menu = Menu::with('permissionMenu')->where('url', $currentUrl)->first();
+        $menu = Menu::with('permissionMenu')
+            ->where('url', 'LIKE', $baseUrl.'%') // Mencocokkan URL yang dimulai dengan $baseUrl
+            ->first();
 
         // Jika menu tidak ditemukan, berikan validasi
         if (! $menu) {

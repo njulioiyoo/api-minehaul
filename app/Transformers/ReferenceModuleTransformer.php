@@ -18,89 +18,101 @@ use App\Models\Vehicle\VehicleType;
 class ReferenceModuleTransformer
 {
     /**
+     * Returns an array of queries for device-related data.
+     */
+    protected function getDeviceQueries(): array
+    {
+        return [
+            'device_status' => fn () => DeviceStatus::select('id', 'name', 'status_theme')->get(),
+            'device_type' => fn () => DeviceType::select('id', 'name')->get(),
+            'device_make' => fn () => DeviceMake::with('deviceType')->select('id', 'device_type_id', 'name')->get(),
+            'device_model' => fn () => DeviceModel::with('deviceMake')->select('id', 'device_make_id', 'name')->get()->map(function ($model) {
+                return [
+                    'id' => $model->id,
+                    'name' => $model->name,
+                    'device_make' => $model->deviceMake ? [
+                        'id' => $model->deviceMake->id,
+                        'name' => $model->deviceMake->name,
+                    ] : null,
+                ];
+            })->toArray(),
+            'device_immobilizitation_type' => fn () => DeviceImmobilizitationType::select('id', 'name')->get(),
+            'device_ignition_type' => fn () => DeviceIgnitionType::select('id', 'name')->get(),
+        ];
+    }
+
+    /**
+     * Returns an array of queries for vehicle-related data.
+     */
+    protected function getVehicleQueries(): array
+    {
+        return [
+            'vehicle_status' => fn () => VehicleStatus::select('id', 'name')->get(),
+            'vehicle_type' => fn () => VehicleType::select('id', 'name')->get(),
+            'vehicle_make' => fn () => VehicleMake::with('vehicleType')->select('id', 'vehicle_type_id', 'name')->get()->map(function ($make) {
+                return [
+                    'id' => $make->id,
+                    'name' => $make->name,
+                    'vehicle_type' => $make->vehicleType ? [
+                        'id' => $make->vehicleType->id,
+                        'name' => $make->vehicleType->name,
+                    ] : null,
+                ];
+            })->toArray(),
+            'vehicle_model' => fn () => VehicleModel::with('vehicleMake')->select('id', 'vehicle_make_id', 'name')->get()->map(function ($model) {
+                return [
+                    'id' => $model->id,
+                    'name' => $model->name,
+                    'vehicle_make' => $model->vehicleMake ? [
+                        'id' => $model->vehicleMake->id,
+                        'name' => $model->vehicleMake->name,
+                    ] : null,
+                ];
+            })->toArray(),
+        ];
+    }
+
+    /**
      * Transforms the requested device data or returns all data if no type is specified.
      *
-     * @param string|null $type
-     * @return array
+     * @param  string|null  $type
      */
     public function transformDevice($type = null): array
     {
-        $status = DeviceStatus::select('id', 'name', 'status_theme')->get();
-        $types = DeviceType::select('id', 'name')->get();
-        $makes = DeviceMake::with('deviceType')->select('id', 'device_type_id', 'name')->get();
-        $models = DeviceModel::with('deviceMake')->select('id', 'device_make_id', 'name')->get();
-        $immobilizitationTypes = DeviceImmobilizitationType::select('id', 'name')->get();
-        $ignitionTypes = DeviceIgnitionType::select('id', 'name')->get();
+        $data = [];
+        $queries = $this->getDeviceQueries();
+        $types = array_filter($queries, fn ($key) => str_starts_with($key, 'device_'), ARRAY_FILTER_USE_KEY);
 
-        $transformedModels = $models->map(function ($model) {
-            return [
-                'id' => $model->id,
-                'name' => $model->name,
-                'device_make' => $model->deviceMake ? [
-                    'id' => $model->deviceMake->id,
-                    'name' => $model->deviceMake->name,
-                ] : null
-            ];
-        })->toArray();
+        if ($type === null || $type === '') {
+            foreach ($types as $key => $query) {
+                $data[$key] = $query();
+            }
+        } elseif (array_key_exists($type, $types)) {
+            $data[$type] = $types[$type]();
+        }
 
-        // Data lengkap yang akan dikembalikan
-        $data = [
-            'device_status' => $status,
-            'device_type' => $types,
-            'device_make' => $makes,
-            'device_model' => $transformedModels,
-            'device_immobilizitation_type' => $immobilizitationTypes,
-            'device_ignition_type' => $ignitionTypes
-        ];
-
-        // Jika ada tipe yang diminta, kembalikan data tersebut saja
-        return $type ? [$type => $data[$type]] : $data;
+        return $data;
     }
 
     /**
      * Transforms the requested vehicle data or returns all data if no type is specified.
      *
-     * @param string|null $type
-     * @return array
+     * @param  string|null  $type
      */
     public function transformVehicle($type = null): array
     {
-        $status = VehicleStatus::select('id', 'name')->get();
-        $types = VehicleType::select('id', 'name')->get();
-        $makes = VehicleMake::with('vehicleType')->select('id', 'vehicle_type_id', 'name')->get();
-        $models = VehicleModel::with('vehicleMake')->select('id', 'vehicle_make_id', 'name')->get();
+        $data = [];
+        $queries = $this->getVehicleQueries();
+        $types = array_filter($queries, fn ($key) => str_starts_with($key, 'vehicle_'), ARRAY_FILTER_USE_KEY);
 
-        $transformedMakes = $makes->map(function ($make) {
-            return [
-                'id' => $make->id,
-                'name' => $make->name,
-                'vehicle_type' => $make->vehicleType ? [
-                    'id' => $make->vehicleType->id,
-                    'name' => $make->vehicleType->name,
-                ] : null
-            ];
-        })->toArray();
+        if ($type === null || $type === '') {
+            foreach ($types as $key => $query) {
+                $data[$key] = $query();
+            }
+        } elseif (array_key_exists($type, $types)) {
+            $data[$type] = $types[$type]();
+        }
 
-        $transformedModel = $models->map(function ($model) {
-            return [
-                'id' => $model->id,
-                'name' => $model->name,
-                'vehicle_model' => $model->vehicleMake ? [
-                    'id' => $model->vehicleMake->id,
-                    'name' => $model->vehicleMake->name,
-                ] : null
-            ];
-        })->toArray();
-
-        // Data lengkap yang akan dikembalikan
-        $data = [
-            'vehicle_status' => $status,
-            'vehicle_type' => $types,
-            'vehicle_make' => $transformedMakes,
-            'vehicle_model' => $transformedModel
-        ];
-
-        // Jika ada tipe yang diminta, kembalikan data tersebut saja
-        return $type ? [$type => $data[$type]] : $data;
+        return $data;
     }
 }

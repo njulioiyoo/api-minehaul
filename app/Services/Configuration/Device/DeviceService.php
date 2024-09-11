@@ -4,16 +4,20 @@ declare(strict_types=1);
 
 namespace App\Services\Configuration\Device;
 
-use App\Models\Device;
-use App\Transformers\DeviceTransformer;
 use App\Helpers\PaginationHelper;
+use App\Models\Device;
+use App\Traits\ExceptionHandlerTrait;
+use App\Transformers\DeviceTransformer;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
 
 class DeviceService
 {
+    use ExceptionHandlerTrait;
+
     protected $transformer;
+
     protected $deviceModel; // Definisikan model device sekali di sini
 
     public function __construct(DeviceTransformer $transformer, Device $device)
@@ -24,13 +28,17 @@ class DeviceService
 
     public function createDevice(array $inputData)
     {
+        // dd($inputData);
         return DB::transaction(function () use ($inputData) {
             $device = $this->deviceModel->create($inputData);
 
             // Clear cache related to devices
-            Cache::forget('device_' . $device->id);
+            Cache::forget('device_'.$device->id);
 
-            return $this->transformer->transform($device);
+            // Menggunakan transformer untuk format response JSON API
+            return $this->formatJsonApiResponse(
+                $this->transformer->transform($device)
+            );
         });
     }
 
@@ -58,11 +66,15 @@ class DeviceService
 
     public function showDevice(string $deviceUid)
     {
+        // Menggunakan cache untuk mengambil device dengan UID yang diberikan
         $device = Cache::remember("device_$deviceUid", 60, function () use ($deviceUid) {
-            return $this->deviceModel->findOrFail($deviceUid);
+            return $this->deviceModel->where('uid', $deviceUid)->firstOrFail();
         });
 
-        return $this->transformer->transform($device);
+        // Menggunakan transformer untuk format response JSON API
+        return $this->formatJsonApiResponse(
+            $this->transformer->transform($device)
+        );
     }
 
     public function updateDevice(string $deviceUid, array $inputData)
@@ -77,7 +89,10 @@ class DeviceService
             // Update cache
             Cache::put("device_$deviceUid", $device, 60);
 
-            return $this->transformer->transform($device);
+            // Menggunakan transformer untuk format response JSON API
+            return $this->formatJsonApiResponse(
+                $this->transformer->transform($device)
+            );
         });
     }
 
