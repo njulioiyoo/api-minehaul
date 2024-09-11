@@ -7,6 +7,7 @@ namespace App\Services\System\User;
 use App\Helpers\PaginationHelper;
 use App\Models\User;
 use App\Transformers\UserTransformer;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Role;
@@ -15,20 +16,21 @@ class UserService
 {
     protected $transformer;
 
-    public function __construct(UserTransformer $transformer)
+    protected $userModel;
+
+    public function __construct(UserTransformer $transformer, User $user)
     {
         $this->transformer = $transformer;
+        $this->userModel = $user;
     }
 
     public function createUser(array $inputData, array $roles = [])
     {
-        DB::beginTransaction();
-        try {
-            $user = User::create($inputData);
+        return DB::transaction(function () use ($inputData, $roles) {
+            $user = $this->userModel->create($inputData);
 
-            if (! $user) {
-                throw new \Exception('Failed to create user');
-            }
+            // Clear cache related to users
+            Cache::forget('user_'.$user->id);
 
             if (! empty($roles)) {
                 $user->syncRoles($roles);
@@ -45,13 +47,8 @@ class UserService
                 $user->syncPermissions($permissions);
             }
 
-            DB::commit();
-
             return $this->transformer->transform($user);
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            throw $th;
-        }
+        });
     }
 
     public function readUser(array $queryParams)
@@ -78,14 +75,13 @@ class UserService
 
     public function updateUser(string $userId, array $inputData, array $roles = [])
     {
-        DB::beginTransaction();
-        try {
-            $user = User::find($userId);
-            if (! $user) {
-                throw new \Exception('User not found');
-            }
+        return DB::transaction(function () use ($userId, $inputData, $roles) {
+            $user = $this->userModel->findOrFail($userId);
 
             $user->update($inputData);
+
+            // Update cache
+            Cache::put("user_$userId", $user, 60);
 
             if (! empty($roles)) {
                 $user->syncRoles($roles);
@@ -101,28 +97,22 @@ class UserService
 
                 $user->syncPermissions($permissions);
             }
-            DB::commit();
 
             return $this->transformer->transform($user);
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            throw $th;
-        }
+        });
     }
 
     public function deleteUser($userId)
     {
         try {
-            $user = User::find($userId);
-
-            if (! $user) {
-                Log::info('User not found with ID: ' . $userId);
-                throw new \Exception('User not found');
-            }
-
+            $user = $this->userModel->findOrFail($userId);
             $user->delete();
-        } catch (\Throwable $th) {
-            throw $th;
+
+            // Clear cache
+            Cache::forget("user_$userId");
+        } catch (\Exception $e) {
+            Log::error("Error deleting user with ID: {$userId}, Error: {$e->getMessage()}");
+            throw $e;
         }
     }
 }
