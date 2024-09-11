@@ -28,7 +28,6 @@ class DeviceService
 
     public function createDevice(array $inputData)
     {
-        // dd($inputData);
         return DB::transaction(function () use ($inputData) {
             $device = $this->deviceModel->create($inputData);
 

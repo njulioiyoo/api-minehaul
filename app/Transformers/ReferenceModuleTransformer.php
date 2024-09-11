@@ -79,19 +79,11 @@ class ReferenceModuleTransformer
      */
     public function transformDevice($type = null): array
     {
-        $data = [];
-        $queries = $this->getDeviceQueries();
-        $types = array_filter($queries, fn ($key) => str_starts_with($key, 'device_'), ARRAY_FILTER_USE_KEY);
+        $types = array_filter($this->getDeviceQueries(), fn ($key) => str_starts_with($key, 'device_'), ARRAY_FILTER_USE_KEY);
 
-        if ($type === null || $type === '') {
-            foreach ($types as $key => $query) {
-                $data[$key] = $query();
-            }
-        } elseif (array_key_exists($type, $types)) {
-            $data[$type] = $types[$type]();
-        }
-
-        return $data;
+        return $type === null || $type === ''
+            ? array_map(fn ($query) => $query(), $types)
+            : (isset($types[$type]) ? [$type => $types[$type]()] : []);
     }
 
     /**
@@ -101,18 +93,10 @@ class ReferenceModuleTransformer
      */
     public function transformVehicle($type = null): array
     {
-        $data = [];
-        $queries = $this->getVehicleQueries();
-        $types = array_filter($queries, fn ($key) => str_starts_with($key, 'vehicle_'), ARRAY_FILTER_USE_KEY);
+        $types = array_filter($this->getVehicleQueries(), fn ($key) => str_starts_with($key, 'vehicle_'), ARRAY_FILTER_USE_KEY);
 
-        if ($type === null || $type === '') {
-            foreach ($types as $key => $query) {
-                $data[$key] = $query();
-            }
-        } elseif (array_key_exists($type, $types)) {
-            $data[$type] = $types[$type]();
-        }
-
-        return $data;
+        return $type === null || $type === ''
+            ? array_map(fn ($query) => $query(), $types)
+            : (isset($types[$type]) ? [$type => $types[$type]()] : []);
     }
 }

@@ -76,4 +76,16 @@ class UserController extends Controller
             return $this->handleException($e, 'Error deleting user');
         }
     }
+
+    public function showUser(Request $request)
+    {
+        try {
+            [$input, $userId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'users', true);
+            $response = $this->userService->showUser($userId);
+
+            return response()->json($response);
+        } catch (\Exception $e) {
+            return $this->handleException($e, 'Error show users');
+        }
+    }
 }

@@ -13,7 +13,7 @@ class UserTransformer
 
     public function transform(User $user): array
     {
-        $data = [
+        return [
             'type' => 'users',
             'id' => $user->id,
             'attributes' => [
@@ -37,7 +37,5 @@ class UserTransformer
                 'account' => $user->persons?->account,
             ],
         ];
-
-        return $this->formatJsonApiResponse($data);
     }
 }

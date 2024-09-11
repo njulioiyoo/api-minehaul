@@ -27,6 +27,7 @@ Route::middleware(['json.api'])->group(function () {
             Route::post('/', [RoleController::class, 'createRole'])->name('roles.create')->middleware('verify.user.permission:create-roles');
             Route::patch('/', [RoleController::class, 'updateRole'])->name('roles.update')->middleware('verify.user.permission:edit-roles');
             Route::delete('/', [RoleController::class, 'deleteRole'])->name('roles.delete')->middleware('verify.user.permission:delete-roles');
+            Route::post('/detail', [RoleController::class, 'showRole'])->name('roles.show')->middleware('verify.user.permission:show-roles');
         });
 
         // Routes for permissions
@@ -43,6 +44,7 @@ Route::middleware(['json.api'])->group(function () {
             Route::post('/', [UserController::class, 'createUser'])->name('users.create')->middleware('verify.user.permission:create-users');
             Route::patch('/', [UserController::class, 'updateUser'])->name('users.update')->middleware('verify.user.permission:edit-users');
             Route::delete('/', [UserController::class, 'deleteUser'])->name('users.delete')->middleware('verify.user.permission:delete-users');
+            Route::post('/detail', [UserController::class, 'showUser'])->name('users.show')->middleware('verify.user.permission:show-users');
         });
 
         // Routes for menus

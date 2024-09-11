@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Transformers;
 
-use Spatie\Permission\Models\Permission;
 use App\Traits\ExceptionHandlerTrait;
+use Spatie\Permission\Models\Permission;
 
 class PermissionTransformer
 {
@@ -13,7 +13,7 @@ class PermissionTransformer
 
     public function transform(Permission $permission): array
     {
-        $data = [
+        return [
             'type' => 'permissions',
             'id' => $permission->id,
             'attributes' => [
@@ -24,7 +24,5 @@ class PermissionTransformer
                 'updated_at' => $permission->updated_at,
             ],
         ];
-
-        return $this->formatJsonApiResponse($data);
     }
 }
