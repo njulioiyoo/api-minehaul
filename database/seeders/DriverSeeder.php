@@ -18,13 +18,10 @@ class DriverSeeder extends Seeder
     {
         $faker = Faker::create();
 
-        $pitUids = DB::table('pits')->pluck('uid')->toArray();
-        $accountUids = DB::table('accounts')->pluck('uid')->toArray();
-
         for ($i = 0; $i < 30; $i++) {
             DB::table('drivers')->insert([
-                'account_id' => $accountUids[array_rand($accountUids)],
-                'pit_id' => $pitUids[array_rand($pitUids)],
+                'account_id' => rand(1, 10),
+                'pit_id' => rand(1, 10),
                 'display_id' => $faker->regexify('[A-Za-z0-9]{10}'),
                 'name' => $faker->name(),
                 'email' => $faker->unique()->safeEmail(),

@@ -52,10 +52,7 @@ class ProfileController extends Controller
     {
         try {
             $validatedData = $request->validated();
-            [$input, $userId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'users', true);
-            // Jika ID pengguna tidak ada dalam permintaan, ambil dari ID otentikasi
-            $userId = $userId ?? auth()->id();
-            $user = $this->userService->updateUser($userId, $validatedData, []);
+            $user = $this->userService->updateUser((string) auth()->id(), $validatedData, []);
 
             return response()->json($user);
         } catch (\Exception $e) {

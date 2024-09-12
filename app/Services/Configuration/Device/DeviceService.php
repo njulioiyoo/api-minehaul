@@ -67,8 +67,12 @@ class DeviceService
     {
         // Menggunakan cache untuk mengambil device dengan UID yang diberikan
         $device = Cache::remember("device_$deviceUid", 60, function () use ($deviceUid) {
-            return $this->deviceModel->where('uid', $deviceUid)->firstOrFail();
+            return $this->deviceModel->where('uid', $deviceUid)->first();
         });
+
+        if (! $device) {
+            throw new \Exception('Device not found');
+        }
 
         // Menggunakan transformer untuk format response JSON API
         return $this->formatJsonApiResponse(
@@ -79,13 +83,15 @@ class DeviceService
     public function updateDevice(string $deviceUid, array $inputData)
     {
         return DB::transaction(function () use ($deviceUid, $inputData) {
-            $device = Cache::remember("device_$deviceUid", 60, function () use ($deviceUid) {
-                return $this->deviceModel->findOrFail($deviceUid);
+            $device = Cache::remember("device_$deviceUid", 60, function () use ($deviceUid, $inputData) {
+                // Update device data
+                $this->deviceModel->where('uid', $deviceUid)->update($inputData);
+
+                // Ambil data yang telah diperbarui
+                return $this->deviceModel->where('uid', $deviceUid)->first();
             });
 
-            $device->update($inputData);
-
-            // Update cache
+            // Update cache dengan data terbaru
             Cache::put("device_$deviceUid", $device, 60);
 
             // Menggunakan transformer untuk format response JSON API
@@ -99,13 +105,13 @@ class DeviceService
     {
         try {
             $device = Cache::remember("device_$deviceUid", 60, function () use ($deviceUid) {
-                return $this->deviceModel->findOrFail($deviceUid);
+                $this->deviceModel->where('uid', $deviceUid)->delete();
             });
-
-            $device->delete();
 
             // Clear cache
             Cache::forget("device_$deviceUid");
+
+            return $device;
         } catch (\Throwable $th) {
             Log::error("Error deleting device with ID: {$deviceUid}, Error: {$th->getMessage()}");
             throw $th;

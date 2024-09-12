@@ -18,20 +18,9 @@ class Vehicle extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $primaryKey = 'uid';
-
-    public $incrementing = false;
-
-    protected $keyType = 'string';
-
     protected $table = 'vehicles';
 
     protected $guarded = [];
-
-    public function getRouteKeyName(): string
-    {
-        return 'uid';
-    }
 
     protected static function boot()
     {
@@ -43,7 +32,7 @@ class Vehicle extends Model
             if ($user) {
                 $account = $user?->persons?->account;
                 if ($account) {
-                    $vehicle->account_id = $account->uid;
+                    $vehicle->account_id = $account->id;
                 }
             }
 
@@ -61,12 +50,12 @@ class Vehicle extends Model
 
     public function account()
     {
-        return $this->belongsTo(Account::class, 'account_id', 'uid')->select('uid', 'company_code', 'company_name');
+        return $this->belongsTo(Account::class, 'account_id', 'id')->select('id', 'company_code', 'company_name');
     }
 
     public function pit()
     {
-        return $this->belongsTo(Pit::class, 'pit_id', 'uid')->select('uid', 'name', 'description');
+        return $this->belongsTo(Pit::class, 'pit_id', 'id')->select('id', 'name', 'description');
     }
 
     public function vehicleType()

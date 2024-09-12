@@ -15,9 +15,9 @@ class DriverTransformer
     {
         return [
             'type' => 'driver',
-            'id' => $driver->uid,
+            'id' => $driver->id,
             'attributes' => [
-                'id' => $driver->uid,
+                'id' => $driver->id,
                 'account' => $this->transformRelation($driver->account, ['id', 'company_code', 'company_name']),
                 'pit' => $this->transformRelation($driver->pit, ['id', 'name', 'description']),
                 'display_id' => $driver->display_id,
