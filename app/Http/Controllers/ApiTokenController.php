@@ -29,9 +29,14 @@ class ApiTokenController extends Controller
         // Buat token baru
         $apiToken = Str::random(60);
 
+        $data = $request->input('data');
+
         // Update atau buat token baru
         CoreApiToken::updateOrCreate(
-            ['user_id' => $user->id], // Kondisi pencarian
+            [
+                'user_id' => $user->id,
+                'url_accessed' => $data['url_accessed'],
+            ],
             [
                 'session_id' => Str::random(40),
                 'url_call' => $request->fullUrl(),

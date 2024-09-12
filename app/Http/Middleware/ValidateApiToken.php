@@ -29,7 +29,10 @@ class ValidateApiToken
         }
 
         // Cek apakah token ada di database dan valid
-        $tokenRecord = CoreApiToken::where('api_token', $apiToken)->first();
+        $tokenRecord = CoreApiToken::where([
+            'api_token' => $apiToken,
+            'url_accessed' => $request->fullUrl(),
+        ])->first();
 
         // Log token record untuk debugging
         Log::info('Token record:', ['tokenRecord' => $tokenRecord]);

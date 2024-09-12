@@ -25,7 +25,7 @@ class VehicleSeeder extends Seeder
             DB::table('vehicles')->insert([
                 'account_id' => $accountUids[array_rand($accountUids)],
                 'pit_id' => $pitUids[array_rand($pitUids)],
-                'display_id' => 'V'.str_pad($i, 4, '0', STR_PAD_LEFT),
+                'display_id' => 'V'.str_pad((string) $i, 4, '0', STR_PAD_LEFT),
                 'name' => $faker->company.' '.$faker->word,
                 'vin' => strtoupper($faker->bothify(strtoupper('??######??######?#'))),
                 'license_plate' => strtoupper($faker->bothify('?? #### ??')),
