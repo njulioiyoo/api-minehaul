@@ -67,8 +67,12 @@ class VehicleService
     {
         // Cache vehicle untuk 60 menit
         $vehicle = Cache::remember("vehicle_$vehicleUid", 60, function () use ($vehicleUid) {
-            return $this->vehicleModel->findOrFail($vehicleUid);
+            return $this->vehicleModel->where('uid', $vehicleUid)->first();
         });
+
+        if (! $vehicle) {
+            throw new \Exception('Vehicle not found');
+        }
 
         // Menggunakan transformer untuk format response JSON API
         return $this->formatJsonApiResponse(
@@ -79,11 +83,11 @@ class VehicleService
     public function updateVehicle(string $vehicleId, array $inputData)
     {
         return DB::transaction(function () use ($vehicleId, $inputData) {
-            $vehicle = Cache::remember("vehicle_$vehicleId", 60, function () use ($vehicleId) {
-                return $this->vehicleModel->findOrFail($vehicleId);
-            });
+            $vehicle = Cache::remember("vehicle_$vehicleId", 60, function () use ($vehicleId, $inputData) {
+                $this->vehicleModel->where('uid', $vehicleId)->update($inputData);
 
-            $vehicle->update($inputData);
+                return $this->vehicleModel->where('uid', $vehicleId)->first();
+            });
 
             // Update cache setelah update vehicle
             Cache::put("vehicle_$vehicleId", $vehicle, 60);
@@ -99,13 +103,13 @@ class VehicleService
     {
         try {
             $vehicle = Cache::remember("vehicle_$vehicleId", 60, function () use ($vehicleId) {
-                return $this->vehicleModel->findOrFail($vehicleId);
+                return $this->vehicleModel->where('uid', $vehicleId)->delete();
             });
-
-            $vehicle->delete();
 
             // Clear cache setelah delete
             Cache::forget("vehicle_$vehicleId");
+
+            return $vehicle;
         } catch (\Throwable $th) {
             Log::error("Error deleting vehicle with ID: {$vehicleId}, Error: {$th->getMessage()}");
             throw $th;

@@ -20,20 +20,9 @@ class Device extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $primaryKey = 'uid';
-
-    public $incrementing = false;
-
-    protected $keyType = 'string';
-
     protected $table = 'devices';
 
     protected $guarded = [];
-
-    public function getRouteKeyName(): string
-    {
-        return 'uid';
-    }
 
     protected static function boot()
     {
@@ -64,12 +53,12 @@ class Device extends Model
 
     public function account()
     {
-        return $this->belongsTo(Account::class, 'account_id', 'uid')->select('id', 'uid', 'company_code', 'company_name');
+        return $this->belongsTo(Account::class, 'account_id', 'id')->select('id', 'company_code', 'company_name');
     }
 
     public function pit()
     {
-        return $this->belongsTo(Pit::class, 'pit_id', 'uid')->select('id', 'uid', 'name', 'description');
+        return $this->belongsTo(Pit::class, 'pit_id', 'id')->select('id', 'name', 'description');
     }
 
     public function deviceType()
@@ -104,6 +93,6 @@ class Device extends Model
 
     public function vehicleId()
     {
-        return $this->belongsTo(Vehicle::class, 'vehicle_id')->select('uid as id', 'name');
+        return $this->belongsTo(Vehicle::class, 'vehicle_id')->select('id', 'name');
     }
 }
