@@ -21,10 +21,13 @@ class Device extends Model
     use SoftDeletes;
 
     protected $primaryKey = 'uid';
+
     public $incrementing = false;
+
     protected $keyType = 'string';
 
     protected $table = 'devices';
+
     protected $guarded = [];
 
     public function getRouteKeyName(): string
@@ -40,9 +43,9 @@ class Device extends Model
             $user = auth()->user();
 
             if ($user) {
-                $person = $user->persons;
-                if ($person) {
-                    $device->account_id = $person->account_id;
+                $account = $user?->persons?->account;
+                if ($account) {
+                    $device->account_id = $account->uid;
                 }
             }
 
@@ -60,12 +63,12 @@ class Device extends Model
 
     public function account()
     {
-        return $this->belongsTo(Account::class)->select('id', 'company_code', 'company_name');
+        return $this->belongsTo(Account::class, 'account_id', 'uid')->select('uid', 'company_code', 'company_name');
     }
 
     public function pit()
     {
-        return $this->belongsTo(Pit::class, 'pit_id')->select('id', 'name', 'description');
+        return $this->belongsTo(Pit::class, 'pit_id', 'uid')->select('uid', 'name', 'description');
     }
 
     public function deviceType()

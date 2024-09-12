@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\Account;
-use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class AccountSeeder extends Seeder
 {
@@ -16,8 +17,9 @@ class AccountSeeder extends Seeder
 
         for ($i = 1; $i <= 10; $i++) {
             Account::create([
-                'company_code' => 'MIN' . str_pad((string)$i, 3, '0', STR_PAD_LEFT),
+                'company_code' => 'MIN'.str_pad((string) $i, 3, '0', STR_PAD_LEFT),
                 'company_name' => $faker->company,
+                'uid' => Str::uuid()->toString(),
             ]);
         }
     }

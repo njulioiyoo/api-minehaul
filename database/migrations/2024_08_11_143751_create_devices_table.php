@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('devices', function (Blueprint $table) {
             $table->id()->bigIncrements()->primary();
-            $table->foreignId('account_id')->constrained()->onDelete('cascade');
-            $table->integer('pit_id')->nullable()->default(null);
+            $table->uuid('account_id')->nullable()->constrained()->onDelete('cascade');
+            $table->uuid('pit_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('device_type_id')->constrained()->onDelete('cascade');
             $table->foreignId('device_make_id')->constrained()->onDelete('cascade');
             $table->foreignId('device_model_id')->constrained()->onDelete('cascade');

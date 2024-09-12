@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Configuration\Vehicle;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -22,7 +24,7 @@ class StoreVehicleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'pit_id' => ['nullable', 'integer', 'regex:/^\d+$/'],
+            'pit_id' => ['nullable', 'string', 'uuid'],
             'year' => ['nullable', 'integer', 'min:1900', 'max:2100'],
             'display_id' => ['required', 'string', 'regex:/^[A-Za-z0-9_-]+$/'],
             'name' => ['required', 'string', 'regex:/^[\p{L}0-9 ]+$/u'],
