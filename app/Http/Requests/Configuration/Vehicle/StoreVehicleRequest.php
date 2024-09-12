@@ -24,16 +24,16 @@ class StoreVehicleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'pit_id' => ['nullable', 'integer'],
+            'pit_id' => ['nullable', 'integer', 'exists:pits,id'],
             'year' => ['nullable', 'integer', 'min:1900', 'max:2100'],
             'display_id' => ['required', 'string', 'regex:/^[A-Za-z0-9_-]+$/'],
             'name' => ['required', 'string', 'regex:/^[\p{L}0-9 ]+$/u'],
             'vin' => ['required', 'string', 'regex:/^[\p{L}0-9 ]+$/u'],
             'license_plate' => ['required', 'string', 'regex:/^[\p{L}0-9 ]+$/u'],
-            'vehicle_type_id' => ['required', 'integer', 'regex:/^\d+$/'],
-            'vehicle_make_id' => ['required', 'integer', 'regex:/^\d+$/'],
-            'vehicle_model_id' => ['required', 'integer', 'regex:/^\d+$/'],
-            'vehicle_status_id' => ['nullable', 'integer', 'regex:/^\d+$/'],
+            'device_type_id' => ['required', 'integer', 'exists:vehicle_types,id'],
+            'vehicle_make_id' => ['required', 'integer', 'exists:vehicle_makes,id'],
+            'vehicle_model_id' => ['required', 'integer', 'exists:vehicle_models,id'],
+            'vehicle_status_id' => ['nullable', 'integer', 'exists:vehicle_statuses,id'],
         ];
     }
 }

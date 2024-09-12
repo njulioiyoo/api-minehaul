@@ -41,7 +41,6 @@ class Device extends Model
             // Set default device_status_id to 1 if it is null
             $device->device_status_id ??= 1;
 
-            // $device->pit_id = $pitId;
             $device->uid = $device->exists ? $device->uid : Str::uuid()->toString();
             $device->{$device->exists ? 'updated_by' : 'created_by'} = auth()->user()->id;
         });

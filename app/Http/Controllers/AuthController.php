@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Models\User;
+use App\Traits\ExceptionHandlerTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -13,6 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
 {
+    use ExceptionHandlerTrait;
+
     public function login(LoginRequest $request): Response
     {
         // Ambil client password dari database
@@ -45,7 +48,7 @@ class AuthController extends Controller
 
         // Buat permintaan token ke endpoint oauth/token
         $response = app()->handle(
-            Request::create(config('app.url') . '/oauth/token', 'POST', [
+            Request::create(config('app.url').'/oauth/token', 'POST', [
                 'grant_type' => 'password',
                 'client_id' => $client->id,
                 'client_secret' => $client->secret,
@@ -67,19 +70,5 @@ class AuthController extends Controller
         $request->user()->token()->revoke(); // Cabut token akses saat ini
 
         return response()->json(['message' => 'Successfully logged out']);
-    }
-
-    private function createError(string $title, string $detail, int $status): Response
-    {
-        return response()->json([
-            'jsonapi' => [
-                'version' => '1.0',
-            ],
-            'errors' => [
-                'title' => $title,
-                'detail' => $detail,
-                'status' => $status,
-            ]
-        ], $status);
     }
 }

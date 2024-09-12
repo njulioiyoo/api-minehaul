@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Traits;
 
-use Illuminate\Support\Facades\Log;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 trait ExceptionHandlerTrait
 {
@@ -16,20 +16,48 @@ trait ExceptionHandlerTrait
     {
         Log::error("{$message}: {$e->getMessage()}");
 
-        return response()->json([
-            'status' => '500',
-            'title' => 'Internal Server Error',
-            'detail' => $e->getMessage(),
-        ], 500);
+        return $this->createError(
+            'Internal Server Error',
+            $e->getMessage(),
+            500
+        );
     }
 
+    /**
+     * Create a JSON API error response.
+     */
+    public function createError(string $title, string $detail, int $status): JsonResponse
+    {
+        return response()->json([
+            'jsonapi' => $this->getJsonApiVersion(),
+            'errors' => [
+                [
+                    'title' => $title,
+                    'detail' => $detail,
+                    'status' => $status,
+                ],
+            ],
+        ], $status);
+    }
+
+    /**
+     * Format JSON API success response.
+     */
     public function formatJsonApiResponse(array $data): array
     {
         return [
-            'jsonapi' => [
-                'version' => '1.0',
-            ],
+            'jsonapi' => $this->getJsonApiVersion(),
             'data' => $data,
+        ];
+    }
+
+    /**
+     * Get the JSON:API version.
+     */
+    public function getJsonApiVersion(): array
+    {
+        return [
+            'version' => '1.0',
         ];
     }
 }
