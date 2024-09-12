@@ -30,19 +30,25 @@ class ApiTokenController extends Controller
         $apiToken = Str::random(60);
 
         $data = $request->input('data');
+        $url = $data['url_accessed'] ?? '';
 
-        // Update atau buat token baru
-        CoreApiToken::updateOrCreate(
-            [
-                'user_id' => $user->id,
-                'url_accessed' => $data['url_accessed'],
-            ],
-            [
-                'session_id' => Str::random(40),
-                'url_call' => $request->fullUrl(),
-                'api_token' => $apiToken,
-            ]
-        );
+        if ($url) {
+            // Hapus protokol http dan https
+            $url = str_replace(['http://', 'https://'], '', $url);
+
+            // Update atau buat token baru
+            CoreApiToken::updateOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'url_accessed' => $url,
+                ],
+                [
+                    'session_id' => Str::random(40),
+                    'url_call' => $request->fullUrl(),
+                    'api_token' => $apiToken,
+                ]
+            );
+        }
 
         return response()->json(['api_token' => $apiToken]);
     }

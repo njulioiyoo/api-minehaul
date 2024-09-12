@@ -13,20 +13,9 @@ class Driver extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $primaryKey = 'uid';
-
-    public $incrementing = false;
-
-    protected $keyType = 'string';
-
     protected $table = 'drivers';
 
     protected $guarded = [];
-
-    public function getRouteKeyName(): string
-    {
-        return 'uid';
-    }
 
     public function account()
     {

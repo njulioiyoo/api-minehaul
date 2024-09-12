@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\System\User;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -26,7 +28,7 @@ class UpdateUserRequest extends FormRequest
 
         return [
             'username' => ['required', 'string', 'regex:/^[a-zA-Z0-9._-]{3,20}$/'],
-            'person_id' => ['required', 'string', 'regex:/^\d+$/'],
+            'person_id' => ['nullable', 'string', 'regex:/^\d+$/'],
             'roles' => ['nullable', 'array'],
             'roles.*' => ['integer'],
             'email' => [
@@ -42,8 +44,6 @@ class UpdateUserRequest extends FormRequest
 
     /**
      * Get the role ID from the request body or route.
-     *
-     * @return string|null
      */
     public function getUserId(): ?string
     {

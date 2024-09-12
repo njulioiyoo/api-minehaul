@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('drivers', function (Blueprint $table) {
             $table->id()->bigIncrements()->primary();
-            $table->uuid('account_id')->nullable()->constrained()->onDelete('cascade');
-            $table->uuid('pit_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('account_id')->constrained()->onDelete('cascade');
+            $table->foreignId('pit_id')->constrained()->onDelete('cascade');
             $table->string('display_id', 100)->nullable()->default(null);
             $table->string('name', 255)->nullable()->default(null);
             $table->string('email', 255)->nullable()->default(null);
