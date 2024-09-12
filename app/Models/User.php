@@ -10,7 +10,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 use Laravel\Passport\HasApiTokens;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
@@ -60,6 +59,11 @@ class User extends Authenticatable
     public function persons()
     {
         return $this->belongsTo(Person::class, 'person_id', 'id')->select('id', 'full_name', 'account_id');
+    }
+
+    public function pits()
+    {
+        return $this->hasManyThrough(Pit::class, Account::class, 'id', 'account_id', 'account_id', 'id');
     }
 
     public function getMenusForRole(): Collection

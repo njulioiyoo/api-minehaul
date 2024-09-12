@@ -35,6 +35,7 @@ class UserTransformer
                 })->toArray(),
                 'menus' => $user->getMenusForRole(),
                 'account' => $user->persons?->account,
+                'pits' => $user->persons->account->pits,
             ],
         ];
     }

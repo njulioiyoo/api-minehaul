@@ -19,4 +19,9 @@ class Account extends Model
     {
         return $this->hasMany(User::class, 'account_id', 'account_id');
     }
+
+    public function pits()
+    {
+        return $this->hasMany(Pit::class, 'account_id');
+    }
 }
