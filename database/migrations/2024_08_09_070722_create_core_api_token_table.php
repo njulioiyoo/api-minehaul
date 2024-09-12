@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('session_id');
             $table->string('url_call');
+            $table->string('url_accessed');
             $table->string('api_token')->unique();
             $table->timestamps();
 

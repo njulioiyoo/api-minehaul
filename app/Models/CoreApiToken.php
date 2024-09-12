@@ -17,6 +17,7 @@ class CoreApiToken extends Model
         'user_id',
         'session_id',
         'url_call',
+        'url_accessed',
         'api_token',
     ];
 }

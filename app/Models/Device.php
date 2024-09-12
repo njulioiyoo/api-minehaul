@@ -45,13 +45,14 @@ class Device extends Model
             if ($user) {
                 $account = $user?->persons?->account;
                 if ($account) {
-                    $device->account_id = $account->uid;
+                    $device->account_id = $account->id;
                 }
             }
 
             // Set default device_status_id to 1 if it is null
             $device->device_status_id ??= 1;
 
+            // $device->pit_id = $pitId;
             $device->uid = $device->exists ? $device->uid : Str::uuid()->toString();
             $device->{$device->exists ? 'updated_by' : 'created_by'} = auth()->user()->id;
         });
@@ -63,12 +64,12 @@ class Device extends Model
 
     public function account()
     {
-        return $this->belongsTo(Account::class, 'account_id', 'uid')->select('uid', 'company_code', 'company_name');
+        return $this->belongsTo(Account::class, 'account_id', 'uid')->select('id', 'uid', 'company_code', 'company_name');
     }
 
     public function pit()
     {
-        return $this->belongsTo(Pit::class, 'pit_id', 'uid')->select('uid', 'name', 'description');
+        return $this->belongsTo(Pit::class, 'pit_id', 'uid')->select('id', 'uid', 'name', 'description');
     }
 
     public function deviceType()

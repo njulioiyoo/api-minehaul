@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\AuthController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReferenceModuleController;
-use App\Http\Controllers\Api\V1\ProfileController;
-
+use Illuminate\Support\Facades\Route;
 
 Route::middleware('json.api')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -15,7 +14,7 @@ Route::middleware('json.api')->group(function () {
 });
 
 Route::middleware('auth:api')->group(function () {
-    Route::post('/api-token', [ApiTokenController::class, 'generateToken']);
+    Route::post('/api-token', [ApiTokenController::class, 'generateToken'])->middleware('json.api');
 
     Route::middleware(['json.api', 'validate.api'])->group(function () {
         Route::get('me', [ProfileController::class, 'readProfile']);

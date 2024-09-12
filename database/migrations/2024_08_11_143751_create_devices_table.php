@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('devices', function (Blueprint $table) {
             $table->id()->bigIncrements()->primary();
-            $table->uuid('account_id')->nullable()->constrained()->onDelete('cascade');
-            $table->uuid('pit_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('account_id')->constrained()->onDelete('cascade');
+            $table->foreignId('pit_id')->constrained()->onDelete('cascade');
             $table->foreignId('device_type_id')->constrained()->onDelete('cascade');
             $table->foreignId('device_make_id')->constrained()->onDelete('cascade');
             $table->foreignId('device_model_id')->constrained()->onDelete('cascade');
@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('sim_id', 255)->nullable()->default(null);
             $table->foreignId('device_immobilizitation_type_id')->constrained()->onDelete('cascade');
             $table->foreignId('device_ignition_type_id')->constrained()->onDelete('cascade');
-            $table->uuid('vehicle_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('vehicle_id')->constrained()->onDelete('cascade');
             $table->foreignId('device_status_id')->constrained()->onDelete('cascade');
             $table->integer('created_by')->nullable()->default(null);
             $table->integer('updated_by')->nullable()->default(null);

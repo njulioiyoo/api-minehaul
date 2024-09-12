@@ -26,7 +26,7 @@ class UpdateDeviceRequest extends FormRequest
         $deviceId = $this->getDeviceId();
 
         return [
-            'pit_id' => ['nullable', 'string', 'uuid'],
+            'pit_id' => ['nullable', 'string', 'integer'],
             'device_type_id' => ['required', 'integer', 'regex:/^\d+$/'],
             'device_make_id' => ['required', 'integer', 'regex:/^\d+$/'],
             'device_model_id' => ['nullable', 'integer', 'regex:/^\d+$/'],
@@ -37,7 +37,7 @@ class UpdateDeviceRequest extends FormRequest
             'device_immobilizitation_type_id' => ['required', 'integer', 'regex:/^\d+$/'],
             'device_ignition_type_id' => ['required', 'integer', 'regex:/^\d+$/'],
             'device_status_id' => ['nullable', 'integer', 'regex:/^\d+$/'],
-            'vehicle_id' => ['required', 'string', 'uuid'],
+            'vehicle_id' => ['required', 'string', 'integer'],
             'uid' => ['sometimes', 'string', 'unique:devices,uid,'.$deviceId],
         ];
     }
