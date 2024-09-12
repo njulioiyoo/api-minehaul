@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('account_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->text('description')->nullable();
+            $table->string('uid', 100)->nullable()->default(null);
 
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();

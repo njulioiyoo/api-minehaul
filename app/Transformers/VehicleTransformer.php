@@ -21,17 +21,17 @@ class VehicleTransformer
             'id' => $vehicle->uid,
             'attributes' => [
                 'id' => $vehicle->uid,
-                'account' => $this->transformRelation($vehicle->account, ['id', 'company_code', 'company_name']),
-                'pit' => $this->transformRelation($vehicle->pit, ['id', 'name', 'description']),
+                'account' => $this->transformRelation($vehicle->account, ['company_code', 'company_name']),
+                'pit' => $this->transformRelation($vehicle->pit, ['name', 'description']),
                 'display_id' => $vehicle->display_id,
                 'name' => $vehicle->name,
                 'vin' => $vehicle->vin,
                 'license_plate' => $vehicle->license_plate,
-                'vehicle_type' => $this->transformRelation($vehicle->vehicleType, ['id', 'name']),
-                'vehicle_make' => $this->transformRelation($vehicle->vehicleMake, ['id', 'name']),
-                'vehicle_model' => $this->transformRelation($vehicle->vehicleModel, ['id', 'name']),
+                'vehicle_type' => $this->transformRelation($vehicle->vehicleType, ['name']),
+                'vehicle_make' => $this->transformRelation($vehicle->vehicleMake, ['name']),
+                'vehicle_model' => $this->transformRelation($vehicle->vehicleModel, ['name']),
                 'year' => $vehicle->year,
-                'vehicle_status' => $this->transformRelation($vehicle->vehicleStatus, ['id', 'name']),
+                'vehicle_status' => $this->transformRelation($vehicle->vehicleStatus, ['name']),
             ],
         ];
     }

@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
+use Faker\Factory as Faker;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Faker\Factory as Faker;
 
 class VehicleSeeder extends Seeder
 {
@@ -16,12 +18,15 @@ class VehicleSeeder extends Seeder
     {
         $faker = Faker::create();
 
+        $pitUids = DB::table('pits')->pluck('uid')->toArray();
+        $accountUids = DB::table('accounts')->pluck('uid')->toArray();
+
         for ($i = 1; $i <= 10; $i++) {
             DB::table('vehicles')->insert([
-                'account_id' => $faker->numberBetween(1, 5),
-                'pit_id' => $faker->numberBetween(1, 5),
-                'display_id' => 'V' . str_pad($i, 4, '0', STR_PAD_LEFT),
-                'name' => $faker->company . ' ' . $faker->word,
+                'account_id' => $accountUids[array_rand($accountUids)],
+                'pit_id' => $pitUids[array_rand($pitUids)],
+                'display_id' => 'V'.str_pad($i, 4, '0', STR_PAD_LEFT),
+                'name' => $faker->company.' '.$faker->word,
                 'vin' => strtoupper($faker->bothify(strtoupper('??######??######?#'))),
                 'license_plate' => strtoupper($faker->bothify('?? #### ??')),
                 'vehicle_type_id' => $faker->numberBetween(1, 2),

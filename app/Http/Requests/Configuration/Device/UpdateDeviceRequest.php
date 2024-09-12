@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Configuration\Device;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -24,7 +26,7 @@ class UpdateDeviceRequest extends FormRequest
         $deviceId = $this->getDeviceId();
 
         return [
-            'pit_id' => ['nullable', 'integer', 'regex:/^\d+$/'],
+            'pit_id' => ['nullable', 'string', 'uuid'],
             'device_type_id' => ['required', 'integer', 'regex:/^\d+$/'],
             'device_make_id' => ['required', 'integer', 'regex:/^\d+$/'],
             'device_model_id' => ['nullable', 'integer', 'regex:/^\d+$/'],
@@ -36,17 +38,15 @@ class UpdateDeviceRequest extends FormRequest
             'device_ignition_type_id' => ['required', 'integer', 'regex:/^\d+$/'],
             'device_status_id' => ['nullable', 'integer', 'regex:/^\d+$/'],
             'vehicle_id' => ['required', 'string', 'uuid'],
-            'uid' => ['sometimes', 'string', 'unique:devices,uid,' . $deviceId],
+            'uid' => ['sometimes', 'string', 'unique:devices,uid,'.$deviceId],
         ];
     }
 
     /**
      * Get the ID from the request body.
-     *
-     * @return string|null
      */
     public function getDeviceId(): ?string
     {
-        return $this->input('data.id') ?? $this->route('devices');;
+        return $this->input('data.id') ?? $this->route('devices');
     }
 }

@@ -7,6 +7,8 @@ namespace App\Services\Configuration\Driver;
 use App\Helpers\PaginationHelper;
 use App\Models\Driver;
 use App\Transformers\DriverTransformer;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class DriverService
 {
@@ -18,6 +20,21 @@ class DriverService
     {
         $this->transformer = $transformer;
         $this->driverModel = $driver;
+    }
+
+    public function createDriver(array $inputData)
+    {
+        return DB::transaction(function () use ($inputData) {
+            $driver = $this->driverModel->create($inputData);
+
+            // Clear cache related to devices
+            Cache::forget('driver_'.$driver->id);
+
+            // Menggunakan transformer untuk format response JSON API
+            // return $this->formatJsonApiResponse(
+            //     $this->transformer->transform($driver)
+            // );
+        });
     }
 
     public function readDriver(array $queryParams)

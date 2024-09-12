@@ -17,6 +17,6 @@ class Person extends Model
 
     public function account()
     {
-        return $this->belongsTo(Account::class, 'account_id', 'id')->select('id', 'company_code', 'company_name');
+        return $this->belongsTo(Account::class, 'account_id', 'id')->select('id', 'company_code', 'company_name', 'uid');
     }
 }

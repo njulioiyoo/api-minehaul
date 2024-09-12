@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1\Configuration;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Configuration\Driver\StoreDriverRequest;
 use App\Services\Configuration\Driver\DriverService;
 use App\Services\RequestHelperService;
 use App\Traits\ExceptionHandlerTrait;
@@ -22,6 +23,18 @@ class DriverController extends Controller
     {
         $this->driverService = $driverService;
         $this->requestHelperService = $requestHelperService;
+    }
+
+    public function createDriver(StoreDriverRequest $request)
+    {
+        try {
+            $validatedData = $request->validated();
+            $device = $this->driverService->createDevice($validatedData);
+
+            return response()->json($device);
+        } catch (\Exception $e) {
+            return $this->handleException($e, 'Error creating drivers');
+        }
     }
 
     public function readDriver(Request $request)

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('company_code');
             $table->string('company_name');
+            $table->string('uid', 100)->nullable()->default(null);
             $table->integer('created_by')->nullable()->default(null);
             $table->integer('updated_by')->nullable()->default(null);
 
@@ -28,5 +29,4 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
-    
 };
