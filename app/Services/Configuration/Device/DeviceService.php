@@ -8,6 +8,7 @@ use App\Helpers\PaginationHelper;
 use App\Models\Device;
 use App\Traits\ExceptionHandlerTrait;
 use App\Transformers\DeviceTransformer;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -16,31 +17,46 @@ class DeviceService
 {
     use ExceptionHandlerTrait;
 
-    protected $transformer;
+    // Properties to store transformer and device model
+    protected DeviceTransformer $transformer;
 
-    protected $deviceModel; // Definisikan model device sekali di sini
+    protected Device $deviceModel;
 
+    // Constructor for dependency injection
     public function __construct(DeviceTransformer $transformer, Device $device)
     {
         $this->transformer = $transformer;
-        $this->deviceModel = $device; // Simpan instance model di dalam properti
+        $this->deviceModel = $device;
     }
 
+    /**
+     * Create a new device in the database and clear related cache.
+     *
+     * @param  array  $inputData  Input data for creating the device
+     * @return mixed Formatted JSON API response
+     */
     public function createDevice(array $inputData)
     {
         return DB::transaction(function () use ($inputData) {
+            // Create a new device within a transaction
             $device = $this->deviceModel->create($inputData);
 
-            // Clear cache related to devices
-            Cache::forget('device_'.$device->id);
+            // Forget cache for the newly created device
+            Cache::forget("device_{$device->uid}");
 
-            // Menggunakan transformer untuk format response JSON API
+            // Return formatted JSON API response
             return $this->formatJsonApiResponse(
                 $this->transformer->transform($device)
             );
         });
     }
 
+    /**
+     * Read a list of devices based on query parameters.
+     *
+     * @param  array  $queryParams  Query parameters for filtering and pagination
+     * @return array Paginated and formatted device data
+     */
     public function readDevice(array $queryParams)
     {
         $perPage = $queryParams['page']['size'] ?? 10;
@@ -48,72 +64,112 @@ class DeviceService
 
         $query = $this->deviceModel->with(['account', 'pit', 'deviceType', 'deviceMake', 'deviceModel']);
 
+        // Apply filters if any
         if (isset($queryParams['filter'])) {
             foreach ($queryParams['filter'] as $field => $value) {
                 $query->where($field, $value);
             }
         }
 
+        // Get paginated device data
         $devices = $query->paginate($perPage, ['*'], 'page[number]', $page);
 
-        $data = $devices->map(function ($device) {
-            return $this->transformer->transform($device);
-        })->values()->all(); // Convert to array
+        // Transform device data using the transformer
+        $data = $devices->map(fn ($device) => $this->transformer->transform($device))->values()->all();
 
+        // Return paginated data with formatting
         return PaginationHelper::format($devices, $data);
     }
 
+    /**
+     * Show the details of a device by UID.
+     *
+     * @param  string  $deviceUid  UID of the device to be displayed
+     * @return mixed Formatted JSON API response
+     *
+     * @throws ModelNotFoundException If the device is not found
+     */
     public function showDevice(string $deviceUid)
     {
-        // Menggunakan cache untuk mengambil device dengan UID yang diberikan
+        // Retrieve device from cache or database
         $device = Cache::remember("device_$deviceUid", 60, function () use ($deviceUid) {
             return $this->deviceModel->where('uid', $deviceUid)->first();
         });
 
+        // If the device is not found, throw exception
         if (! $device) {
-            throw new \Exception('Device not found');
+            throw new ModelNotFoundException('Device not found');
         }
 
-        // Menggunakan transformer untuk format response JSON API
+        // Return formatted JSON API response
         return $this->formatJsonApiResponse(
             $this->transformer->transform($device)
         );
     }
 
+    /**
+     * Update the data of a device by UID.
+     *
+     * @param  string  $deviceUid  UID of the device to be updated
+     * @param  array  $inputData  Input data for the update
+     * @return mixed Formatted JSON API response
+     *
+     * @throws ModelNotFoundException If the device is not found
+     */
     public function updateDevice(string $deviceUid, array $inputData)
     {
         return DB::transaction(function () use ($deviceUid, $inputData) {
-            $device = Cache::remember("device_$deviceUid", 60, function () use ($deviceUid, $inputData) {
-                // Update device data
-                $this->deviceModel->where('uid', $deviceUid)->update($inputData);
+            // Update the device data
+            $this->deviceModel->where('uid', $deviceUid)->update($inputData);
 
-                // Ambil data yang telah diperbarui
-                return $this->deviceModel->where('uid', $deviceUid)->first();
-            });
+            // Retrieve the updated device
+            $device = $this->deviceModel->where('uid', $deviceUid)->first();
 
-            // Update cache dengan data terbaru
-            Cache::put("device_$deviceUid", $device, 60);
+            // If the device is not found, throw exception
+            if ($device) {
+                // Update cache with the latest data
+                Cache::put("device_$deviceUid", $device, 60);
 
-            // Menggunakan transformer untuk format response JSON API
-            return $this->formatJsonApiResponse(
-                $this->transformer->transform($device)
-            );
+                // Return formatted JSON API response
+                return $this->formatJsonApiResponse(
+                    $this->transformer->transform($device)
+                );
+            }
+
+            throw new ModelNotFoundException('Device not found');
         });
     }
 
+    /**
+     * Delete a device by UID.
+     *
+     * @param  string  $deviceUid  UID of the device to be deleted
+     * @return mixed JSON response confirming the deletion
+     *
+     * @throws \Throwable If an error occurs during deletion
+     */
     public function deleteDevice(string $deviceUid)
     {
         try {
-            $device = Cache::remember("device_$deviceUid", 60, function () use ($deviceUid) {
-                $this->deviceModel->where('uid', $deviceUid)->delete();
-            });
+            // Find the device before deleting
+            $device = $this->deviceModel->where('uid', $deviceUid)->first();
 
-            // Clear cache
+            // If the device is not found, throw exception
+            if (! $device) {
+                throw new ModelNotFoundException('Device not found');
+            }
+
+            // Delete the device
+            $device->delete();
+
+            // Forget cache for the deleted device
             Cache::forget("device_$deviceUid");
 
-            return $device;
+            // Return JSON response confirming the deletion
+            return response()->json(['message' => 'Device deleted successfully']);
         } catch (\Throwable $th) {
-            Log::error("Error deleting device with ID: {$deviceUid}, Error: {$th->getMessage()}");
+            // Log the error
+            Log::error("Error deleting device with UID: {$deviceUid}, Error: {$th->getMessage()}");
             throw $th;
         }
     }
