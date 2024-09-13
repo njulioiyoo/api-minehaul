@@ -8,6 +8,7 @@ use App\Helpers\PaginationHelper;
 use App\Models\Vehicle;
 use App\Traits\ExceptionHandlerTrait;
 use App\Transformers\VehicleTransformer;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -16,9 +17,9 @@ class VehicleService
 {
     use ExceptionHandlerTrait;
 
-    protected $transformer;
+    protected VehicleTransformer $transformer;
 
-    protected $vehicleModel;
+    protected Vehicle $vehicleModel;
 
     public function __construct(VehicleTransformer $transformer, Vehicle $vehicle)
     {
@@ -26,21 +27,34 @@ class VehicleService
         $this->vehicleModel = $vehicle;
     }
 
+    /**
+     * Create a new vehicle in the database and clear related cache.
+     *
+     * @param  array  $inputData  Input data for creating the vehicle
+     * @return mixed Formatted JSON API response
+     */
     public function createVehicle(array $inputData)
     {
         return DB::transaction(function () use ($inputData) {
+            // Create a new vehicle within a transaction
             $vehicle = $this->vehicleModel->create($inputData);
 
-            // Clear cache setelah membuat kendaraan baru
-            Cache::forget('vehicle_'.$vehicle->id);
+            // Clear cache for the newly created vehicle
+            Cache::forget("vehicle_{$vehicle->uid}");
 
-            // Menggunakan transformer untuk format response JSON API
+            // Return formatted JSON API response
             return $this->formatJsonApiResponse(
                 $this->transformer->transform($vehicle)
             );
         });
     }
 
+    /**
+     * Read a list of vehicles based on query parameters.
+     *
+     * @param  array  $queryParams  Query parameters for filtering and pagination
+     * @return array Paginated and formatted vehicle data
+     */
     public function readVehicle(array $queryParams)
     {
         $perPage = $queryParams['page']['size'] ?? 10;
@@ -48,70 +62,112 @@ class VehicleService
 
         $query = $this->vehicleModel->query();
 
+        // Apply filters if any
         if (isset($queryParams['filter'])) {
             foreach ($queryParams['filter'] as $field => $value) {
                 $query->where($field, $value);
             }
         }
 
-        $vehicle = $query->paginate($perPage, ['*'], 'page[number]', $page);
+        // Get paginated vehicle data
+        $vehicles = $query->paginate($perPage, ['*'], 'page[number]', $page);
 
-        $data = $vehicle->map(function ($vehicle) {
-            return $this->transformer->transform($vehicle);
-        })->values()->all(); // Convert to array
+        // Transform vehicle data using the transformer
+        $data = $vehicles->map(fn ($vehicle) => $this->transformer->transform($vehicle))->values()->all();
 
-        return PaginationHelper::format($vehicle, $data);
+        // Return paginated data with formatting
+        return PaginationHelper::format($vehicles, $data);
     }
 
+    /**
+     * Show the details of a vehicle by UID.
+     *
+     * @param  string  $vehicleUid  UID of the vehicle to be displayed
+     * @return mixed Formatted JSON API response
+     *
+     * @throws ModelNotFoundException If the vehicle is not found
+     */
     public function showVehicle(string $vehicleUid)
     {
-        // Cache vehicle untuk 60 menit
+        // Retrieve vehicle from cache or database
         $vehicle = Cache::remember("vehicle_$vehicleUid", 60, function () use ($vehicleUid) {
             return $this->vehicleModel->where('uid', $vehicleUid)->first();
         });
 
+        // If the vehicle is not found, throw exception
         if (! $vehicle) {
-            throw new \Exception('Vehicle not found');
+            throw new ModelNotFoundException('Vehicle not found');
         }
 
-        // Menggunakan transformer untuk format response JSON API
+        // Return formatted JSON API response
         return $this->formatJsonApiResponse(
             $this->transformer->transform($vehicle)
         );
     }
 
-    public function updateVehicle(string $vehicleId, array $inputData)
+    /**
+     * Update the data of a vehicle by UID.
+     *
+     * @param  string  $vehicleUid  UID of the vehicle to be updated
+     * @param  array  $inputData  Input data for the update
+     * @return mixed Formatted JSON API response
+     *
+     * @throws ModelNotFoundException If the vehicle is not found
+     */
+    public function updateVehicle(string $vehicleUid, array $inputData)
     {
-        return DB::transaction(function () use ($vehicleId, $inputData) {
-            $vehicle = Cache::remember("vehicle_$vehicleId", 60, function () use ($vehicleId, $inputData) {
-                $this->vehicleModel->where('uid', $vehicleId)->update($inputData);
+        return DB::transaction(function () use ($vehicleUid, $inputData) {
+            // Update the vehicle data
+            $this->vehicleModel->where('uid', $vehicleUid)->update($inputData);
 
-                return $this->vehicleModel->where('uid', $vehicleId)->first();
-            });
+            // Retrieve the updated vehicle
+            $vehicle = $this->vehicleModel->where('uid', $vehicleUid)->first();
 
-            // Update cache setelah update vehicle
-            Cache::put("vehicle_$vehicleId", $vehicle, 60);
+            // If the vehicle is not found, throw exception
+            if ($vehicle) {
+                // Update cache with the latest data
+                Cache::put("vehicle_$vehicleUid", $vehicle, 60);
 
-            // Menggunakan transformer untuk format response JSON API
-            return $this->formatJsonApiResponse(
-                $this->transformer->transform($vehicle)
-            );
+                // Return formatted JSON API response
+                return $this->formatJsonApiResponse(
+                    $this->transformer->transform($vehicle)
+                );
+            }
+
+            throw new ModelNotFoundException('Vehicle not found');
         });
     }
 
-    public function deleteVehicle($vehicleId)
+    /**
+     * Delete a vehicle by UID.
+     *
+     * @param  string  $vehicleUid  UID of the vehicle to be deleted
+     * @return mixed JSON response confirming the deletion
+     *
+     * @throws \Throwable If an error occurs during deletion
+     */
+    public function deleteVehicle(string $vehicleUid)
     {
         try {
-            $vehicle = Cache::remember("vehicle_$vehicleId", 60, function () use ($vehicleId) {
-                return $this->vehicleModel->where('uid', $vehicleId)->delete();
-            });
+            // Find the vehicle before deleting
+            $vehicle = $this->vehicleModel->where('uid', $vehicleUid)->first();
 
-            // Clear cache setelah delete
-            Cache::forget("vehicle_$vehicleId");
+            // If the vehicle is not found, throw exception
+            if (! $vehicle) {
+                throw new ModelNotFoundException('Vehicle not found');
+            }
 
-            return $vehicle;
+            // Delete the vehicle
+            $vehicle->delete();
+
+            // Forget cache for the deleted vehicle
+            Cache::forget("vehicle_$vehicleUid");
+
+            // Return JSON response confirming the deletion
+            return response()->json(['message' => 'Vehicle deleted successfully']);
         } catch (\Throwable $th) {
-            Log::error("Error deleting vehicle with ID: {$vehicleId}, Error: {$th->getMessage()}");
+            // Log the error
+            Log::error("Error deleting vehicle with UID: {$vehicleUid}, Error: {$th->getMessage()}");
             throw $th;
         }
     }
