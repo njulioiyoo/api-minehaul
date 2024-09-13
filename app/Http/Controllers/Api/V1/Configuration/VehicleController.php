@@ -1,88 +1,129 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\V1\Configuration;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Configuration\Vehicle\StoreVehicleRequest;
 use App\Http\Requests\Configuration\Vehicle\UpdateVehicleRequest;
 use App\Services\Configuration\Vehicle\VehicleService;
-use Illuminate\Http\Request;
 use App\Services\RequestHelperService;
 use App\Traits\ExceptionHandlerTrait;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class VehicleController extends Controller
 {
     use ExceptionHandlerTrait;
 
-    protected $requestHelperService;
-    protected $vehicleService;
+    protected VehicleService $vehicleService;
 
-    public function __construct(RequestHelperService $requestHelperService, VehicleService $vehicleService)
+    protected RequestHelperService $requestHelperService;
+
+    /**
+     * Constructor to initialize services.
+     */
+    public function __construct(VehicleService $vehicleService, RequestHelperService $requestHelperService)
     {
-        $this->requestHelperService = $requestHelperService;
         $this->vehicleService = $vehicleService;
+        $this->requestHelperService = $requestHelperService;
     }
 
-    public function createVehicle(StoreVehicleRequest $request)
+    /**
+     * Create a new vehicle.
+     */
+    public function createVehicle(StoreVehicleRequest $request): JsonResponse
     {
         try {
+            // Validate and retrieve request data
             $validatedData = $request->validated();
+            // Create the vehicle using the service
             $vehicle = $this->vehicleService->createVehicle($validatedData);
 
-            return response()->json($vehicle);
+            // Return the created vehicle with a 201 Created status
+            return response()->json($vehicle, 201);
         } catch (\Exception $e) {
-            return $this->handleException($e, 'Error creating vehicles');
+            // Handle any exceptions and return an error response
+            return $this->handleException($e, 'Error creating vehicle');
         }
     }
 
-    public function readVehicle(Request $request)
+    /**
+     * Read vehicles based on query parameters.
+     */
+    public function readVehicle(Request $request): JsonResponse
     {
         try {
+            // Get query parameters from the request
             $queryParams = $request->query();
+            // Retrieve vehicles using the service
             $response = $this->vehicleService->readVehicle($queryParams);
 
+            // Return the vehicles
             return response()->json($response);
         } catch (\Exception $e) {
+            // Handle any exceptions and return an error response
             return $this->handleException($e, 'Error reading vehicles');
         }
     }
 
-    public function showVehicle(Request $request)
+    /**
+     * Show details of a specific vehicle.
+     */
+    public function showVehicle(Request $request): JsonResponse
     {
         try {
-            [$input, $vehicleUid, $queryParams] = $this->requestHelperService->getInputAndId($request, 'vehicles', true);
+            // Retrieve input and vehicle ID from the request
+            [, $vehicleUid] = $this->requestHelperService->getInputAndId($request, 'vehicles', true);
+            // Get vehicle details using the service
             $response = $this->vehicleService->showVehicle($vehicleUid);
 
+            // Return the vehicle details
             return response()->json($response);
         } catch (\Exception $e) {
-            return $this->handleException($e, 'Error show vehicles');
+            // Handle any exceptions and return an error response
+            return $this->handleException($e, 'Error showing vehicle');
         }
     }
 
-    public function updateVehicle(UpdateVehicleRequest $request)
+    /**
+     * Update a specific vehicle.
+     */
+    public function updateVehicle(UpdateVehicleRequest $request): JsonResponse
     {
         try {
+            // Validate and retrieve request data
             $validatedData = $request->validated();
-            [$input, $vehicleId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'vehicles', true);
+            // Retrieve input and vehicle ID from the request
+            [, $vehicleUid] = $this->requestHelperService->getInputAndId($request, 'vehicles', true);
+            // Update the vehicle using the service
+            $vehicle = $this->vehicleService->updateVehicle($vehicleUid, $validatedData);
 
-            $vehicle = $this->vehicleService->updateVehicle($vehicleId, $validatedData);
-
+            // Return the updated vehicle
             return response()->json($vehicle);
         } catch (\Exception $e) {
-            return $this->handleException($e, 'Error updating vehicles');
+            // Handle any exceptions and return an error response
+            return $this->handleException($e, 'Error updating vehicle');
         }
     }
 
-    public function deleteVehicle(Request $request)
+    /**
+     * Delete a specific vehicle.
+     */
+    public function deleteVehicle(Request $request): JsonResponse
     {
         try {
-            [$input, $vehicleId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'vehicles', true);
-            $this->vehicleService->deleteVehicle($vehicleId);
+            // Retrieve input and vehicle ID from the request
+            [, $vehicleUid] = $this->requestHelperService->getInputAndId($request, 'vehicles', true);
+            // Delete the vehicle using the service
+            $this->vehicleService->deleteVehicle($vehicleUid);
 
-            // Jika tidak ada data lain yang perlu dikembalikan maka kembalikan status 204 No Content
+            // Return a 204 No Content status
             return response()->json(null, 204);
         } catch (\Exception $e) {
-            return $this->handleException($e, 'Error deleting vehicles');
+            // Handle any exceptions and return an error response
+            return $this->handleException($e, 'Error deleting vehicle');
         }
     }
 }

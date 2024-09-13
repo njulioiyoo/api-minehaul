@@ -9,82 +9,121 @@ use App\Http\Requests\Configuration\Device\StoreDeviceRequest;
 use App\Http\Requests\Configuration\Device\UpdateDeviceRequest;
 use App\Services\Configuration\Device\DeviceService;
 use App\Services\RequestHelperService;
-use Illuminate\Http\Request;
 use App\Traits\ExceptionHandlerTrait;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class DeviceController extends Controller
 {
     use ExceptionHandlerTrait;
 
-    protected $deviceService;
-    protected $requestHelperService;
+    protected DeviceService $deviceService;
 
+    protected RequestHelperService $requestHelperService;
+
+    /**
+     * Constructor to initialize services.
+     */
     public function __construct(DeviceService $deviceService, RequestHelperService $requestHelperService)
     {
         $this->deviceService = $deviceService;
         $this->requestHelperService = $requestHelperService;
     }
 
-    public function createDevice(StoreDeviceRequest $request)
+    /**
+     * Create a new device.
+     */
+    public function createDevice(StoreDeviceRequest $request): JsonResponse
     {
         try {
+            // Validate and retrieve request data
             $validatedData = $request->validated();
+            // Create the device using the service
             $device = $this->deviceService->createDevice($validatedData);
 
-            return response()->json($device);
+            // Return the created device with a 201 Created status
+            return response()->json($device, 201);
         } catch (\Exception $e) {
-            return $this->handleException($e, 'Error creating devices');
+            // Handle any exceptions and return an error response
+            return $this->handleException($e, 'Error creating device');
         }
     }
 
-    public function readDevice(Request $request)
+    /**
+     * Read devices based on query parameters.
+     */
+    public function readDevice(Request $request): JsonResponse
     {
         try {
+            // Get query parameters from the request
             $queryParams = $request->query();
+            // Retrieve devices using the service
             $response = $this->deviceService->readDevice($queryParams);
 
+            // Return the devices
             return response()->json($response);
         } catch (\Exception $e) {
+            // Handle any exceptions and return an error response
             return $this->handleException($e, 'Error reading devices');
         }
     }
 
-    public function showDevice(Request $request)
+    /**
+     * Show details of a specific device.
+     */
+    public function showDevice(Request $request): JsonResponse
     {
         try {
-            [$input, $deviceUid, $queryParams] = $this->requestHelperService->getInputAndId($request, 'devices', true);
+            // Retrieve input and device ID from the request
+            [, $deviceUid] = $this->requestHelperService->getInputAndId($request, 'devices', true);
+            // Get device details using the service
             $response = $this->deviceService->showDevice($deviceUid);
 
+            // Return the device details
             return response()->json($response);
         } catch (\Exception $e) {
-            return $this->handleException($e, 'Error show devices');
+            // Handle any exceptions and return an error response
+            return $this->handleException($e, 'Error showing device');
         }
     }
 
-    public function updateDevice(UpdateDeviceRequest $request)
+    /**
+     * Update a specific device.
+     */
+    public function updateDevice(UpdateDeviceRequest $request): JsonResponse
     {
         try {
+            // Validate and retrieve request data
             $validatedData = $request->validated();
-            [$input, $deviceUid, $queryParams] = $this->requestHelperService->getInputAndId($request, 'devices', true);
-
+            // Retrieve input and device ID from the request
+            [, $deviceUid] = $this->requestHelperService->getInputAndId($request, 'devices', true);
+            // Update the device using the service
             $device = $this->deviceService->updateDevice($deviceUid, $validatedData);
 
+            // Return the updated device
             return response()->json($device);
         } catch (\Exception $e) {
-            return $this->handleException($e, 'Error updating devices');
+            // Handle any exceptions and return an error response
+            return $this->handleException($e, 'Error updating device');
         }
     }
 
-    public function deleteDevice(Request $request)
+    /**
+     * Delete a specific device.
+     */
+    public function deleteDevice(Request $request): JsonResponse
     {
         try {
-            [$input, $deviceUid, $queryParams] = $this->requestHelperService->getInputAndId($request, 'devices', true);
+            // Retrieve input and device ID from the request
+            [, $deviceUid] = $this->requestHelperService->getInputAndId($request, 'devices', true);
+            // Delete the device using the service
             $this->deviceService->deleteDevice($deviceUid);
 
-            // Jika tidak ada data lain yang perlu dikembalikan maka kembalikan status 204 No Content
+            // Return a 204 No Content status
             return response()->json(null, 204);
         } catch (\Exception $e) {
-            return $this->handleException($e, 'Error deleting devices');
+            // Handle any exceptions and return an error response
+            return $this->handleException($e, 'Error deleting device');
         }
     }
 }
