@@ -13,7 +13,7 @@ Route::middleware('json.api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth:api');
 });
 
-Route::middleware('auth:api')->group(function () {
+Route::middleware(['auth:api', 'throttle:60,1'])->group(function () {
     Route::post('/api-token', [ApiTokenController::class, 'generateToken'])->middleware('json.api');
 
     Route::middleware(['json.api', 'validate.api'])->group(function () {
