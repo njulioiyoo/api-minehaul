@@ -23,8 +23,6 @@ class UpdateDeviceRequest extends FormRequest
      */
     public function rules(): array
     {
-        $deviceId = $this->getDeviceId();
-
         return [
             'pit_id' => ['nullable', 'integer', 'exists:pits,id'],
             'device_type_id' => ['required', 'integer', 'exists:device_types,id'],
@@ -38,15 +36,6 @@ class UpdateDeviceRequest extends FormRequest
             'device_ignition_type_id' => ['required', 'integer', 'exists:device_ignition_types,id'],
             'device_status_id' => ['nullable', 'integer', 'exists:device_statuses,id'],
             'vehicle_id' => ['required', 'integer', 'exists:vehicles,id'],
-            'uid' => ['sometimes', 'string', 'unique:devices,uid,'.$deviceId],
         ];
-    }
-
-    /**
-     * Get the ID from the request body.
-     */
-    public function getDeviceId(): ?string
-    {
-        return $this->input('data.id') ?? $this->route('devices');
     }
 }

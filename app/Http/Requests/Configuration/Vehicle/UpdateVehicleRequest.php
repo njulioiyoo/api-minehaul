@@ -23,8 +23,6 @@ class UpdateVehicleRequest extends FormRequest
      */
     public function rules(): array
     {
-        $vehicleId = $this->getVehicleId();
-
         return [
             'pit_id' => ['nullable', 'integer', 'exists:pits,id'],
             'year' => ['nullable', 'integer', 'min:1900', 'max:2100'],
@@ -36,15 +34,6 @@ class UpdateVehicleRequest extends FormRequest
             'vehicle_make_id' => ['required', 'integer', 'exists:vehicle_makes,id'],
             'vehicle_model_id' => ['required', 'integer', 'exists:vehicle_models,id'],
             'vehicle_status_id' => ['nullable', 'integer', 'exists:vehicle_statuses,id'],
-            'uid' => ['sometimes', 'string', 'unique:vehicles,uid,'.$vehicleId],
         ];
-    }
-
-    /**
-     * Get the ID from the request body.
-     */
-    public function getVehicleId(): ?string
-    {
-        return $this->input('data.id') ?? $this->route('vehicles');
     }
 }

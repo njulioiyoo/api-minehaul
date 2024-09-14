@@ -20,20 +20,42 @@ class JsonApi
         // Get JSON body
         $input = $request->json()->all();
 
-        // Check if the input has the 'data' key
+        // Check if 'uid' or 'id' is outside 'data'
+        if (isset($input['uid']) || isset($input['id'])) {
+            // If 'uid' or 'id' is found outside 'data', throw a JSON:API formatted validation error
+            return response()->json([
+                'jsonapi' => [
+                    'version' => '1.0',
+                ],
+                'errors' => [
+                    [
+                        'status' => '400',
+                        'title' => 'Invalid Request',
+                        'detail' => 'The uid or id field must be inside the data object.',
+                        'source' => [
+                            'pointer' => isset($input['uid']) ? '/uid' : '/id',
+                        ],
+                    ],
+                ],
+            ], 400);
+        }
+
+        // If 'data' exists, continue processing
         if (isset($input['data'])) {
             $attributes = $input['data']['attributes'] ?? [];
+            $uid = $input['data']['uid'] ?? null;
             $id = $input['data']['id'] ?? null;
 
-            // Merge attributes with the original request data
-            $requestData = $attributes;
+            // Merge attributes with uid and id
+            $requestData = array_merge(
+                $attributes,
+                array_filter([
+                    'uid' => $uid,
+                    'id' => $id,
+                ])
+            );
 
-            // If there's an id, include it in the request data
-            if ($id) {
-                $requestData['id'] = $id;
-            }
-
-            // Replace request data with attributes and id
+            // Replace request data with attributes, uid, and id
             $request->merge($requestData);
         }
 
