@@ -32,6 +32,9 @@ class VehicleController extends Controller
 
     /**
      * Create a new vehicle.
+     *
+     * @param  StoreVehicleRequest  $request  The incoming request containing vehicle data.
+     * @return JsonResponse The created vehicle with a 201 status code.
      */
     public function createVehicle(StoreVehicleRequest $request): JsonResponse
     {
@@ -51,6 +54,9 @@ class VehicleController extends Controller
 
     /**
      * Read vehicles based on query parameters.
+     *
+     * @param  Request  $request  The incoming request with query parameters.
+     * @return JsonResponse A JSON response containing the list of vehicles.
      */
     public function readVehicle(Request $request): JsonResponse
     {
@@ -70,6 +76,9 @@ class VehicleController extends Controller
 
     /**
      * Show details of a specific vehicle.
+     *
+     * @param  Request  $request  The incoming request containing the vehicle ID.
+     * @return JsonResponse The details of the requested vehicle.
      */
     public function showVehicle(Request $request): JsonResponse
     {
@@ -89,6 +98,9 @@ class VehicleController extends Controller
 
     /**
      * Update a specific vehicle.
+     *
+     * @param  UpdateVehicleRequest  $request  The incoming request containing updated vehicle data.
+     * @return JsonResponse The updated vehicle details.
      */
     public function updateVehicle(UpdateVehicleRequest $request): JsonResponse
     {
@@ -110,6 +122,9 @@ class VehicleController extends Controller
 
     /**
      * Delete a specific vehicle.
+     *
+     * @param  Request  $request  The incoming request containing the vehicle ID.
+     * @return JsonResponse A 204 status with no content after successful deletion.
      */
     public function deleteVehicle(Request $request): JsonResponse
     {
