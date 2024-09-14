@@ -21,7 +21,7 @@ class VerifyUserRole
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Cek jika user belum login
+        // Check if the user is not logged in
         if (! Auth::check()) {
             return response()->json([
                 'error' => 'Unauthenticated',
@@ -29,17 +29,18 @@ class VerifyUserRole
             ], 401);
         }
 
-        // Ambil URL rute saat ini
+        // Get the current route URL
         $currentUrl = $request->path();
 
-        $baseUrl = Str::before($currentUrl, '/'); // Mengambil segmen awal sebelum parameter kedua
+        // Extract the base URL segment before the second parameter
+        $baseUrl = Str::before($currentUrl, '/');
 
-        // Cari menu berdasarkan URL
+        // Find the menu based on the URL
         $menu = Menu::with('permissionMenu')
-            ->where('url', 'LIKE', $baseUrl.'%') // Mencocokkan URL yang dimulai dengan $baseUrl
+            ->where('url', 'LIKE', $baseUrl.'%') // Match URLs starting with $baseUrl
             ->first();
 
-        // Jika menu tidak ditemukan, berikan validasi
+        // If the menu is not found, return a validation error
         if (! $menu) {
             return response()->json([
                 'error' => 'Not Found',
@@ -47,10 +48,10 @@ class VerifyUserRole
             ], 404);
         }
 
-        // Ambil role_id dari user yang sedang login
+        // Get the role_id of the currently logged-in user
         $roleId = Auth::user()->roles->first()->id ?? null;
 
-        // Cek jika role_id tidak ditemukan
+        // Check if role_id is not found
         if (! $roleId) {
             return response()->json([
                 'error' => 'Unauthorized',
@@ -58,12 +59,12 @@ class VerifyUserRole
             ], 403);
         }
 
-        // Cek apakah menu terkait dengan role melalui tabel role_menus
+        // Check if the menu is associated with the role via the role_menus table
         $userMenu = RoleMenu::where('role_id', $roleId)
             ->where('menu_id', $menu->id)
             ->first();
 
-        // Jika user tidak memiliki akses ke menu ini, berikan validasi
+        // If the user does not have access to this menu, return a validation error
         if (! $userMenu) {
             return response()->json([
                 'error' => 'Unauthorized',
@@ -71,8 +72,8 @@ class VerifyUserRole
             ], 403);
         }
 
-        // Cek role pengguna dengan roles yang ada di menu
-        $roles = $menu->roles; // Langsung ambil roles tanpa decode
+        // Check the user's roles against the roles available in the menu
+        $roles = $menu->roles; // Directly retrieve roles without decoding
         if ($roles && ! Auth::user()->hasAnyRole($roles)) {
             return response()->json([
                 'error' => 'Unauthorized',
@@ -80,7 +81,7 @@ class VerifyUserRole
             ], 403);
         }
 
-        // Jika semua validasi berhasil, teruskan request
+        // If all validations pass, proceed with the request
         return $next($request);
     }
 }
