@@ -32,6 +32,9 @@ class DeviceController extends Controller
 
     /**
      * Create a new device.
+     *
+     * @param  StoreDeviceRequest  $request  The incoming request containing device data.
+     * @return JsonResponse The created device with a 201 status code.
      */
     public function createDevice(StoreDeviceRequest $request): JsonResponse
     {
@@ -51,6 +54,9 @@ class DeviceController extends Controller
 
     /**
      * Read devices based on query parameters.
+     *
+     * @param  Request  $request  The incoming request with query parameters.
+     * @return JsonResponse A JSON response containing the list of devices.
      */
     public function readDevice(Request $request): JsonResponse
     {
@@ -70,6 +76,9 @@ class DeviceController extends Controller
 
     /**
      * Show details of a specific device.
+     *
+     * @param  Request  $request  The incoming request containing the device ID.
+     * @return JsonResponse The details of the requested device.
      */
     public function showDevice(Request $request): JsonResponse
     {
@@ -89,6 +98,9 @@ class DeviceController extends Controller
 
     /**
      * Update a specific device.
+     *
+     * @param  UpdateDeviceRequest  $request  The incoming request containing updated device data.
+     * @return JsonResponse The updated device details.
      */
     public function updateDevice(UpdateDeviceRequest $request): JsonResponse
     {
@@ -110,6 +122,9 @@ class DeviceController extends Controller
 
     /**
      * Delete a specific device.
+     *
+     * @param  Request  $request  The incoming request containing the device ID.
+     * @return JsonResponse A 204 status with no content after successful deletion.
      */
     public function deleteDevice(Request $request): JsonResponse
     {
