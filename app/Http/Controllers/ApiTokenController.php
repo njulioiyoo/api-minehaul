@@ -14,29 +14,32 @@ class ApiTokenController extends Controller
     /**
      * Generate a new API token for the authenticated user.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @param  Request  $request  The incoming HTTP request
+     * @return \Illuminate\Http\JsonResponse The JSON response with the generated API token
      */
     public function generateToken(Request $request)
     {
+        // Retrieve the currently authenticated user
         $user = Auth::user();
         if (! $user) {
+            // Return unauthorized response if user is not authenticated
             return response()->json([
                 'error' => 'Unauthorized',
                 'message' => 'You must be logged in to access this resource.',
             ], 401);
         }
 
-        // Buat token baru
+        // Generate a new API token
         $apiToken = Str::random(60);
 
-        $data = $request->input('data');
-        $url = $data['url_accessed'] ?? '';
+        // Retrieve the accessed URL from the request input
+        $url = $request->input('data.url_accessed', '');
 
         if ($url) {
-            // Hapus protokol http dan https
+            // Remove the http and https protocols from the URL
             $url = str_replace(['http://', 'https://'], '', $url);
 
-            // Update atau buat token baru
+            // Update or create a new API token record in the database
             CoreApiToken::updateOrCreate(
                 [
                     'user_id' => $user->id,
@@ -50,6 +53,7 @@ class ApiTokenController extends Controller
             );
         }
 
+        // Return the newly generated API token in the response
         return response()->json(['api_token' => $apiToken]);
     }
 }
