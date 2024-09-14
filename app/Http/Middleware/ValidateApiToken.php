@@ -31,14 +31,14 @@ class ValidateApiToken
             return response()->json(['message' => 'API token is required'], 401);
         }
 
-        // Get the full URL of the request and remove HTTP and HTTPS protocols
-        $url = $request->fullUrl();
-        $url = str_replace(['http://', 'https://'], '', $url);
+        // Decode the URL to handle encoded characters and remove HTTP/HTTPS protocols
+        $url = urldecode($request->fullUrl());
+        $baseUrl = preg_replace('/^https?:\/\//', '', $url);
 
         // Check if the token exists in the database and is valid for the current URL
         $tokenRecord = CoreApiToken::where([
             'api_token' => $apiToken,
-            'url_accessed' => $url,
+            'url_accessed' => $baseUrl,
         ])->first();
 
         // Log the token record for debugging purposes
