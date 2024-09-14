@@ -32,14 +32,11 @@ class ValidateApiToken
         }
 
         // Decode the URL to handle encoded characters and remove HTTP/HTTPS protocols
-        $url = urldecode($request->fullUrl());
+        $url = urldecode($request->path());
         $baseUrl = preg_replace('/^https?:\/\//', '', $url);
 
         // Check if the token exists in the database and is valid for the current URL
-        $tokenRecord = CoreApiToken::where([
-            'api_token' => $apiToken,
-            'url_accessed' => $baseUrl,
-        ])->first();
+        $tokenRecord = CoreApiToken::where('api_token', $apiToken)->where('url_accessed', 'LIKE', '%'.$baseUrl.'%')->first();
 
         // Log the token record for debugging purposes
         Log::info('Token record:', ['tokenRecord' => $tokenRecord]);
