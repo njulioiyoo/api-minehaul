@@ -14,36 +14,42 @@ class ValidateApiToken
     /**
      * Handle an incoming request.
      *
-     * @return mixed
+     * @param  Request  $request  The incoming HTTP request
+     * @param  Closure  $next  The next middleware or request handler
+     * @return mixed The response or the next middleware handler
      */
     public function handle(Request $request, Closure $next)
     {
-        // Ambil token dari header request
+        // Retrieve the API token from the request header
         $apiToken = $request->header('x-api-token');
 
-        // Log untuk debugging
+        // Log for debugging purposes
         Log::info('Received API token:', ['apiToken' => $apiToken]);
 
+        // Return an error response if the API token is not provided
         if (! $apiToken) {
             return response()->json(['message' => 'API token is required'], 401);
         }
 
+        // Get the full URL of the request and remove HTTP and HTTPS protocols
         $url = $request->fullUrl();
         $url = str_replace(['http://', 'https://'], '', $url);
 
-        // Cek apakah token ada di database dan valid
+        // Check if the token exists in the database and is valid for the current URL
         $tokenRecord = CoreApiToken::where([
             'api_token' => $apiToken,
             'url_accessed' => $url,
         ])->first();
 
-        // Log token record untuk debugging
+        // Log the token record for debugging purposes
         Log::info('Token record:', ['tokenRecord' => $tokenRecord]);
 
+        // Return an error response if the token is not valid
         if (! $tokenRecord) {
             return response()->json(['message' => 'Invalid API token'], 403);
         }
 
+        // Proceed to the next middleware or request handler if the token is valid
         return $next($request);
     }
 }
