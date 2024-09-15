@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Traits\ExceptionHandlerTrait;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class JsonApi
 {
+    use ExceptionHandlerTrait;
+
     /**
      * Handle an incoming request.
      *
@@ -21,23 +24,9 @@ class JsonApi
         $input = $request->json()->all();
 
         // Check if 'uid' or 'id' is outside 'data'
-        if (isset($input['uid']) || isset($input['id'])) {
+        if (array_key_exists('uid', $input) || array_key_exists('id', $input)) {
             // If 'uid' or 'id' is found outside 'data', throw a JSON:API formatted validation error
-            return response()->json([
-                'jsonapi' => [
-                    'version' => '1.0',
-                ],
-                'errors' => [
-                    [
-                        'status' => '400',
-                        'title' => 'Invalid Request',
-                        'detail' => 'The uid or id field must be inside the data object.',
-                        'source' => [
-                            'pointer' => isset($input['uid']) ? '/uid' : '/id',
-                        ],
-                    ],
-                ],
-            ], 400);
+            return $this->createError('Invalid Request', 'The uid or id field must be inside the data object.', 400);
         }
 
         // If 'data' exists, continue processing
