@@ -45,6 +45,7 @@ class RolePermissionSeeder extends Seeder
             'Edit Device',
             'Delete Device',
             'View Driver',
+            'Show Driver',
             'Create Driver',
             'Edit Driver',
             'Delete Driver',

@@ -6,7 +6,7 @@ namespace App\Http\Requests\Configuration\Driver;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreDriverRequest extends FormRequest
+class UpdateDriverRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,7 +28,7 @@ class StoreDriverRequest extends FormRequest
             'display_id' => ['required', 'string', 'regex:/^[A-Za-z0-9_-]+$/'],
             'name' => ['required', 'string', 'regex:/^[\p{L}0-9 ]+$/u'],
             'email' => [
-                'required',
+                'nullable',
                 'email',
                 'regex:/^[\w\.-]+@[\w\.-]+\.[a-zA-Z]{2,6}$/',
                 'unique:drivers,email',

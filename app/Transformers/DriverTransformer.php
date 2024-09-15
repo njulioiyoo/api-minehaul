@@ -14,10 +14,11 @@ class DriverTransformer
     public function transform(Driver $driver): array
     {
         return [
-            'type' => 'driver',
+            'type' => 'drivers',
             'id' => $driver->id,
             'attributes' => [
                 'id' => $driver->id,
+                'uid' => $driver->uid,
                 'account' => $this->transformRelation($driver->account, ['id', 'company_code', 'company_name']),
                 'pit' => $this->transformRelation($driver->pit, ['id', 'name', 'description']),
                 'display_id' => $driver->display_id,

@@ -6,6 +6,7 @@ namespace App\Services\Configuration\Driver;
 
 use App\Helpers\PaginationHelper;
 use App\Models\Driver;
+use App\Traits\ExceptionHandlerTrait;
 use App\Transformers\DriverTransformer;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
@@ -15,6 +16,8 @@ use Illuminate\Support\Facades\Log;
 
 class DriverService
 {
+    use ExceptionHandlerTrait;
+
     protected DriverTransformer $transformer;
 
     protected Driver $driverModel;
@@ -29,9 +32,9 @@ class DriverService
      * Create a new driver in the database and clear related cache.
      *
      * @param  array  $inputData  Input data for creating the driver
-     * @return JsonResponse Formatted JSON API response
+     * @return mixed Formatted JSON API response
      */
-    public function createDriver(array $inputData): JsonResponse
+    public function createDriver(array $inputData)
     {
         return DB::transaction(function () use ($inputData) {
             $driver = $this->driverModel->create($inputData);
@@ -80,10 +83,10 @@ class DriverService
      *
      * @throws ModelNotFoundException If the driver is not found
      */
-    public function showDriver(int $driverId): JsonResponse
+    public function showDriver(string $driverUid)
     {
-        $driver = Cache::remember("driver_$driverId", 60, function () use ($driverId) {
-            return $this->driverModel->find($driverId);
+        $driver = Cache::remember("driver_$driverUid", 60, function () use ($driverUid) {
+            return $this->driverModel->where('uid', $driverUid)->first();
         });
 
         if (! $driver) {
@@ -96,23 +99,24 @@ class DriverService
     }
 
     /**
-     * Update the data of a driver by ID.
+     * Update the data of a driver by UID.
      *
-     * @param  int  $driverId  ID of the driver to be updated
+     * @param  string  $driverUid  UID of the driver to be updated
      * @param  array  $inputData  Input data for the update
-     * @return JsonResponse Formatted JSON API response
+     * @return mixed Formatted JSON API response
      *
      * @throws ModelNotFoundException If the driver is not found
      */
-    public function updateDriver(int $driverId, array $inputData): JsonResponse
+    public function updateDriver(string $driverUid, array $inputData)
     {
-        return DB::transaction(function () use ($driverId, $inputData) {
-            $this->driverModel->where('id', $driverId)->update($inputData);
+        return DB::transaction(function () use ($driverUid, $inputData) {
+            $this->driverModel->where('uid', $driverUid)->update($inputData);
 
-            $driver = $this->driverModel->find($driverId);
+            // Retrieve the updated driver
+            $driver = $this->driverModel->where('uid', $driverUid)->first();
 
             if ($driver) {
-                Cache::put("driver_$driverId", $driver, 60);
+                Cache::put("driver_$driverUid", $driver, 60);
 
                 return $this->formatJsonApiResponse(
                     $this->transformer->transform($driver)
@@ -131,10 +135,10 @@ class DriverService
      *
      * @throws \Throwable If an error occurs during deletion
      */
-    public function deleteDriver(int $driverId): JsonResponse
+    public function deleteDriver(string $driverUid)
     {
         try {
-            $driver = $this->driverModel->find($driverId);
+            $driver = $this->driverModel->where('uid', $driverUid)->first();
 
             if (! $driver) {
                 throw new ModelNotFoundException('Driver not found');
@@ -142,23 +146,12 @@ class DriverService
 
             $driver->delete();
 
-            Cache::forget("driver_$driverId");
+            Cache::forget("driver_$driverUid");
 
             return response()->json(['message' => 'Driver deleted successfully']);
         } catch (\Throwable $th) {
-            Log::error("Error deleting driver with ID: {$driverId}, Error: {$th->getMessage()}");
+            Log::error("Error deleting driver with ID: {$driverUid}, Error: {$th->getMessage()}");
             throw $th;
         }
-    }
-
-    /**
-     * Format the JSON API response.
-     *
-     * @param  mixed  $data  Data to be formatted
-     * @return JsonResponse Formatted JSON API response
-     */
-    protected function formatJsonApiResponse($data): JsonResponse
-    {
-        return response()->json($data);
     }
 }
