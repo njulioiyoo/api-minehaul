@@ -30,7 +30,7 @@ class StoreVehicleRequest extends FormRequest
             'name' => ['required', 'string', 'regex:/^[\p{L}0-9 ]+$/u'],
             'vin' => ['required', 'string', 'regex:/^[\p{L}0-9 ]+$/u'],
             'license_plate' => ['required', 'string', 'regex:/^[\p{L}0-9 ]+$/u'],
-            'device_type_id' => ['required', 'integer', 'exists:vehicle_types,id'],
+            'vehicle_type_id' => ['required', 'integer', 'exists:vehicle_types,id'],
             'vehicle_make_id' => ['required', 'integer', 'exists:vehicle_makes,id'],
             'vehicle_model_id' => ['required', 'integer', 'exists:vehicle_models,id'],
             'vehicle_status_id' => ['nullable', 'integer', 'exists:vehicle_statuses,id'],

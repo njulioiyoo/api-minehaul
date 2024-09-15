@@ -40,5 +40,9 @@ Route::middleware(['validate.api', 'json.api', 'verify.user.role'])->group(funct
     // Routes for vehicles
     Route::prefix('drivers')->group(function () {
         Route::get('/', [DriverController::class, 'readDriver'])->name('driver.index')->middleware('verify.user.permission:view-driver');
+        Route::post('/', [DriverController::class, 'createDriver'])->name('driver.create')->middleware('verify.user.permission:create-driver');
+        Route::patch('/', [DriverController::class, 'updateDriver'])->name('driver.update')->middleware('verify.user.permission:edit-driver');
+        Route::delete('/', [DriverController::class, 'deleteDriver'])->name('driver.delete')->middleware('verify.user.permission:delete-driver');
+        Route::post('/detail', [DriverController::class, 'showDriver'])->name('driver.show')->middleware('verify.user.permission:show-driver');
     });
 });
