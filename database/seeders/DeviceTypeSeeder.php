@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
+use Faker\Factory as Faker;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use Faker\Factory as Faker;
 
 class DeviceTypeSeeder extends Seeder
 {
@@ -19,15 +20,10 @@ class DeviceTypeSeeder extends Seeder
         $faker = Faker::create();
 
         $deviceTypes = [
+            'GPS',
+            'BLE Beacon',
+            'Load Scanner',
             'Smartphone',
-            'Tablet',
-            'Laptop',
-            'Desktop',
-            'Wearable',
-            'IoT Device',
-            'Printer',
-            'Router',
-            'Server'
         ];
 
         foreach ($deviceTypes as $deviceType) {
