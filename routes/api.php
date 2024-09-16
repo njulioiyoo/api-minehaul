@@ -10,10 +10,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('json.api')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth:api');
+    Route::post('/oauth/refresh', [AuthController::class, 'refreshToken'])->name('oauth.refresh');
 });
 
 Route::middleware(['auth:api', 'throttle:60,1'])->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::post('/api-token', [ApiTokenController::class, 'generateToken'])->middleware('json.api');
 
     Route::middleware(['json.api', 'validate.api'])->group(function () {

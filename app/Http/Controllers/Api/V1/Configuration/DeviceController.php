@@ -33,6 +33,8 @@ class DeviceController extends Controller
     /**
      * Create a new device.
      *
+     * @query
+     *
      * @param  StoreDeviceRequest  $request  The incoming request containing device data.
      * @return JsonResponse The created device with a 201 status code.
      */
