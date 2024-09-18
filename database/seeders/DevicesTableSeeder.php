@@ -21,7 +21,7 @@ class DevicesTableSeeder extends Seeder
             $devices[] = [
                 'account_id' => rand(1, 10),
                 'pit_id' => rand(1, 10),
-                'device_type_id' => rand(1, 5),
+                'device_type_id' => rand(1, 4),
                 'device_make_id' => rand(1, 5),
                 'device_model_id' => rand(1, 5),
                 'year' => rand(2018, 2024),

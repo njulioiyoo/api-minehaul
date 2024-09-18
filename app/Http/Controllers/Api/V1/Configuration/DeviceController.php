@@ -12,6 +12,7 @@ use App\Services\RequestHelperService;
 use App\Traits\ExceptionHandlerTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class DeviceController extends Controller
 {
@@ -49,6 +50,8 @@ class DeviceController extends Controller
             // Return the created device with a 201 Created status
             return response()->json($device, 201);
         } catch (\Exception $e) {
+            Log::error($e->getMessage(), ['exception' => $e]);
+
             // Handle any exceptions and return an error response
             return $this->handleException($e, 'Error creating device');
         }
@@ -71,6 +74,8 @@ class DeviceController extends Controller
             // Return the devices
             return response()->json($response);
         } catch (\Exception $e) {
+            Log::error($e->getMessage(), ['exception' => $e]);
+
             // Handle any exceptions and return an error response
             return $this->handleException($e, 'Error reading devices');
         }
@@ -93,6 +98,8 @@ class DeviceController extends Controller
             // Return the device details
             return response()->json($response);
         } catch (\Exception $e) {
+            Log::error($e->getMessage(), ['exception' => $e]);
+
             // Handle any exceptions and return an error response
             return $this->handleException($e, 'Error showing device');
         }
@@ -117,6 +124,8 @@ class DeviceController extends Controller
             // Return the updated device
             return response()->json($device);
         } catch (\Exception $e) {
+            Log::error($e->getMessage(), ['exception' => $e]);
+
             // Handle any exceptions and return an error response
             return $this->handleException($e, 'Error updating device');
         }
@@ -139,6 +148,8 @@ class DeviceController extends Controller
             // Return a 204 No Content status
             return response()->json(null, 204);
         } catch (\Exception $e) {
+            Log::error($e->getMessage(), ['exception' => $e]);
+
             // Handle any exceptions and return an error response
             return $this->handleException($e, 'Error deleting device');
         }

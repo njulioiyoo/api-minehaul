@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\Configuration\DeviceController;
 use App\Http\Controllers\Api\V1\Configuration\DriverController;
+use App\Http\Controllers\Api\V1\Configuration\LocationController;
 use App\Http\Controllers\Api\V1\Configuration\VehicleController;
 use Illuminate\Support\Facades\Route;
 
@@ -44,5 +45,10 @@ Route::middleware(['validate.api', 'json.api', 'verify.user.role'])->group(funct
         Route::patch('/', [DriverController::class, 'updateDriver'])->name('driver.update')->middleware('verify.user.permission:edit-driver');
         Route::delete('/', [DriverController::class, 'deleteDriver'])->name('driver.delete')->middleware('verify.user.permission:delete-driver');
         Route::post('/detail', [DriverController::class, 'showDriver'])->name('driver.show')->middleware('verify.user.permission:show-driver');
+    });
+
+    // Routes for vehicles
+    Route::prefix('locations')->group(function () {
+        Route::get('/', [LocationController::class, 'readLocation'])->name('location.index')->middleware('verify.user.permission:view-location');
     });
 });

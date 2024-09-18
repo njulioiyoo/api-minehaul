@@ -41,6 +41,7 @@ class DatabaseSeeder extends Seeder
         $this->call(DevicesTableSeeder::class);
 
         $this->call(LocationTypeSeeder::class);
+        $this->call(LocationSeeder::class);
 
         $this->call(AlertStatusSeeder::class);
         $this->call(AlertTypesSeeder::class);

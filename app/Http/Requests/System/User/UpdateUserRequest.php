@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\System\User;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -45,9 +46,8 @@ class UpdateUserRequest extends FormRequest
     /**
      * Get the role ID from the request body or route.
      */
-    public function getUserId(): ?string
+    public function getUserId(): ?int
     {
-        // Ambil ID dari body request terlebih dahulu, jika tidak ada gunakan ID dari route
-        return $this->input('data.id') ?? auth()->id();
+        return User::select('id')->where('id', $this->input('id'))->firstOrFail()->id;
     }
 }
