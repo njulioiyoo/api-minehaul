@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-// app/Traits/HasAccountAndPit.php
-
 namespace App\Models\Traits;
 
 use App\Models\Account;
