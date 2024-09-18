@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Traits\HasAccountAndPit;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,6 +12,7 @@ use Illuminate\Support\Str;
 
 class Location extends Model
 {
+    use HasAccountAndPit;
     use HasFactory;
     use SoftDeletes;
 
@@ -39,15 +41,5 @@ class Location extends Model
         static::saved(function ($location) {
             // Logic tambahan setelah disimpan, jika diperlukan
         });
-    }
-
-    public function account()
-    {
-        return $this->belongsTo(Account::class, 'account_id', 'id')->select('id', 'company_code', 'company_name');
-    }
-
-    public function pit()
-    {
-        return $this->belongsTo(Pit::class, 'pit_id', 'id')->select('id', 'name', 'description');
     }
 }

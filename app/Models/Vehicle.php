@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Traits\HasAccountAndPit;
 use App\Models\Vehicle\VehicleMake;
 use App\Models\Vehicle\VehicleModel;
 use App\Models\Vehicle\VehicleStatus;
@@ -15,6 +16,7 @@ use Illuminate\Support\Str;
 
 class Vehicle extends Model
 {
+    use HasAccountAndPit;
     use HasFactory;
     use SoftDeletes;
 
@@ -46,16 +48,6 @@ class Vehicle extends Model
         static::saved(function ($vehicle) {
             // Logic tambahan setelah disimpan, jika diperlukan
         });
-    }
-
-    public function account()
-    {
-        return $this->belongsTo(Account::class, 'account_id', 'id')->select('id', 'company_code', 'company_name');
-    }
-
-    public function pit()
-    {
-        return $this->belongsTo(Pit::class, 'pit_id', 'id')->select('id', 'name', 'description');
     }
 
     public function vehicleType()
