@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use Dedoc\Scramble\Scramble;
-use Illuminate\Routing\Route;
+use Dedoc\Scramble\Support\Generator\OpenApi;
+use Dedoc\Scramble\Support\Generator\SecurityScheme;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
 use Laravel\Passport\Passport;
 
 class AppServiceProvider extends ServiceProvider
@@ -40,8 +41,14 @@ class AppServiceProvider extends ServiceProvider
         // Mengatur masa berlaku token personal menjadi sebulan
         Passport::personalAccessTokensExpireIn(now()->addMonths(1)); // Personal Access Token expired in 1 month
 
-        Scramble::routes(function (Route $route) {
-            return Str::startsWith($route->uri, 'api/');
+        Scramble::afterOpenApiGenerated(function (OpenApi $openApi) {
+            $openApi->secure(
+                SecurityScheme::http('bearer')
+            );
+        });
+
+        Gate::define('viewApiDocs', function () {
+            return true;
         });
     }
 }

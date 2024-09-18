@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Extensions\AddCustomHeader;
 use Dedoc\Scramble\Http\Middleware\RestrictedDocsAccess;
 
 return [
@@ -31,7 +32,7 @@ return [
         /*
          * Description rendered on the home page of the API documentation (`/docs/api`).
          */
-        'description' => '',
+        'description' => 'Welcome to the official documentation for Minehaul Partner API! This document serves as a comprehensive guide to understanding and utilizing the functionalities offered by our API.',
     ],
 
     /*
@@ -41,7 +42,7 @@ return [
         /*
          * Define the title of the documentation's website. App name is used when this config is `null`.
          */
-        'title' => 'Docs Minehaul',
+        'title' => 'Minehaul API',
 
         /*
          * Define the theme of the documentation. Available options are `light` and `dark`.
@@ -85,5 +86,7 @@ return [
         RestrictedDocsAccess::class,
     ],
 
-    'extensions' => [],
+    'extensions' => [
+        AddCustomHeader::class,
+    ],
 ];
