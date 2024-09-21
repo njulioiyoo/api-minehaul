@@ -27,6 +27,7 @@ class VehicleTransformer
                 'display_id' => $vehicle->display_id,
                 'name' => $vehicle->name,
                 'vin' => $vehicle->vin,
+                'tags' => $vehicle->tags,
                 'license_plate' => $vehicle->license_plate,
                 'vehicle_type' => $this->transformRelation($vehicle->vehicleType, ['id', 'name']),
                 'vehicle_make' => $this->transformRelation($vehicle->vehicleMake, ['id', 'name']),

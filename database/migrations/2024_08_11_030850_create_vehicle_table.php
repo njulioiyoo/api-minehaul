@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('display_id', 100)->nullable();
             $table->string('name', 255)->nullable();
             $table->string('vin', 255)->nullable();
+            $table->text('tags')->nullable();
             $table->string('license_plate', 50)->nullable();
             $table->foreignId('vehicle_type_id')->constrained()->onDelete('cascade');
             $table->foreignId('vehicle_make_id')->constrained()->onDelete('cascade');
