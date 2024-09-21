@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Traits\HasAccountAndPit;
+use App\Models\Traits\HasAccountInfo;
 use App\Models\Vehicle\VehicleMake;
 use App\Models\Vehicle\VehicleModel;
 use App\Models\Vehicle\VehicleStatus;
@@ -17,6 +18,7 @@ use Illuminate\Support\Str;
 class Vehicle extends Model
 {
     use HasAccountAndPit;
+    use HasAccountInfo;
     use HasFactory;
     use SoftDeletes;
 

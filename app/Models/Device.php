@@ -11,6 +11,7 @@ use App\Models\Device\DeviceModel;
 use App\Models\Device\DeviceStatus;
 use App\Models\Device\DeviceType;
 use App\Models\Traits\HasAccountAndPit;
+use App\Models\Traits\HasAccountInfo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -19,6 +20,7 @@ use Illuminate\Support\Str;
 class Device extends Model
 {
     use HasAccountAndPit;
+    use HasAccountInfo;
     use HasFactory;
     use SoftDeletes;
 
