@@ -25,6 +25,7 @@ class VehicleSeeder extends Seeder
                 'display_id' => 'V'.str_pad((string) $i, 4, '0', STR_PAD_LEFT),
                 'name' => $faker->company.' '.$faker->word,
                 'vin' => strtoupper($faker->bothify(strtoupper('??######??######?#'))),
+                'tags' => implode(',', $faker->words(3)),
                 'license_plate' => strtoupper($faker->bothify('?? #### ??')),
                 'vehicle_type_id' => $faker->numberBetween(1, 2),
                 'vehicle_make_id' => $faker->numberBetween(1, 9),
