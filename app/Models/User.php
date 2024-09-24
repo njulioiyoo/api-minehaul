@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Laravel\Passport\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -25,7 +26,7 @@ class User extends Authenticatable
         'username',
         'email',
         'password',
-        'person_id',
+        'people_id',
     ];
 
     /**
@@ -51,14 +52,23 @@ class User extends Authenticatable
         ];
     }
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($user) {
+            $user->uid = $user->exists ? $user->uid : Str::uuid()->toString();
+        });
+    }
+
     public function findForPassport($username)
     {
         return $this->where('username', $username)->first();
     }
 
-    public function persons()
+    public function people()
     {
-        return $this->belongsTo(Person::class, 'person_id', 'id')->select('id', 'full_name', 'account_id');
+        return $this->belongsTo(People::class, 'people_id', 'id')->select('id', 'full_name', 'account_id');
     }
 
     public function pits()

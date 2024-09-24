@@ -14,13 +14,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id()->bigIncrements();
+            $table->id();
+            $table->foreignId('people_id')->constrained()->onDelete('cascade');
             $table->string('username');
-            $table->integer('person_id');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+            $table->string('uid', 100)->nullable()->default(null);
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();
         });

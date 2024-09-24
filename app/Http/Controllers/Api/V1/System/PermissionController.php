@@ -38,6 +38,11 @@ class PermissionController extends Controller
         }
     }
 
+    /**
+     * This is summary.
+     *
+     * This is a description. In can be as large as needed and contain `markdown`.
+     */
     public function readPermission(Request $request)
     {
         $queryParams = $request->query();

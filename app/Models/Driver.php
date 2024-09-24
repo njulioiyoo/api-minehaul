@@ -30,7 +30,7 @@ class Driver extends Model
             $user = auth()->user();
 
             if ($user) {
-                $account = $user?->persons?->account;
+                $account = $user?->people?->account;
                 if ($account) {
                     $driver->account_id = $account->id;
                 }

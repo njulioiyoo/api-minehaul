@@ -56,8 +56,9 @@ class UserController extends Controller
         try {
             $validatedData = $request->validated();
             $roles = $validatedData['roles'] ?? [];
-            [$input, $userId, $queryParams] = $this->requestHelperService->getInputAndId($request, 'users', true);
-            $user = $this->userService->updateUser($userId, $validatedData, $roles);
+            [$input, $userUid, $queryParams] = $this->requestHelperService->getInputAndId($request, 'users', true);
+
+            $user = $this->userService->updateUser($userUid, $validatedData, $roles);
 
             return response()->json($user);
         } catch (\Exception $e) {
