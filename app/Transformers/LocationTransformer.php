@@ -21,6 +21,7 @@ class LocationTransformer
                 'uid' => $location->uid,
                 'account' => $this->transformRelation($location->account, ['id', 'company_code', 'company_name']),
                 'pit' => $this->transformRelation($location->pit, ['id', 'name', 'description']),
+                'location_type' => $this->transformRelation($location->locationType, ['id', 'name']),
                 'name' => $location->name,
                 'geom_type' => $location->geom_type,
                 'geom' => $location->geom,

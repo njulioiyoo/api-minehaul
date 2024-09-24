@@ -84,4 +84,14 @@ class ReferenceModuleController extends Controller
     {
         return $this->handleData($request, 'type', 'transformVehicle', 'Error reading vehicle reference');
     }
+
+    /**
+     * Handle vehicle data based on type from the request body.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getLocationData(Request $request)
+    {
+        return $this->handleData($request, 'type', 'transformLocation', 'Error reading vehicle reference');
+    }
 }

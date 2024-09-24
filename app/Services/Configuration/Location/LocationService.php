@@ -159,15 +159,4 @@ class LocationService
             throw $th;
         }
     }
-
-    /**
-     * Helper function to format JSON API responses.
-     *
-     * @param  array  $data  Transformed data to be returned in the response
-     * @return mixed Formatted JSON API response
-     */
-    private function formatJsonApiResponse(array $data)
-    {
-        return response()->json(['data' => $data], 200);
-    }
 }

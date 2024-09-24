@@ -6,7 +6,7 @@ namespace App\Http\Requests\Configuration\Location;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreLocationRequest extends FormRequest
+class UpdateLocationRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,8 +27,8 @@ class StoreLocationRequest extends FormRequest
             'pit_id' => ['nullable', 'integer', 'exists:pits,id'],
             'location_type_id' => ['required', 'integer', 'exists:location_types,id'],
             'name' => ['required', 'string', 'regex:/^[\p{L}0-9 ]+$/u'],
-            'geom_type' => ['required', 'in:Polygon,Point'],  // geom_type harus diisi
-            'geom' => ['required', 'string', function ($attribute, $value, $fail) {
+            'geom_type' => ['nullable', 'in:Polygon,Point'],
+            'geom' => ['nullable', 'string', function ($attribute, $value, $fail) {
                 // Cek apakah geom sesuai dengan tipe geometri
                 $geomType = request()->input('geom_type');
                 if ($geomType === 'Polygon' && ! preg_match('/^POLYGON\(\(.*\)\)$/', $value)) {
