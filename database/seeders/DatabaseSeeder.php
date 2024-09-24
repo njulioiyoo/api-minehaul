@@ -16,11 +16,12 @@ class DatabaseSeeder extends Seeder
         $this->call(PassportKeySeeder::class);
         $this->call(PassportClientSeeder::class);
 
+        $this->call(PeopleSeeder::class);
         $this->call(UsersTableSeeder::class);
+
         $this->call(RolePermissionSeeder::class);
         $this->call(MenuSeeder::class);
 
-        $this->call(PersonSeeder::class);
         $this->call(AccountSeeder::class);
         $this->call(PitsTableSeeder::class);
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Traits\HasAccountAndPit;
+use App\Models\Traits\HasAccountInfo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -13,6 +14,7 @@ use Illuminate\Support\Str;
 class Location extends Model
 {
     use HasAccountAndPit;
+    use HasAccountInfo;
     use HasFactory;
     use SoftDeletes;
 
@@ -28,7 +30,7 @@ class Location extends Model
             $user = auth()->user();
 
             if ($user) {
-                $account = $user?->persons?->account;
+                $account = $user?->people?->account;
                 if ($account) {
                     $location->account_id = $account->id;
                 }

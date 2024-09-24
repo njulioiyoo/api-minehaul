@@ -29,7 +29,8 @@ class UpdateUserRequest extends FormRequest
 
         return [
             'username' => ['required', 'string', 'regex:/^[a-zA-Z0-9._-]{3,20}$/'],
-            'person_id' => ['nullable', 'string', 'regex:/^\d+$/'],
+            'full_name' => ['required', 'string'],
+            'account_id' => ['required', 'integer'],
             'roles' => ['nullable', 'array'],
             'roles.*' => ['integer'],
             'email' => [
@@ -46,8 +47,8 @@ class UpdateUserRequest extends FormRequest
     /**
      * Get the role ID from the request body or route.
      */
-    public function getUserId(): ?int
+    public function getUserId()
     {
-        return User::select('id')->where('id', $this->input('id'))->firstOrFail()->id;
+        return User::select('id')->where('uid', $this->input('uid'))->first();
     }
 }

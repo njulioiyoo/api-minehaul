@@ -7,6 +7,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UsersTableSeeder extends Seeder
 {
@@ -18,27 +19,31 @@ class UsersTableSeeder extends Seeder
         $users = [
             [
                 'username' => 'administrator_user',
-                'person_id' => '1',
+                'people_id' => '1',
                 'email' => 'administrator_user@admin.com',
                 'password' => Hash::make('password'),
+                'uid' => Str::uuid(),
             ],
             [
                 'username' => 'regular_user',
-                'person_id' => '2',
+                'people_id' => '2',
                 'email' => 'regular_user@company.com',
                 'password' => Hash::make('password'),
+                'uid' => Str::uuid(),
             ],
             [
                 'username' => 'super_account',
-                'person_id' => '1',
+                'people_id' => '1',
                 'email' => 'super_account@company.com',
                 'password' => Hash::make('password'),
+                'uid' => Str::uuid(),
             ],
             [
                 'username' => 'super_user',
-                'person_id' => '2',
+                'people_id' => '2',
                 'email' => 'super_user@company.com',
                 'password' => Hash::make('password'),
+                'uid' => Str::uuid(),
             ],
         ];
 

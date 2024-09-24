@@ -69,12 +69,12 @@ class AuthController extends Controller
     {
         // Retrieve the user and check if the user belongs to the correct company
         $user = User::where('username', $request->input('username'))
-            ->with(['persons.account' => function ($query) use ($request) {
+            ->with(['people.account' => function ($query) use ($request) {
                 $query->where('company_code', $request->input('company_code'));
             }])->first();
 
         // Return an error if user, person, or account is not found
-        if (! $user || ! $user->persons || ! $user->persons->account) {
+        if (! $user || ! $user->people || ! $user->people->account) {
             return $this->createError('Invalid Data', 'Invalid User or Company ID.', Response::HTTP_BAD_REQUEST);
         }
 

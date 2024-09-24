@@ -18,24 +18,19 @@ class UserTransformer
             'id' => $user->id,
             'attributes' => [
                 'id' => $user->id,
+                'uid' => $user->uid,
                 'username' => $user->username,
-                'person_id' => $user->person_id,
                 'email' => $user->email,
                 'roles' => $user->roles->map(function ($role) {
                     return [
                         'id' => $role->id,
                         'name' => $role->name,
-                        'permissions' => $role->permissions->map(function ($permission) {
-                            return [
-                                'id' => $permission->id,
-                                'name' => $permission->name,
-                            ];
-                        })->toArray(),
                     ];
                 })->toArray(),
-                'menus' => $user->getMenusForRole(),
-                'account' => $user->persons?->account,
-                'pits' => $user->persons->account->pits,
+                'person' => [
+                    'full_name' => $user->people?->full_name,
+                ],
+                'account' => $user->people?->account,
             ],
         ];
     }

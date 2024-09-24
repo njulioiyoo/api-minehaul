@@ -13,7 +13,7 @@ trait HasAccountInfo
         // Global scope untuk memfilter berdasarkan account_id
         static::addGlobalScope('account', function (Builder $builder) {
             if (auth()->check()) {
-                $accountId = auth()->user()->persons->account_id;
+                $accountId = auth()->user()->people->account_id;
                 $builder->where('account_id', $accountId);
             }
         });

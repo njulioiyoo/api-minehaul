@@ -34,7 +34,7 @@ class Vehicle extends Model
             $user = auth()->user();
 
             if ($user) {
-                $account = $user?->persons?->account;
+                $account = $user?->people?->account;
                 if ($account) {
                     $vehicle->account_id = $account->id;
                 }

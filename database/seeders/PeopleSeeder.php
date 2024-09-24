@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\Account;
-use App\Models\Person;
+use App\Models\People;
 use Illuminate\Database\Seeder;
 
-class PersonSeeder extends Seeder
+class PeopleSeeder extends Seeder
 {
     public function run(): void
     {
@@ -24,15 +24,15 @@ class PersonSeeder extends Seeder
             $account = Account::create($accountData);
 
             // Example Person Data
-            $persons = [
+            $people = [
                 ['full_name' => 'John Miner', 'account_id' => $account->id],
                 ['full_name' => 'Sara Digger', 'account_id' => $account->id],
                 ['full_name' => 'Mike Shovel', 'account_id' => $account->id],
             ];
 
             // Insert Person Data
-            foreach ($persons as $personData) {
-                Person::create($personData);
+            foreach ($people as $personData) {
+                People::create($personData);
             }
         }
     }
