@@ -24,6 +24,7 @@ Route::middleware('auth:api')->group(function () {
         Route::prefix('reference')->group(function () {
             Route::post('/devices', [ReferenceModuleController::class, 'getDeviceData']);
             Route::post('/vehicles', [ReferenceModuleController::class, 'getVehicleData']);
+            Route::post('/locations', [ReferenceModuleController::class, 'getLocationData']);
         });
     });
 

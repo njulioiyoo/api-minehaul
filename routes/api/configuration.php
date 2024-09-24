@@ -50,5 +50,9 @@ Route::middleware(['validate.api', 'json.api', 'verify.user.role'])->group(funct
     // Routes for vehicles
     Route::prefix('locations')->group(function () {
         Route::get('/', [LocationController::class, 'readLocation'])->name('location.index')->middleware('verify.user.permission:view-location');
+        Route::post('/', [LocationController::class, 'createLocation'])->name('location.create')->middleware('verify.user.permission:create-location');
+        Route::patch('/', [LocationController::class, 'updateLocation'])->name('location.update')->middleware('verify.user.permission:edit-location');
+        Route::delete('/', [LocationController::class, 'deleteLocation'])->name('location.delete')->middleware('verify.user.permission:delete-location');
+        Route::post('/detail', [LocationController::class, 'showLocation'])->name('location.show')->middleware('verify.user.permission:show-location');
     });
 });

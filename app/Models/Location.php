@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Location\LocationType;
 use App\Models\Traits\HasAccountAndPit;
 use App\Models\Traits\HasAccountInfo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -36,6 +37,13 @@ class Location extends Model
                 }
             }
 
+            // Cek apakah geom_type adalah "Point"
+            if ($location->geom_type === 'Point') {
+                // Hitung radius otomatis (misalnya berdasarkan logika tertentu)
+                // Dalam contoh ini, kita asumsikan radius adalah jarak dari pusat (0,0)
+                $location->radius = $location->calculateRadius();
+            }
+
             $location->uid = $location->exists ? $location->uid : Str::uuid()->toString();
             $location->{$location->exists ? 'updated_by' : 'created_by'} = auth()->user()->id;
         });
@@ -43,5 +51,28 @@ class Location extends Model
         static::saved(function ($location) {
             // Logic tambahan setelah disimpan, jika diperlukan
         });
+    }
+
+    public function calculateRadius()
+    {
+        // Ambil nilai x dan y dari geom POINT
+        preg_match('/POINT\((\d+)\s(\d+)\)/', $this->geom, $matches);
+
+        if ($matches) {
+            $x = (float) $matches[1];
+            $y = (float) $matches[2];
+
+            // Menggunakan rumus sederhana jarak Euclidean untuk menghitung radius
+            // Jarak dari titik (x, y) ke pusat (0, 0)
+            return sqrt(pow($x, 2) + pow($y, 2));
+        }
+
+        // Jika tidak bisa menghitung, return null atau default value
+        return null;
+    }
+
+    public function locationType()
+    {
+        return $this->belongsTo(LocationType::class, 'location_type_id');
     }
 }

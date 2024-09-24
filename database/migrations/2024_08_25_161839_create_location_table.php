@@ -32,6 +32,8 @@ return new class extends Migration
             // Kolom radius (jika diperlukan)
             $table->float('radius')->nullable();
 
+            $table->string('uid', 100)->nullable()->default(null);
+
             // Kolom untuk tracking siapa yang membuat dan memperbarui record
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();

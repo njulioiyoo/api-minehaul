@@ -10,6 +10,7 @@ use App\Models\Device\DeviceMake;
 use App\Models\Device\DeviceModel;
 use App\Models\Device\DeviceStatus;
 use App\Models\Device\DeviceType;
+use App\Models\Location\LocationType;
 use App\Models\Vehicle\VehicleMake;
 use App\Models\Vehicle\VehicleModel;
 use App\Models\Vehicle\VehicleStatus;
@@ -73,6 +74,16 @@ class ReferenceModuleTransformer
     }
 
     /**
+     * Returns an array of queries for vehicle-related data.
+     */
+    protected function getLocationQueries(): array
+    {
+        return [
+            'location_type' => fn () => LocationType::select('id', 'name')->get(),
+        ];
+    }
+
+    /**
      * Transforms the requested device data or returns all data if no type is specified.
      *
      * @param  string|null  $type
@@ -94,6 +105,20 @@ class ReferenceModuleTransformer
     public function transformVehicle($type = null): array
     {
         $types = array_filter($this->getVehicleQueries(), fn ($key) => str_starts_with($key, 'vehicle_'), ARRAY_FILTER_USE_KEY);
+
+        return $type === null || $type === ''
+            ? array_map(fn ($query) => $query(), $types)
+            : (isset($types[$type]) ? [$type => $types[$type]()] : []);
+    }
+
+    /**
+     * Transforms the requested vehicle data or returns all data if no type is specified.
+     *
+     * @param  string|null  $type
+     */
+    public function transformLocation($type = null): array
+    {
+        $types = array_filter($this->getLocationQueries(), fn ($key) => str_starts_with($key, 'location_'), ARRAY_FILTER_USE_KEY);
 
         return $type === null || $type === ''
             ? array_map(fn ($query) => $query(), $types)
