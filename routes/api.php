@@ -31,3 +31,5 @@ Route::middleware('auth:api')->group(function () {
     require base_path('routes/api/configuration.php');
     require base_path('routes/api/system.php');
 });
+
+require base_path('routes/api/log.php');
