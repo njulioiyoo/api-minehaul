@@ -18,18 +18,16 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/api-token', [ApiTokenController::class, 'generateToken'])->middleware('json.api');
 
     Route::middleware(['json.api', 'validate.api'])->group(function () {
-        Route::get('me', [ProfileController::class, 'readProfile']);
+        Route::get('me', [ProfileController::class, 'readProfile'])->name('readProfile');
         Route::patch('me', [ProfileController::class, 'updateProfile']);
 
         Route::prefix('reference')->group(function () {
-            Route::post('/devices', [ReferenceModuleController::class, 'getDeviceData']);
-            Route::post('/vehicles', [ReferenceModuleController::class, 'getVehicleData']);
-            Route::post('/locations', [ReferenceModuleController::class, 'getLocationData']);
+            Route::post('/devices', [ReferenceModuleController::class, 'getDeviceData'])->name('getDeviceData');
+            Route::post('/vehicles', [ReferenceModuleController::class, 'getVehicleData'])->name('getVehicleData');
+            Route::post('/locations', [ReferenceModuleController::class, 'getLocationData'])->name('getLocationData');
         });
     });
 
     require base_path('routes/api/configuration.php');
     require base_path('routes/api/system.php');
 });
-
-require base_path('routes/api/log.php');

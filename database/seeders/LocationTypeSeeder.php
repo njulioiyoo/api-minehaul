@@ -18,7 +18,7 @@ class LocationTypeSeeder extends Seeder
         $locationTypes = [
             'Mining Area',
             'Parking Station',
-            'Loading Area',
+            'PIT Loading Area',
             'Dumping Area',
             'Port Area',
         ];
