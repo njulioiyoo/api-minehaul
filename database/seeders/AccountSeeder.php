@@ -16,10 +16,12 @@ class AccountSeeder extends Seeder
         $faker = Faker::create();
 
         for ($i = 1; $i <= 10; $i++) {
+            $uid = Str::uuid()->toString();
+
             Account::create([
                 'company_code' => 'MIN'.str_pad((string) $i, 3, '0', STR_PAD_LEFT),
                 'company_name' => $faker->company,
-                'uid' => Str::uuid()->toString(),
+                'uid' => $uid,
             ]);
         }
     }
