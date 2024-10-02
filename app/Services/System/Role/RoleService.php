@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\System\Role;
 
 use App\Helpers\PaginationHelper;
+use App\Models\RoleHasPit;
 use App\Traits\ExceptionHandlerTrait;
 use App\Transformers\RoleTransformer;
 use Illuminate\Support\Facades\Cache;
@@ -29,15 +30,33 @@ class RoleService
     public function createRole(array $inputData, array $permissions = [])
     {
         return DB::transaction(function () use ($inputData, $permissions) {
+            // Create a new role
             $role = $this->roleModel->create($inputData);
 
-            // Clear cache related to roles
+            // Clear any cache related to this role
             Cache::forget('role_'.$role->id);
 
+            // If there are permissions provided, sync them with the role
             if (! empty($permissions)) {
                 $role->syncPermissions($permissions);
             }
 
+            // Get account_id from the input data
+            $accountId = $inputData['account_id'];
+
+            // Get list of pit_ids from the input data
+            $pitIds = $inputData['pit_id'];
+
+            // Save the data into the role_has_pits table using the model
+            foreach ($pitIds as $pitId) {
+                RoleHasPit::create([
+                    'role_id' => $role->id,
+                    'account_id' => $accountId,
+                    'pit_id' => $pitId,
+                ]);
+            }
+
+            // Return the response in JSON API format
             return $this->formatJsonApiResponse(
                 $this->transformer->transform($role)
             );
@@ -69,18 +88,40 @@ class RoleService
     public function updateRole(string $roleId, array $inputData, array $permissions = [])
     {
         return DB::transaction(function () use ($roleId, $inputData, $permissions) {
+            // Find the role or fail if it doesn't exist
             $role = $this->roleModel->findOrFail($roleId);
 
+            // Update the role with the new input data
             $role->update($inputData);
 
-            // Update cache
+            // Update the cache for the role
             Cache::put("role_$roleId", $role, 60);
 
+            // If there are permissions, sync them with the role
             if (! empty($permissions)) {
                 $role->syncPermissions($permissions);
             }
 
-            // Menggunakan transformer untuk format response JSON API
+            // Get account_id from the input data
+            $accountId = $inputData['account_id'];
+
+            // Get list of pit_ids from the input data
+            $pitIds = $inputData['pit_id'];
+
+            // Remove old entries from role_has_pits and add the new ones
+            // First, delete all current role_has_pits for the role
+            RoleHasPit::where('role_id', $role->id)->delete();
+
+            // Then insert the new account_id and pit_id mappings
+            foreach ($pitIds as $pitId) {
+                RoleHasPit::create([
+                    'role_id' => $role->id,
+                    'account_id' => $accountId,
+                    'pit_id' => $pitId,
+                ]);
+            }
+
+            // Return the response in JSON API format using a transformer
             return $this->formatJsonApiResponse(
                 $this->transformer->transform($role)
             );

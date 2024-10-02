@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\System\Role;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -27,10 +29,13 @@ class StoreRoleRequest extends FormRequest
                 'required',
                 'string',
                 'regex:/^[\p{L}0-9 ]+$/u',
-                Rule::unique('roles', 'name')
+                Rule::unique('roles', 'name'),
             ],
             'permissions' => ['nullable', 'array'],
             'permissions.*' => ['integer'],
+            'account_id' => ['required', 'integer'],
+            'pit_id' => ['nullable', 'array'],
+            'pit_id.*' => ['integer'],
         ];
     }
 }
