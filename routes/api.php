@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\AuthController;
@@ -25,6 +26,10 @@ Route::middleware('auth:api')->group(function () {
             Route::post('/devices', [ReferenceModuleController::class, 'getDeviceData'])->name('getDeviceData');
             Route::post('/vehicles', [ReferenceModuleController::class, 'getVehicleData'])->name('getVehicleData');
             Route::post('/locations', [ReferenceModuleController::class, 'getLocationData'])->name('getLocationData');
+        });
+
+        Route::prefix('dashboard')->group(function () {
+            Route::get('trips', [DashboardController::class, 'readTrip'])->name('readTrip');
         });
     });
 
