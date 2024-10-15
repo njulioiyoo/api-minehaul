@@ -19,8 +19,8 @@ class DevicesTableSeeder extends Seeder
 
         for ($i = 1; $i <= 10; $i++) {
             $devices[] = [
-                'account_id' => rand(1, 10),
-                'pit_id' => rand(1, 10),
+                'account_id' => 1,
+                'pit_id' => 1,
                 'device_type_id' => rand(1, 4),
                 'device_make_id' => rand(1, 5),
                 'device_model_id' => rand(1, 5),

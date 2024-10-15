@@ -15,9 +15,9 @@ return new class extends Migration
     {
         Schema::create('geo_locations', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('location_id');
-            $table->decimal('latitude', 10, 8);
-            $table->decimal('longitude', 11, 8);
+            $table->foreignId('location_id')->constrained()->onDelete('cascade');
+            $table->float('latitude', 16, 2);
+            $table->float('longitude', 16, 2);
             $table->timestamps();
         });
     }

@@ -20,8 +20,8 @@ class DriverSeeder extends Seeder
 
         for ($i = 0; $i < 30; $i++) {
             DB::table('drivers')->insert([
-                'account_id' => rand(1, 10),
-                'pit_id' => rand(1, 10),
+                'account_id' => 1,
+                'pit_id' => 1,
                 'display_id' => $faker->regexify('[A-Za-z0-9]{10}'),
                 'name' => $faker->name(),
                 'email' => $faker->unique()->safeEmail(),
