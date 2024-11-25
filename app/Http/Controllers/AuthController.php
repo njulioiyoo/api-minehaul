@@ -102,12 +102,15 @@ class AuthController extends Controller
             'refresh_token' => 'required',
         ]);
 
-        // Handle OAuth token request using the refresh token grant and return the token
-        return response()->json(json_decode($this->handleOAuthTokenRequest([
+        // Use handleOAuthTokenRequest and ensure it returns a proper response
+        $response = $this->handleOAuthTokenRequest([
             'grant_type' => 'refresh_token',
             'refresh_token' => $request->input('refresh_token'),
             'scope' => '',
-        ])->getContent(), true));
+        ]);
+
+        // Handle OAuth token request using the refresh token grant and return the token
+        return response()->json(json_decode($response->getContent(), true), $response->getStatusCode());
     }
 
     public function logout(Request $request)
