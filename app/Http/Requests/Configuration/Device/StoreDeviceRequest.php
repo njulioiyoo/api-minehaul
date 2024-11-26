@@ -28,6 +28,7 @@ class StoreDeviceRequest extends FormRequest
             'device_ignition_type_id' => ['required', 'integer', 'exists:device_ignition_types,id'],
             'device_status_id' => ['nullable', 'integer', 'exists:device_statuses,id'],
             'vehicle_id' => ['required', 'integer', 'exists:vehicles,id'],
+            'location_id' => ['nullable', 'integer', 'exists:locations,id'],
         ];
     }
 }

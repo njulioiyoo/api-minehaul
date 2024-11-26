@@ -25,6 +25,7 @@ class UpdateDeviceRequest extends FormRequest
     {
         return [
             'pit_id' => ['nullable', 'integer', 'exists:pits,id'],
+            'location_id' => ['nullable', 'integer', 'exists:locations,id'],
             'device_type_id' => ['required', 'integer', 'exists:device_types,id'],
             'device_make_id' => ['required', 'integer', 'exists:device_makes,id'],
             'device_model_id' => ['nullable', 'integer', 'exists:device_models,id'],

@@ -17,23 +17,25 @@ return new class extends Migration
             $table->id()->bigIncrements()->primary();
             $table->foreignId('account_id')->constrained()->onDelete('cascade');
             $table->foreignId('pit_id')->constrained()->onDelete('cascade');
+            $table->foreignId('location_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('device_type_id')->constrained()->onDelete('cascade');
             $table->foreignId('device_make_id')->constrained()->onDelete('cascade');
             $table->foreignId('device_model_id')->constrained()->onDelete('cascade');
             $table->year('year')->nullable()->default(null);
             $table->string('display_id', 100)->nullable()->default(null);
             $table->string('name', 255)->nullable()->default(null);
-            $table->string('sim_id', 255)->nullable()->default(null);
+            $table->string('sim_id')->nullable()->default(null);
+            $table->text('tags', 255)->nullable()->default(null);
             $table->foreignId('device_immobilizitation_type_id')->constrained()->onDelete('cascade');
             $table->foreignId('device_ignition_type_id')->constrained()->onDelete('cascade');
-            $table->foreignId('vehicle_id')->constrained()->onDelete('cascade');
             $table->foreignId('device_status_id')->constrained()->onDelete('cascade');
+            $table->foreignId('vehicle_id')->constrained()->onDelete('cascade');
             $table->integer('created_by')->nullable()->default(null);
             $table->integer('updated_by')->nullable()->default(null);
-            $table->string('uid', 100)->nullable()->default(null);
 
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();
+            $table->string('uid', 100)->nullable()->default(null);
         });
     }
 

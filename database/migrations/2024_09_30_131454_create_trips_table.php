@@ -15,6 +15,8 @@ return new class extends Migration
     {
         Schema::create('trips', function (Blueprint $table) {
             $table->id()->primary();
+            $table->foreignId('account_id')->constrained()->onDelete('cascade');
+            $table->foreignId('pit_id')->constrained()->onDelete('cascade');
             $table->string('trip_type_id')->nullable();
             $table->string('driver_id')->nullable();
             $table->string('truck_id')->nullable();

@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ExternalApiController;
 use App\Http\Controllers\ReferenceModuleController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +18,10 @@ Route::middleware('json.api')->group(function () {
 Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::post('/api-token', [ApiTokenController::class, 'generateToken'])->middleware('json.api');
+
+    Route::prefix('wls')->group(function () {
+        Route::get('/get-updates', [ExternalApiController::class, 'getUpdates']);
+    });
 
     Route::middleware(['json.api', 'validate.api'])->group(function () {
         Route::get('me', [ProfileController::class, 'readProfile'])->name('readProfile');

@@ -20,8 +20,8 @@ class VehicleSeeder extends Seeder
 
         for ($i = 1; $i <= 10; $i++) {
             DB::table('vehicles')->insert([
-                'account_id' => rand(1, 10),
-                'pit_id' => rand(1, 10),
+                'account_id' => 1,
+                'pit_id' => 1,
                 'display_id' => 'V'.str_pad((string) $i, 4, '0', STR_PAD_LEFT),
                 'name' => $faker->company.' '.$faker->word,
                 'vin' => strtoupper($faker->bothify(strtoupper('??######??######?#'))),

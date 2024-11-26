@@ -75,4 +75,9 @@ class Location extends Model
     {
         return $this->belongsTo(LocationType::class, 'location_type_id');
     }
+
+    public function geoLocation()
+    {
+        return $this->belongsTo(GeoLocation::class, 'id', 'location_id');
+    }
 }

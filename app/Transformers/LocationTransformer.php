@@ -25,6 +25,7 @@ class LocationTransformer
                 'name' => $location->name,
                 'geom_type' => $location->geom_type,
                 'geom' => $location->geom,
+                'geo_location' => $this->transformRelation($location->geoLocation, ['id', 'latitude', 'longitude']),
                 'radius' => $location->radius,
             ],
         ];
