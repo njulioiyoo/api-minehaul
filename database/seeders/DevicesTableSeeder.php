@@ -18,6 +18,8 @@ class DevicesTableSeeder extends Seeder
         $devices = [];
 
         for ($i = 1; $i <= 10; $i++) {
+            $display_id = ($i <= 3) ? 'LS102' : 'LS'.str_pad((string) rand(103, 999), 3, '0', STR_PAD_LEFT);
+
             $devices[] = [
                 'account_id' => 1,
                 'pit_id' => 1,
@@ -25,7 +27,7 @@ class DevicesTableSeeder extends Seeder
                 'device_make_id' => rand(1, 5),
                 'device_model_id' => rand(1, 5),
                 'year' => rand(2018, 2024),
-                'display_id' => 'D'.str_pad((string) $i, 5, '0', STR_PAD_LEFT),
+                'display_id' => $display_id,
                 'name' => 'Device '.$i,
                 'sim_id' => 'SIM'.str_pad((string) $i, 10, '0', STR_PAD_LEFT),
                 'device_immobilizitation_type_id' => rand(1, 5),

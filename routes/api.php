@@ -20,7 +20,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/api-token', [ApiTokenController::class, 'generateToken'])->middleware('json.api');
 
     Route::prefix('wls')->group(function () {
-        Route::get('/get-updates', [ExternalApiController::class, 'getUpdates']);
+        Route::get('/sync-load-scanners', [ExternalApiController::class, 'syncTickets']);
     });
 
     Route::middleware(['json.api', 'validate.api'])->group(function () {

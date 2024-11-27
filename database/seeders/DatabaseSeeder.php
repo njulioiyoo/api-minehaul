@@ -50,5 +50,6 @@ class DatabaseSeeder extends Seeder
         $this->call(UnitOfMeasurementsSeeder::class);
 
         $this->call(DriverSeeder::class);
+        $this->call(TripTypesSeeder::class);
     }
 }
