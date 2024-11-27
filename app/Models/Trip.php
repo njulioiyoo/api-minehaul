@@ -8,7 +8,6 @@ use App\Models\Traits\HasAccountAndPit;
 use App\Models\Traits\HasAccountInfo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 class Trip extends Model
 {
@@ -35,12 +34,6 @@ class Trip extends Model
                     $device->account_id = $account->id;
                 }
             }
-
-            // Set default device_status_id to 1 if it is null
-            // $device->device_status_id ??= 1;
-
-            // $device->uid = $device->exists ? $device->uid : Str::uuid()->toString();
-            // $device->{$device->exists ? 'updated_by' : 'created_by'} = auth()->user()->id;
         });
 
         static::saved(function ($device) {
