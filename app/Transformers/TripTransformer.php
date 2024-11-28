@@ -6,6 +6,7 @@ namespace App\Transformers;
 
 use App\Models\Trip;
 use App\Traits\ExceptionHandlerTrait;
+use Carbon\Carbon;
 
 class TripTransformer
 {
@@ -18,29 +19,13 @@ class TripTransformer
             'id' => $trip->id,
             'attributes' => [
                 'id' => $trip->id,
-                'trip_type_id' => $trip->trip_type_id,
-                'driver_id' => $trip->driver_id,
-                'truck_id' => $trip->truck_id,
-                'excavator_id' => $trip->excavator_id,
-                'load_scanner_id' => $trip->load_scanner_id,
+                'account' => $this->transformRelation($trip->account, ['id', 'company_code', 'company_name']),
+                'pit' => $this->transformRelation($trip->pit, ['id', 'name', 'description']),
+                'trip_type' => $this->transformRelation($trip->tripType, ['id', 'name']),
+                'trip_load_scanner' => $this->transformRelation($trip->tripLoadScanner, ['id', 'ticket_no', 'ls_code', 'vehicle_vrm', 'vehicle_size', 'supplier_name', 'operator_name', 'full_scan_at', 'empty_scan_at', 'volume', 'sync_at', 'extras', 'created_at', 'updated_at', 'profile_id', 'user_id', 'material_type']),
+                'vehicle' => $this->transformRelation($trip->vehicle, ['id', 'display_id', 'name', 'vin', 'tags', 'license_plate']),
+                'device' => $this->transformRelation($trip->device, ['id', 'year', 'display_id', 'name', 'sim_id']),
                 'quantity' => $trip->quantity,
-                'trip_start_date' => $trip->trip_start_date,
-                'trip_end_date' => $trip->trip_end_date,
-                'trip_duration' => $trip->trip_duration,
-                'loading_queue_start_date' => $trip->loading_queue_start_date,
-                'loading_queue_end_date' => $trip->loading_queue_end_date,
-                'loading_queue_duration' => $trip->loading_queue_duration,
-                'loading_start_date' => $trip->loading_start_date,
-                'loading_end_date' => $trip->loading_end_date,
-                'loading_duration' => $trip->loading_duration,
-                'dumping_queue_start_date' => $trip->dumping_queue_start_date,
-                'dumping_queue_end_date' => $trip->dumping_queue_end_date,
-                'dumping_queue_duration' => $trip->dumping_queue_duration,
-                'dumping_start_date' => $trip->dumping_start_date,
-                'dumping_end_date' => $trip->dumping_end_date,
-                'dumping_duration' => $trip->dumping_duration,
-                'ref_id' => $trip->ref_id,
-                'last_ref_id' => $trip->last_ref_id,
             ],
         ];
     }
@@ -56,6 +41,15 @@ class TripTransformer
             return null;
         }
 
-        return $relation->only($fields);
+        $data = $relation->only($fields);
+
+        // Memproses nilai created_at dan updated_at jika ada di array fields
+        foreach (['created_at', 'updated_at'] as $dateField) {
+            if (isset($data[$dateField])) {
+                $data[$dateField] = Carbon::parse($data[$dateField])->format('Y-m-d H:i:s');
+            }
+        }
+
+        return $data;
     }
 }

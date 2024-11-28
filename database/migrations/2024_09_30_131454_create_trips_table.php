@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id()->primary();
             $table->foreignId('account_id')->constrained()->onDelete('cascade');
             $table->foreignId('pit_id')->constrained()->onDelete('cascade');
-            $table->string('trip_type_id')->nullable();
+            $table->integer('trip_type_id')->nullable();
             $table->string('trip_load_scanner_id')->nullable();
             $table->string('driver_id')->nullable();
             $table->string('truck_id')->nullable();

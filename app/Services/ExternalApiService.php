@@ -4,38 +4,46 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Helpers\PaginationHelper;
 use App\Models\Device;
 use App\Models\Trip;
 use App\Models\TripLoadScanner;
+use App\Transformers\TripTransformer;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
 
 class ExternalApiService
 {
-    protected Client $client;
+    protected $client;
 
-    public function __construct()
+    protected Trip $tripModel;
+
+    protected TripTransformer $transformer;
+
+    public function __construct(Trip $trip, TripTransformer $transformer)
     {
         $this->client = new Client([
             'base_uri' => config('minehaul.wls.load_scanner_url'),
             'timeout' => 10.0, // Timeout in seconds
         ]);
+
+        $this->tripModel = $trip;
+        $this->transformer = $transformer;
     }
 
     /**
-     * Fetch updates along with associated devices for the authenticated user's account.
+     * Fetches updates along with associated devices for the authenticated user's account.
      *
      * @param  int  $page  The page number for pagination (default is 1).
-     * @param  int  $limit  The number of results per page (default is 5).
-     * @param  string  $displayId  The display ID to filter devices (optional).
+     * @param  int  $limit  The number of results per page (default is 10).
      * @return array An array of valid responses containing device and update data,
      *               or an error array if exceptions occur.
      *
      * @throws \Exception If the account or devices are not found for the authenticated user.
      * @throws RequestException If an error occurs during the API request for updates.
      */
-    public function getUpdatesWithDevices(int $page = 1, int $limit = 5, string $displayId = ''): array
+    public function getUpdatesWithDevices($page = 1, $limit = 5, $displayId = '')
     {
         try {
             // Retrieve the authenticated user
@@ -53,8 +61,7 @@ class ExternalApiService
                 'account_id' => $account->id,
                 'device_type_id' => 3,
             ])
-                ->orWhere('name', 'like', '%'.$displayId.'%')
-                ->get();
+                ->orWhere('name', 'like', '%'.$displayId.'%')->get();
 
             if ($devices->isEmpty()) {
                 throw new \Exception('No devices found for the given account.');
@@ -71,7 +78,7 @@ class ExternalApiService
 
                 try {
                     // Make the GET request for the current device
-                    $response = $this->client->get('get_updates', [
+                    $response = $this->client->get('tickets/get_updates', [
                         'headers' => [
                             'accept' => 'application/json',
                             'X-Unit-Code' => $unitCode, // Dynamic X-Unit-Code for each device
@@ -121,15 +128,42 @@ class ExternalApiService
     }
 
     /**
-     * Fetch tickets using updates by calling the ExternalApiService.
+     * Fetches tickets using updates by calling the ExternalApiService.
      *
-     * @param  int  $page  The page number for pagination.
-     * @param  int  $limit  The number of results per page.
-     * @param  string  $displayId  The display ID to filter devices (optional).
-     * @param  int  $clean  Flag to specify whether to clean existing tickets.
-     * @return array A collection of ticket responses.
+     * The method takes three query parameters: page, limit, and clean. The page
+     * parameter is used to specify the page number of the results to return. The
+     * limit parameter is used to specify the number of results to return per
+     * page. The clean parameter is used to specify whether the existing tickets
+     * should be cleaned before fetching new ones.
+     *
+     * If the request is successful, the method returns a JSON response with a
+     * structure like the following:
+     *
+     * [
+     *     'success' => true,
+     *     'data' => [
+     *         [
+     *             'display_id' => string,
+     *             'ticket_id' => string,
+     *             'data' => array,
+     *         ],
+     *         // ...
+     *     ],
+     * ]
+     *
+     * If an error occurs during the request, the method logs the error and
+     * returns a structured error response. The error response will have a
+     * structure like the following:
+     *
+     * [
+     *     'success' => false,
+     *     'error' => [
+     *         'code' => integer,
+     *         'message' => string,
+     *     ],
+     * ]
      */
-    public function fetchTicketsUsingUpdates(int $page, int $limit, string $displayId, int $clean = 0): array
+    public function fetchTicketsUsingUpdates($page, $limit, $displayId, $clean = 1)
     {
         try {
             // Fetch updates and associated device data
@@ -166,14 +200,11 @@ class ExternalApiService
 
                     try {
                         // Make the GET request for the ticket
-                        $response = $this->client->get("tickets/{$ticketId}", [
+                        $response = $this->client->get("tickets/{$ticketId}?clean=$clean", [
                             'headers' => [
                                 'accept' => 'application/json',
                                 'X-Unit-Code' => $displayId,
                                 'api-key' => config('minehaul.wls.load_scanner_key'),
-                            ],
-                            'query' => [
-                                'clean' => $clean,
                             ],
                         ]);
 
@@ -217,11 +248,15 @@ class ExternalApiService
     /**
      * Creates a new trip in the database based on the provided ticket ID, display ID, and response data.
      *
+     * This method attempts to create a trip record using the given information.
+     * It logs a success message upon successful creation and logs an error message
+     * if an exception occurs during the trip creation process.
+     *
      * @param  string  $ticketId  The unique identifier of the ticket.
      * @param  string  $displayId  The display identifier associated with the device.
      * @param  array  $responseData  The response data containing trip details.
      */
-    private function createTripFromTicket(string $ticketId, string $displayId, array $responseData, array $getUpdatesWithDevices): void
+    private function createTripFromTicket(string $ticketId, string $displayId, array $responseData, array $getUpdatesWithDevices)
     {
         // Get the nested 'data' array from the response
         $data = $responseData['data'];
@@ -234,5 +269,29 @@ class ExternalApiService
         } catch (\Exception $e) {
             Log::error("Error creating trip for ticket_id {$ticketId} and display_id {$displayId}: ".$e->getMessage());
         }
+    }
+
+    public function fetchTripLoadScanners(array $queryParams)
+    {
+        $perPage = $queryParams['page']['size'] ?? 10;
+        $page = $queryParams['page']['number'] ?? 1;
+
+        $query = $this->tripModel->with(['driver', 'tripType']);
+
+        // Apply filters if any
+        if (isset($queryParams['filter'])) {
+            foreach ($queryParams['filter'] as $field => $value) {
+                $query->where($field, $value);
+            }
+        }
+
+        // Get paginated trip data
+        $trips = $query->paginate($perPage, ['*'], 'page[number]', $page);
+
+        // Transform device data using the transformer
+        $data = $trips->map(fn ($trip) => $this->transformer->transform($trip))->values()->all();
+
+        // Return paginated data with formatting
+        return PaginationHelper::format($trips, $data);
     }
 }

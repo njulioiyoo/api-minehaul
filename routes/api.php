@@ -20,6 +20,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/api-token', [ApiTokenController::class, 'generateToken'])->middleware('json.api');
 
     Route::prefix('wls')->group(function () {
+        Route::get('/trip-load-scanners', [ExternalApiController::class, 'tripLoadScanners']);
         Route::get('/sync-load-scanners', [ExternalApiController::class, 'syncTickets']);
     });
 
@@ -35,6 +36,7 @@ Route::middleware('auth:api')->group(function () {
 
         Route::prefix('dashboard')->group(function () {
             Route::get('trips', [DashboardController::class, 'readTrip'])->name('readTrip');
+            Route::get('production', [DashboardController::class, 'readProduction'])->name('readProduction');
         });
     });
 

@@ -38,7 +38,6 @@ class DeviceService
     public function createDevice(array $inputData)
     {
         return DB::transaction(function () use ($inputData) {
-            dd($this->formatJsonApiResponse($inputData));
             // Create a new device within a transaction
             $device = $this->deviceModel->create($inputData);
 

@@ -45,4 +45,24 @@ class Trip extends Model
     {
         return $this->belongsTo(Driver::class);
     }
+
+    public function tripType()
+    {
+        return $this->belongsTo(TripType::class);
+    }
+
+    public function tripLoadScanner()
+    {
+        return $this->belongsTo(TripLoadScanner::class);
+    }
+
+    public function vehicle()
+    {
+        return $this->belongsTo(Vehicle::class, 'truck_id', 'id');
+    }
+
+    public function device()
+    {
+        return $this->belongsTo(Device::class, 'load_scanner_id', 'id');
+    }
 }
