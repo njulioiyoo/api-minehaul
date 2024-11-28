@@ -128,120 +128,103 @@ class ExternalApiService
     }
 
     /**
-     * Fetches tickets using updates by calling the ExternalApiService.
+     * Fetches tickets using updates retrieved from an external service.
      *
-     * The method takes three query parameters: page, limit, and clean. The page
-     * parameter is used to specify the page number of the results to return. The
-     * limit parameter is used to specify the number of results to return per
-     * page. The clean parameter is used to specify whether the existing tickets
-     * should be cleaned before fetching new ones.
-     *
-     * If the request is successful, the method returns a JSON response with a
-     * structure like the following:
-     *
-     * [
-     *     'success' => true,
-     *     'data' => [
-     *         [
-     *             'display_id' => string,
-     *             'ticket_id' => string,
-     *             'data' => array,
-     *         ],
-     *         // ...
-     *     ],
-     * ]
-     *
-     * If an error occurs during the request, the method logs the error and
-     * returns a structured error response. The error response will have a
-     * structure like the following:
-     *
-     * [
-     *     'success' => false,
-     *     'error' => [
-     *         'code' => integer,
-     *         'message' => string,
-     *     ],
-     * ]
+     * @param  int  $page  The current page for pagination.
+     * @param  int  $limit  The number of records per page.
+     * @param  string  $displayId  The display ID for filtering updates.
+     * @param  int  $clean  Whether to clean the ticket data (default: 1).
+     * @return array The list of ticket responses or an error message.
      */
     public function fetchTicketsUsingUpdates($page, $limit, $displayId, $clean = 1)
     {
         try {
-            // Fetch updates and associated device data
+            // Retrieve updates with associated device information
             $updates = $this->getUpdatesWithDevices($page, $limit, $displayId);
 
-            // Check if updates contain errors
+            // Check for errors in the updates response
             if (isset($updates['error']) && $updates['error']) {
                 throw new \Exception($updates['message'] ?? 'Error fetching updates.');
             }
 
-            $ticketResponses = []; // To store ticket responses for each device
+            $ticketResponses = []; // Initialize an array to store ticket responses
 
             // Iterate over each update
             foreach ($updates as $update) {
                 $displayId = $update['display_id'] ?? null;
-                $data = $update['data']['data'] ?? []; // Assuming 'data' contains an array of items
+                $data = $update['data']['data'] ?? []; // Extract ticket data from the update
 
-                // Check if 'data' is not empty
+                // Skip if no ticket data is found
                 if (empty($data)) {
-                    Log::info("No data found in update for display_id {$displayId}. Skipping...");
+                    Log::info("No data found for display_id {$displayId}. Skipping...");
 
                     continue;
                 }
 
-                // Loop through the 'data' array to get ticket_id
-                foreach ($data as $ticketData) {
-                    $ticketId = $ticketData ?? null; // Assuming each item in 'data' has a 'ticket_id'
-
+                // Process each ticket in the data array
+                foreach ($data as $ticketId) {
                     if (! $ticketId) {
-                        Log::info("Missing ticket_id in data for display_id {$displayId}. Skipping...");
+                        Log::info("Missing ticket_id for display_id {$displayId}. Skipping...");
 
                         continue;
                     }
 
-                    try {
-                        // Make the GET request for the ticket
-                        $response = $this->client->get("tickets/{$ticketId}?clean=$clean", [
-                            'headers' => [
-                                'accept' => 'application/json',
-                                'X-Unit-Code' => $displayId,
-                                'api-key' => config('minehaul.wls.load_scanner_key'),
-                            ],
-                        ]);
-
-                        // Decode the JSON response
-                        $responseData = json_decode($response->getBody()->getContents(), true);
-
-                        // Store the valid response along with ticket details
-                        $ticketResponses[] = [
-                            'display_id' => $displayId,
-                            'ticket_id' => $ticketId,
-                            'data' => $responseData,
-                        ];
-
-                        // Insert data into the Trip model after successful ticket retrieval
-                        $this->createTripFromTicket($ticketId, $displayId, $responseData, $update);
-                    } catch (RequestException $e) {
-                        // Check for 404 status code
-                        if ($e->getResponse() && $e->getResponse()->getStatusCode() === 404) {
-                            Log::info("Ticket not found for display_id {$displayId} and ticket_id {$ticketId}");
-
-                            continue; // Skip processing this ticket
-                        }
-
-                        // Rethrow other exceptions
-                        throw $e;
-                    }
+                    // Process the individual ticket
+                    $this->processTicket($ticketId, $displayId, $clean, $ticketResponses, $update);
                 }
             }
 
-            // Return all collected ticket responses
+            // Return all successfully processed ticket responses
             return $ticketResponses;
         } catch (\Exception $e) {
-            // Handle exceptions and return an error response
-            return [
-                'error' => true,
-                'message' => $e->getMessage(),
+            // Return an error response in case of failure
+            return ['error' => true, 'message' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Processes an individual ticket by retrieving its data and storing it.
+     *
+     * @param  mixed  $ticketId  The ID of the ticket to process.
+     * @param  string  $displayId  The display ID associated with the ticket.
+     * @param  int  $clean  Whether to clean the ticket data.
+     * @param  array  &$ticketResponses  A reference to the array storing ticket responses.
+     * @param  array  $update  The original update data associated with the ticket.
+     *
+     * @throws RequestException Throws an exception if the ticket request fails.
+     */
+    private function processTicket($ticketId, $displayId, $clean, &$ticketResponses, $update)
+    {
+        try {
+            // Send a GET request to fetch ticket details
+            $response = $this->client->get("tickets/{$ticketId}?clean={$clean}", [
+                'headers' => [
+                    'accept' => 'application/json',
+                    'X-Unit-Code' => $displayId,
+                    'api-key' => config('minehaul.wls.load_scanner_key'),
+                ],
+            ]);
+
+            // Decode the JSON response
+            $responseData = json_decode($response->getBody()->getContents(), true);
+
+            // Add the response to the ticketResponses array
+            $ticketResponses[] = [
+                'display_id' => $displayId,
+                'ticket_id' => $ticketId,
+                'data' => $responseData,
             ];
+
+            // Store the ticket data in the Trip model
+            $this->createTripFromTicket($ticketId, $displayId, $responseData, $update);
+        } catch (RequestException $e) {
+            // Handle 404 errors gracefully
+            if ($e->getResponse() && $e->getResponse()->getStatusCode() === 404) {
+                Log::info("Ticket not found for display_id {$displayId} and ticket_id {$ticketId}");
+            } else {
+                // Re-throw other exceptions
+                throw $e;
+            }
         }
     }
 

@@ -22,60 +22,29 @@ class ExternalApiController extends Controller
     }
 
     /**
-     * Fetches tickets using updates by calling the ExternalApiService.
+     * Synchronizes tickets by fetching updates from an API service.
      *
-     * The method takes three query parameters: page, limit, and clean. The page
-     * parameter is used to specify the page number of the results to return. The
-     * limit parameter is used to specify the number of results to return per
-     * page. The clean parameter is used to specify whether the existing tickets
-     * should be cleaned before fetching new ones.
-     *
-     * If the request is successful, the method returns a JSON response with a
-     * structure like the following:
-     *
-     * [
-     *     'success' => true,
-     *     'data' => [
-     *         [
-     *             'display_id' => string,
-     *             'ticket_id' => string,
-     *             'data' => array,
-     *         ],
-     *         // ...
-     *     ],
-     * ]
-     *
-     * If an error occurs during the request, the method logs the error and
-     * returns a structured error response. The error response will have a
-     * structure like the following:
-     *
-     * [
-     *     'success' => false,
-     *     'error' => [
-     *         'code' => integer,
-     *         'message' => string,
-     *     ],
-     * ]
+     * @param  Request  $request  The HTTP request containing query parameters.
+     * @return JsonResponse The JSON response with fetched ticket data or error details.
      */
     public function syncTickets(Request $request): JsonResponse
     {
         try {
-            // Retrieve the query parameters from the request
+            // Retrieve query parameters from the request
             $page = $request->query('page', 1);
             $limit = $request->query('limit', 5);
             $displayId = $request->query('display_id', '');
             $clean = $request->query('clean', 0);
 
-            // Call the service to fetch tickets using updates
+            // Call the service to fetch tickets using the updates
             $response = $this->apiService->fetchTicketsUsingUpdates($page, $limit, $displayId, $clean);
 
-            // Return the response in JSON format
+            // Return the fetched data in JSON format
             return response()->json($response);
         } catch (\Exception $e) {
-            // Log the error
-            Log::error('Error fetching tickets using updates: '.$e->getMessage(), ['exception' => $e]);
+            // Log the error and return a structured error response
+            Log::error('Error syncing tickets: '.$e->getMessage(), ['exception' => $e]);
 
-            // Return a structured error response
             return $this->handleException($e, 'Error syncing tickets.');
         }
     }
