@@ -30,19 +30,24 @@ class ExternalApiController extends Controller
     public function syncTickets(Request $request): JsonResponse
     {
         try {
-            // Retrieve query parameters from the request
-            $page = $request->query('page', 1);
-            $limit = $request->query('limit', 5);
-            $displayId = $request->query('display_id', '');
-            $clean = $request->query('clean', 0);
+            // Retrieve query parameters and set defaults where necessary
+            $queryParams = $request->query() + [
+                'page' => 1,
+                'limit' => 5,
+                'display_id' => '',
+                'clean' => 0,
+            ];
 
-            // Call the service to fetch tickets using the updates
-            $response = $this->apiService->fetchTicketsUsingUpdates($page, $limit, $displayId, $clean);
+            // Pass the parameters to the service
+            $response = $this->apiService->fetchTicketsUsingUpdates(
+                $queryParams['page'],
+                $queryParams['limit'],
+                $queryParams['display_id'],
+                $queryParams['clean']
+            );
 
-            // Return the fetched data in JSON format
             return response()->json($response);
         } catch (\Exception $e) {
-            // Log the error and return a structured error response
             Log::error('Error syncing tickets: '.$e->getMessage(), ['exception' => $e]);
 
             return $this->handleException($e, 'Error syncing tickets.');

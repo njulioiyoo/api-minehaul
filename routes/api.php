@@ -8,6 +8,8 @@ use App\Http\Controllers\ApiTokenController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ExternalApiController;
 use App\Http\Controllers\ReferenceModuleController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('json.api')->group(function () {
@@ -42,4 +44,19 @@ Route::middleware('auth:api')->group(function () {
 
     require base_path('routes/api/configuration.php');
     require base_path('routes/api/system.php');
+});
+
+Route::post('send-data-load-scanner', function (Request $request) {
+    DB::table('scanner_logs')->insert([
+        'headers' => json_encode($request->headers->all()),
+        'url' => $request->fullUrl(),
+        'ip' => $request->ip(),
+        'body' => $request->getContent(),
+        'user_agent' => $request->header('User-Agent'),
+        'method' => $request->method(),
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    return response()->json(['message' => 'Data received and stored'], 200);
 });
