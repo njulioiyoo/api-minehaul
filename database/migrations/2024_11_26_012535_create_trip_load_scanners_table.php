@@ -14,8 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('trip_load_scanners', function (Blueprint $table) {
-            $table->uuid('id')->primary(); // UUID sebagai primary key
-            $table->uuid('ticket_uuid')->unique();
+            $table->text('id')->primary();
             $table->string('ticket_no')->unique();
             $table->string('ls_code');
             $table->string('vehicle_vrm');
@@ -26,12 +25,12 @@ return new class extends Migration
             $table->timestamp('empty_scan_at')->nullable();
             $table->integer('volume');
             $table->timestamp('sync_at')->nullable();
-            $table->jsonb('extras'); // JSONB untuk performa lebih baik dalam PostgreSQL
+            $table->jsonb('extras')->nullable(); // JSONB untuk performa lebih baik dalam PostgreSQL
             $table->timestamp('created_at')->nullable(); // Kolom createdAt
             $table->timestamp('updated_at')->nullable(); // Kolom updatedAt
             $table->uuid('profile_id'); // UUID untuk profileId
             $table->uuid('user_id'); // UUID untuk userId
-            $table->jsonb('material_type'); // JSONB untuk materialType
+            $table->jsonb('material_type')->nullable(); // JSONB untuk materialType
         });
     }
 

@@ -22,28 +22,56 @@ class ExternalApiController extends Controller
     }
 
     /**
-     * Calls the external API and returns the response from the API.
+     * Synchronizes tickets by fetching updates from an API service.
      *
-     * The page and limit query parameters are used to fetch the required number of updates.
-     * If the parameters are not provided, the default values of 1 (page) and 10 (limit) are used.
+     * @param  Request  $request  The HTTP request containing query parameters.
+     * @return JsonResponse The JSON response with fetched ticket data or error details.
      */
-    public function getUpdates(Request $request): JsonResponse
+    public function syncTickets(Request $request): JsonResponse
     {
         try {
-            // Get query parameters from the request
-            $queryParams = $request->query();
+            // Retrieve query parameters from the request
+            $page = $request->query('page', 1);
+            $limit = $request->query('limit', 5);
+            $displayId = $request->query('display_id', '');
+            $clean = $request->query('clean', 0);
 
-            // Call the external API through the service
-            $response = $this->apiService->getUpdates($queryParams['page'] ?? 1, $queryParams['limit'] ?? 10);
+            // Call the service to fetch tickets using the updates
+            $response = $this->apiService->fetchTicketsUsingUpdates($page, $limit, $displayId, $clean);
 
-            // Return the response from the external API
+            // Return the fetched data in JSON format
             return response()->json($response);
         } catch (\Exception $e) {
-            // Log the error if an exception occurs
-            Log::error($e->getMessage(), ['exception' => $e]);
+            // Log the error and return a structured error response
+            Log::error('Error syncing tickets: '.$e->getMessage(), ['exception' => $e]);
 
-            // Handle the exception and return an error response
-            return $this->handleException($e, 'Error fetching updates');
+            return $this->handleException($e, 'Error syncing tickets.');
+        }
+    }
+
+    /**
+     * Fetch trip load scanners based on query parameters.
+     *
+     * @param  Request  $request  The incoming request with query parameters.
+     * @return JsonResponse A JSON response containing the trip load scanners.
+     */
+    public function tripLoadScanners(Request $request): JsonResponse
+    {
+        try {
+            // Retrieve query parameters from the request
+            $queryParams = $request->query();
+
+            // Call the service to fetch trip load scanners
+            $response = $this->apiService->fetchTripLoadScanners($queryParams);
+
+            // Return the response in JSON format
+            return response()->json($response);
+        } catch (\Exception $e) {
+            // Log the error
+            Log::error('Error fetching trip load scanners: '.$e->getMessage(), ['exception' => $e]);
+
+            // Return a structured error response
+            return $this->handleException($e, 'Error fetching trip load scanners.');
         }
     }
 }

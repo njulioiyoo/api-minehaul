@@ -27,4 +27,15 @@ class DashboardController extends Controller
         } catch (\Exception $e) {
         }
     }
+
+    public function readProduction()
+    {
+        try {
+            $response = $this->dashboardService->readProduction();
+
+            return response()->json($response);
+        } catch (\Exception $e) {
+            dd($e);
+        }
+    }
 }
