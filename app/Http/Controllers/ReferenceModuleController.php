@@ -31,7 +31,7 @@ class ReferenceModuleController extends Controller
     private function handleData(Request $request, string $typeKey, string $transformMethod, string $errorMessage)
     {
         try {
-            $type = $request->input("data.{$typeKey}", null);
+            $type = $request->get($typeKey, null);
 
             // Dapatkan data lengkap dari transform method
             $allData = $this->transformer->{$transformMethod}();
@@ -54,10 +54,8 @@ class ReferenceModuleController extends Controller
             return response()->json([
                 'jsonapi' => $this->getJsonApiVersion(),
                 'data' => [
-                    [
-                        'type' => $type ?? 'all',
-                        'attributes' => $attributes,
-                    ],
+                    'type' => $type ?? 'all',
+                    'attributes' => $attributes,
                 ],
             ]);
         } catch (\Exception $e) {

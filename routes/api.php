@@ -31,9 +31,9 @@ Route::middleware('auth:api')->group(function () {
         Route::patch('me', [ProfileController::class, 'updateProfile']);
 
         Route::prefix('reference')->group(function () {
-            Route::post('/devices', [ReferenceModuleController::class, 'getDeviceData'])->name('getDeviceData');
-            Route::post('/vehicles', [ReferenceModuleController::class, 'getVehicleData'])->name('getVehicleData');
-            Route::post('/locations', [ReferenceModuleController::class, 'getLocationData'])->name('getLocationData');
+            Route::get('/devices', [ReferenceModuleController::class, 'getDeviceData'])->name('getDeviceData');
+            Route::get('/vehicles', [ReferenceModuleController::class, 'getVehicleData'])->name('getVehicleData');
+            Route::get('/locations', [ReferenceModuleController::class, 'getLocationData'])->name('getLocationData');
         });
 
         Route::prefix('dashboard')->group(function () {
