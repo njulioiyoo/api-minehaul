@@ -59,20 +59,37 @@ class RoleTransformer
             ->where('roles.id', '=', $role->id);
 
         if ($isRoleAccessRoute) {
-            $result = $baseQuery
+            $results = $baseQuery
                 ->where('model_has_roles.model_id', '=', auth()->user()->id)
-                ->first($this->getSelectFields());
+                ->get($this->getSelectFields());
 
-            // Konversi objek menjadi array
-            return $result ? (array) $result : [];
+            // Format data untuk struktur one-to-many
+            return $results->groupBy('account_id')->map(function ($groupedAccounts) {
+                $account = $groupedAccounts->first();
+
+                return [
+                    'id' => $account->account_id,
+                    'company_code' => $account->company_code,
+                    'company_name' => $account->company_name,
+                    'uid' => $account->account_uid,
+                    'pits' => $groupedAccounts->map(function ($item) {
+                        return [
+                            'id' => $item->pit_id,
+                            'name' => $item->pit_name,
+                            'description' => $item->pit_description,
+                            'uid' => $item->pit_uid,
+                        ];
+                    })->toArray(),
+                ];
+            })->values()->toArray();
         }
 
-        $result = $baseQuery
+        $results = $baseQuery
             ->groupBy('account_id')
             ->get($this->getSelectFields());
 
         // Konversi Collection menjadi array
-        return $result->map(function ($groupedAccounts) {
+        return $results->map(function ($groupedAccounts) {
             $account = $groupedAccounts->first();
 
             return [
@@ -89,9 +106,7 @@ class RoleTransformer
                     ];
                 })->toArray(),
             ];
-        })
-            ->values()
-            ->toArray();
+        })->values()->toArray();
     }
 
     /**
