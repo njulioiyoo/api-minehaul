@@ -29,6 +29,7 @@ Route::middleware('auth:api')->group(function () {
     Route::middleware(['json.api', 'validate.api'])->group(function () {
         Route::get('me', [ProfileController::class, 'readProfile'])->name('readProfile');
         Route::patch('me', [ProfileController::class, 'updateProfile']);
+        Route::get('role-access', [ProfileController::class, 'roleAccess'])->name('roleAccess');
 
         Route::prefix('reference')->group(function () {
             Route::get('/devices', [ReferenceModuleController::class, 'getDeviceData'])->name('getDeviceData');

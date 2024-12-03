@@ -8,10 +8,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\System\User\UpdateUserRequest;
 use App\Models\User;
 use App\Services\RequestHelperService;
+use App\Services\System\Role\RoleService;
 use App\Services\System\User\UserService;
 use App\Traits\ExceptionHandlerTrait;
+use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Responses\DataResponse;
 use LaravelJsonApi\Core\Responses\ErrorResponse;
+use Spatie\Permission\Models\Role;
 
 class ProfileController extends Controller
 {
@@ -21,10 +24,13 @@ class ProfileController extends Controller
 
     protected $requestHelperService;
 
-    public function __construct(UserService $userService, RequestHelperService $requestHelperService)
+    protected $roleService;
+
+    public function __construct(UserService $userService, RequestHelperService $requestHelperService, RoleService $roleService)
     {
         $this->userService = $userService;
         $this->requestHelperService = $requestHelperService;
+        $this->roleService = $roleService;
     }
 
     public function readProfile()
@@ -57,6 +63,21 @@ class ProfileController extends Controller
             return response()->json($user);
         } catch (\Exception $e) {
             return $this->handleException($e, 'Error updating user');
+        }
+    }
+
+    public function roleAccess(Request $request)
+    {
+        try {
+            $queryParams = $request->query();
+
+            $role = Role::findOrFail($queryParams['id']);
+
+            return $this->formatJsonApiResponse(
+                app('App\Transformers\RoleTransformer')->transform($role)
+            );
+        } catch (\Exception $e) {
+            return $this->handleException($e, 'Error fetching role data');
         }
     }
 }
