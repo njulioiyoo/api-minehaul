@@ -14,8 +14,6 @@ class UserTransformer
 
     public function transform(User $user): array
     {
-        $isProfileRoute = request()->route()->getName() === 'readProfile';
-
         // Mengambil data roles dan pits dari database
         $rolesData = DB::table('roles')
             ->join('role_has_pits', 'roles.id', '=', 'role_has_pits.role_id')
@@ -40,20 +38,6 @@ class UserTransformer
                 return [
                     'id' => $role->role_id,
                     'name' => $role->role_name,
-                    'account' => [
-                        'id' => $role->account_id,
-                        'company_code' => $role->company_code,
-                        'company_name' => $role->company_name,
-                        'uid' => $role->account_uid,
-                        'pits' => $groupedRoles->map(function ($item) {
-                            return [
-                                'id' => $item->pit_id,
-                                'name' => $item->pit_name,
-                                'description' => $item->pit_description,
-                                'uid' => $item->pit_uid,
-                            ];
-                        })->toArray(),
-                    ],
                 ];
             })
             ->values()
@@ -74,10 +58,6 @@ class UserTransformer
                 ],
             ],
         ];
-
-        if ($isProfileRoute) {
-            $data['attributes']['menus'] = $user->getMenusForRole();
-        }
 
         return $data;
     }
