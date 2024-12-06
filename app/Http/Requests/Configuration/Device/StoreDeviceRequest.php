@@ -24,10 +24,10 @@ class StoreDeviceRequest extends FormRequest
             'display_id' => ['required', 'string', 'regex:/^[A-Za-z0-9_-]+$/'],
             'name' => ['required', 'string', 'regex:/^[\p{L}0-9 ]+$/u'],
             'sim_id' => ['nullable', 'string', 'regex:/^[0-9]{10,20}$/'],
-            'device_immobilizitation_type_id' => ['required', 'integer', 'exists:device_immobilizitation_types,id'],
-            'device_ignition_type_id' => ['required', 'integer', 'exists:device_ignition_types,id'],
+            'device_immobilizitation_type_id' => ['nullable', 'integer', 'exists:device_immobilizitation_types,id'],
+            'device_ignition_type_id' => ['nullable', 'integer', 'exists:device_ignition_types,id'],
             'device_status_id' => ['nullable', 'integer', 'exists:device_statuses,id'],
-            'vehicle_id' => ['required', 'integer', 'exists:vehicles,id'],
+            // 'vehicle_id' => ['required', 'integer', 'exists:vehicles,id'],
             'location_id' => ['nullable', 'integer', 'exists:locations,id'],
         ];
     }

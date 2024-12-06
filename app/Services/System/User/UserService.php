@@ -6,6 +6,7 @@ namespace App\Services\System\User;
 
 use App\Helpers\PaginationHelper;
 use App\Models\People;
+use App\Models\RoleHasPit;
 use App\Models\User;
 use App\Traits\ExceptionHandlerTrait;
 use App\Transformers\UserTransformer;
@@ -165,6 +166,9 @@ class UserService
             // If roles are provided, update roles and permissions
             if (! empty($roles)) {
                 $this->updateRolesAndPermissions($user, $roles);
+
+                // Synchronize RoleHasPit for the roles
+                $this->syncRolePits($user, $roles);
             }
 
             // Return the updated user as a JSON API response
@@ -216,5 +220,47 @@ class UserService
         return $this->formatJsonApiResponse(
             $this->transformer->transform($user)
         );
+    }
+
+    /**
+     * Synchronizes RoleHasPit data for a user based on roles using Query Builder.
+     *
+     * @param  \App\Models\User  $user
+     * @param  array  $roles  An array of role IDs.
+     * @return void
+     */
+    private function syncRolePits($user, array $roles)
+    {
+        $roleHasPitData = [];
+
+        // Retrieve pit IDs associated with the given roles using Query Builder
+        $pitIds = DB::table('pits')
+            ->whereIn('role_id', $roles)
+            ->pluck('id')
+            ->unique();
+
+        // Build data for RoleHasPit insertion
+        foreach ($roles as $roleId) {
+            foreach ($pitIds as $pitId) {
+                $roleHasPitData[] = [
+                    'role_id' => $roleId,
+                    'account_id' => $user->id,
+                    'pit_id' => $pitId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+        }
+
+        // Synchronize RoleHasPit table
+        DB::transaction(function () use ($roleHasPitData, $user) {
+            // Delete existing RoleHasPit entries for this user's roles
+            DB::table('role_has_pits')->where('account_id', $user->id)->delete();
+
+            // Insert new RoleHasPit entries
+            if (! empty($roleHasPitData)) {
+                DB::table('role_has_pits')->insert($roleHasPitData);
+            }
+        });
     }
 }
