@@ -231,6 +231,7 @@ class UserService
      */
     private function syncRolePits($user, array $roles)
     {
+        dd($roles);
         $roleHasPitData = [];
 
         // Retrieve pit IDs associated with the given roles using Query Builder
@@ -241,15 +242,15 @@ class UserService
 
         // Build data for RoleHasPit insertion
         foreach ($roles as $roleId) {
-            foreach ($pitIds as $pitId) {
-                $roleHasPitData[] = [
-                    'role_id' => $roleId,
-                    'account_id' => $user->id,
-                    'pit_id' => $pitId,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            }
+            // foreach ($pitIds as $pitId) {
+            $roleHasPitData[] = [
+                'role_id' => $roleId,
+                'account_id' => $user->id,
+                'pit_id' => $pitId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+            // }
         }
 
         // Synchronize RoleHasPit table
