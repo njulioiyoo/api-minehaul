@@ -88,4 +88,9 @@ class Device extends Model
     {
         return $this->belongsTo(Vehicle::class, 'vehicle_id')->select('id', 'name');
     }
+
+    public function locationId()
+    {
+        return $this->belongsTo(Location::class, 'location_id');
+    }
 }

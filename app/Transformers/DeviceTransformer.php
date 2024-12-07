@@ -21,6 +21,7 @@ class DeviceTransformer
                 'uid' => $device->uid,
                 'account' => $this->transformRelation($device->account, ['id', 'company_code', 'company_name']),
                 'pit' => $this->transformRelation($device->pit, ['id', 'name', 'description']),
+                'location' => $this->transformRelation($device->locationId, ['id', 'name', 'geom_type', 'geom', 'radius']),
                 'device_type' => $this->transformRelation($device->deviceType, ['id', 'name']),
                 'device_make' => $this->transformRelation($device->deviceMake, ['id', 'name']),
                 'device_model' => $this->transformRelation($device->deviceModel, ['id', 'name']),
