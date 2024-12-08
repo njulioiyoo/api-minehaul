@@ -231,34 +231,41 @@ class UserService
      */
     private function syncRolePits($user, array $roles)
     {
-        dd($roles);
-        $roleHasPitData = [];
+        // Ensure account_id is always treated as an array
+        $accountIds = (array) $user->people->account_id;
 
-        // Retrieve pit IDs associated with the given roles using Query Builder
+        // Retrieve unique pit IDs associated with the account IDs
         $pitIds = DB::table('pits')
-            ->whereIn('role_id', $roles)
+            ->whereIn('account_id', $accountIds)
             ->pluck('id')
             ->unique();
 
-        // Build data for RoleHasPit insertion
-        foreach ($roles as $roleId) {
-            // foreach ($pitIds as $pitId) {
-            $roleHasPitData[] = [
-                'role_id' => $roleId,
-                'account_id' => $user->id,
-                'pit_id' => $pitId,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-            // }
+        if ($pitIds->isEmpty()) {
+            // If no pits are found, delete existing data and return early
+            DB::table('role_has_pits')->where('account_id', $user->people->account_id)->delete();
+
+            return;
         }
 
-        // Synchronize RoleHasPit table
-        DB::transaction(function () use ($roleHasPitData, $user) {
-            // Delete existing RoleHasPit entries for this user's roles
-            DB::table('role_has_pits')->where('account_id', $user->id)->delete();
+        // Build the data for RoleHasPit using a collection
+        $roleHasPitData = collect($roles)
+            ->crossJoin($pitIds) // Create all combinations of roles and pit IDs
+            ->map(fn ($pair) => [
+                'role_id' => $pair[0],
+                'pit_id' => $pair[1],
+                'account_id' => $user->people->account_id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ])->all();
 
-            // Insert new RoleHasPit entries
+        // Perform the synchronization in a database transaction
+        DB::transaction(function () use ($roleHasPitData, $user) {
+            // Delete existing RoleHasPit entries for the user's account
+            DB::table('role_has_pits')
+                ->where('account_id', $user->people->account_id)
+                ->delete();
+
+            // Insert new RoleHasPit entries if data is available
             if (! empty($roleHasPitData)) {
                 DB::table('role_has_pits')->insert($roleHasPitData);
             }
