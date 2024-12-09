@@ -4,26 +4,24 @@ declare(strict_types=1);
 
 namespace App\Services\Configuration\Driver;
 
-use App\Helpers\PaginationHelper;
 use App\Models\Driver;
+use App\Services\Configuration\EntityCrudService;
 use App\Traits\ExceptionHandlerTrait;
 use App\Transformers\DriverTransformer;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class DriverService
 {
     use ExceptionHandlerTrait;
 
+    protected EntityCrudService $entityCrudService;
+
     protected DriverTransformer $transformer;
 
     protected Driver $driverModel;
 
-    public function __construct(DriverTransformer $transformer, Driver $driver)
+    public function __construct(EntityCrudService $entityCrudService, DriverTransformer $transformer, Driver $driver)
     {
+        $this->entityCrudService = $entityCrudService;
         $this->transformer = $transformer;
         $this->driverModel = $driver;
     }
@@ -36,122 +34,81 @@ class DriverService
      */
     public function createDriver(array $inputData)
     {
-        return DB::transaction(function () use ($inputData) {
-            $driver = $this->driverModel->create($inputData);
-
-            // Clear cache related to the newly created driver
-            Cache::forget('driver_'.$driver->id);
-
-            // Return formatted JSON API response
-            return $this->formatJsonApiResponse(
-                $this->transformer->transform($driver)
-            );
-        });
-    }
-
-    /**
-     * Read a list of drivers based on query parameters.
-     *
-     * @param  array  $queryParams  Query parameters for filtering and pagination
-     * @return array Paginated and formatted driver data
-     */
-    public function readDriver(array $queryParams): array
-    {
-        $perPage = $queryParams['page']['size'] ?? 10;
-        $page = $queryParams['page']['number'] ?? 1;
-
-        $query = $this->driverModel->with(['account', 'pit']);
-
-        if (isset($queryParams['filter'])) {
-            foreach ($queryParams['filter'] as $field => $value) {
-                $query->where($field, $value);
-            }
-        }
-
-        $drivers = $query->paginate($perPage, ['*'], 'page[number]', $page);
-
-        $data = $drivers->map(fn ($driver) => $this->transformer->transform($driver))->values()->all();
-
-        return PaginationHelper::format($drivers, $data);
-    }
-
-    /**
-     * Show the details of a driver by ID.
-     *
-     * @param  int  $driverId  ID of the driver to be displayed
-     * @return JsonResponse Formatted JSON API response
-     *
-     * @throws ModelNotFoundException If the driver is not found
-     */
-    public function showDriver(string $driverUid)
-    {
-        $driver = Cache::remember("driver_$driverUid", 60, function () use ($driverUid) {
-            return $this->driverModel->where('uid', $driverUid)->first();
-        });
-
-        if (! $driver) {
-            throw new ModelNotFoundException('Driver not found');
-        }
-
-        return $this->formatJsonApiResponse(
-            $this->transformer->transform($driver)
+        // Call the generic create method from EntityCrudService
+        return $this->entityCrudService->create(
+            $this->driverModel,             // Model
+            $inputData,                     // Input data
+            'driver',                        // Cache key prefix
+            $this->transformer               // Transformer
         );
     }
 
     /**
-     * Update the data of a driver by UID.
+     * Read drivers with pagination and filters.
      *
-     * @param  string  $driverUid  UID of the driver to be updated
-     * @param  array  $inputData  Input data for the update
-     * @return mixed Formatted JSON API response
-     *
-     * @throws ModelNotFoundException If the driver is not found
+     * @param  array  $queryParams  Query parameters including filters and pagination info.
+     * @return array The paginated data with formatted response.
      */
-    public function updateDriver(string $driverUid, array $inputData)
+    public function readDriver(array $queryParams): array
     {
-        return DB::transaction(function () use ($driverUid, $inputData) {
-            $this->driverModel->where('uid', $driverUid)->update($inputData);
+        // Define the relationships for the Driver model
+        $relations = ['account', 'pit'];
 
-            // Retrieve the updated driver
-            $driver = $this->driverModel->where('uid', $driverUid)->first();
-
-            if ($driver) {
-                Cache::put("driver_$driverUid", $driver, 60);
-
-                return $this->formatJsonApiResponse(
-                    $this->transformer->transform($driver)
-                );
-            }
-
-            throw new ModelNotFoundException('Driver not found');
-        });
+        // Call the generic read method from EntityCrudService
+        return $this->entityCrudService->read(
+            $this->driverModel,            // The model instance (Driver)
+            $queryParams,                  // The query parameters
+            $this->transformer,            // The transformer for Driver
+            $relations                     // Relationships to eager load
+        );
     }
 
     /**
-     * Delete a driver by ID.
+     * Show a single driver based on UID.
      *
-     * @param  int  $driverId  ID of the driver to be deleted
-     * @return JsonResponse JSON response confirming the deletion
-     *
-     * @throws \Throwable If an error occurs during deletion
+     * @param  string  $driverUid  The UID of the driver to retrieve
+     * @return array The formatted response after retrieval
      */
-    public function deleteDriver(string $driverUid)
+    public function showDriver(string $driverUid): array
     {
-        try {
-            $driver = $this->driverModel->where('uid', $driverUid)->first();
+        return $this->entityCrudService->show(
+            $this->driverModel,          // The model instance (Driver)
+            $driverUid,                  // The driver UID
+            'driver',                    // Cache key prefix for driver
+            $this->transformer           // The transformer for Driver
+        );
+    }
 
-            if (! $driver) {
-                throw new ModelNotFoundException('Driver not found');
-            }
+    /**
+     * Update a driver based on UID and input data.
+     *
+     * @param  string  $driverUid  The UID of the driver to update
+     * @param  array  $inputData  The input data to update the driver
+     * @return array The formatted response after update
+     */
+    public function updateDriver(string $driverUid, array $inputData): array
+    {
+        return $this->entityCrudService->update(
+            $this->driverModel,          // The model instance (Driver)
+            $driverUid,                  // The driver UID
+            $inputData,                  // The data to update
+            'driver',                    // Cache key prefix for driver
+            $this->transformer           // The transformer for Driver
+        );
+    }
 
-            $driver->delete();
-
-            Cache::forget("driver_$driverUid");
-
-            return response()->json(['message' => 'Driver deleted successfully']);
-        } catch (\Throwable $th) {
-            Log::error("Error deleting driver with ID: {$driverUid}, Error: {$th->getMessage()}");
-            throw $th;
-        }
+    /**
+     * Delete a driver based on UID.
+     *
+     * @param  string  $driverUid  The UID of the driver to delete
+     * @return array The response after deletion
+     */
+    public function deleteDriver(string $driverUid): array
+    {
+        return $this->entityCrudService->delete(
+            $this->driverModel,          // The model instance (Driver)
+            $driverUid,                  // The driver UID
+            'driver'                     // Cache key prefix for driver
+        );
     }
 }
