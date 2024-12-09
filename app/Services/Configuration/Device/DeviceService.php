@@ -4,27 +4,25 @@ declare(strict_types=1);
 
 namespace App\Services\Configuration\Device;
 
-use App\Helpers\PaginationHelper;
 use App\Models\Device;
+use App\Services\Configuration\EntityCrudService;
 use App\Traits\ExceptionHandlerTrait;
 use App\Transformers\DeviceTransformer;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class DeviceService
 {
     use ExceptionHandlerTrait;
 
-    // Properties to store transformer and device model
+    protected EntityCrudService $entityCrudService;
+
     protected DeviceTransformer $transformer;
 
     protected Device $deviceModel;
 
     // Constructor for dependency injection
-    public function __construct(DeviceTransformer $transformer, Device $device)
+    public function __construct(EntityCrudService $entityCrudService, DeviceTransformer $transformer, Device $device)
     {
+        $this->entityCrudService = $entityCrudService;
         $this->transformer = $transformer;
         $this->deviceModel = $device;
     }
@@ -37,140 +35,81 @@ class DeviceService
      */
     public function createDevice(array $inputData)
     {
-        return DB::transaction(function () use ($inputData) {
-            // Create a new device within a transaction
-            $device = $this->deviceModel->create($inputData);
-
-            // Forget cache for the newly created device
-            Cache::forget("device_{$device->uid}");
-
-            // Return formatted JSON API response
-            return $this->formatJsonApiResponse(
-                $this->transformer->transform($device)
-            );
-        });
-    }
-
-    /**
-     * Read a list of devices based on query parameters.
-     *
-     * @param  array  $queryParams  Query parameters for filtering and pagination
-     * @return array Paginated and formatted device data
-     */
-    public function readDevice(array $queryParams)
-    {
-        $perPage = $queryParams['page']['size'] ?? 10;
-        $page = $queryParams['page']['number'] ?? 1;
-
-        $query = $this->deviceModel->with(['account', 'pit', 'deviceType', 'deviceMake', 'deviceModel']);
-
-        // Apply filters if any
-        if (isset($queryParams['filter'])) {
-            foreach ($queryParams['filter'] as $field => $value) {
-                $query->where($field, $value);
-            }
-        }
-
-        // Get paginated device data
-        $devices = $query->paginate($perPage, ['*'], 'page[number]', $page);
-
-        // Transform device data using the transformer
-        $data = $devices->map(fn ($device) => $this->transformer->transform($device))->values()->all();
-
-        // Return paginated data with formatting
-        return PaginationHelper::format($devices, $data);
-    }
-
-    /**
-     * Show the details of a device by UID.
-     *
-     * @param  string  $deviceUid  UID of the device to be displayed
-     * @return mixed Formatted JSON API response
-     *
-     * @throws ModelNotFoundException If the device is not found
-     */
-    public function showDevice(string $deviceUid)
-    {
-        // Retrieve device from cache or database
-        $device = Cache::remember("device_$deviceUid", 60, function () use ($deviceUid) {
-            return $this->deviceModel->where('uid', $deviceUid)->first();
-        });
-
-        // If the device is not found, throw exception
-        if (! $device) {
-            throw new ModelNotFoundException('Device not found');
-        }
-
-        // Return formatted JSON API response
-        return $this->formatJsonApiResponse(
-            $this->transformer->transform($device)
+        // Call the generic create method from EntityCrudService
+        return $this->entityCrudService->create(
+            $this->deviceModel,            // Model
+            $inputData,                    // Input data
+            'device',                       // Cache key prefix
+            $this->transformer              // Transformer
         );
     }
 
     /**
-     * Update the data of a device by UID.
+     * Read devices with pagination and filters.
      *
-     * @param  string  $deviceUid  UID of the device to be updated
-     * @param  array  $inputData  Input data for the update
-     * @return mixed Formatted JSON API response
-     *
-     * @throws ModelNotFoundException If the device is not found
+     * @param  array  $queryParams  Query parameters including filters and pagination info.
+     * @return array The paginated data with formatted response.
      */
-    public function updateDevice(string $deviceUid, array $inputData)
+    public function readDevice(array $queryParams): array
     {
-        return DB::transaction(function () use ($deviceUid, $inputData) {
-            // Update the device data
-            $this->deviceModel->where('uid', $deviceUid)->update($inputData);
+        // Define the relationships for the Device model
+        $relations = ['account', 'pit', 'deviceType', 'deviceMake', 'deviceModel'];
 
-            // Retrieve the updated device
-            $device = $this->deviceModel->where('uid', $deviceUid)->first();
-
-            // If the device is not found, throw exception
-            if ($device) {
-                // Update cache with the latest data
-                Cache::put("device_$deviceUid", $device, 60);
-
-                // Return formatted JSON API response
-                return $this->formatJsonApiResponse(
-                    $this->transformer->transform($device)
-                );
-            }
-
-            throw new ModelNotFoundException('Device not found');
-        });
+        // Call the generic read method from EntityCrudService
+        return $this->entityCrudService->read(
+            $this->deviceModel,            // The model instance (Device)
+            $queryParams,                  // The query parameters
+            $this->transformer,            // The transformer for Device
+            $relations                     // Relationships to eager load
+        );
     }
 
     /**
-     * Delete a device by UID.
+     * Show a single device based on UID.
      *
-     * @param  string  $deviceUid  UID of the device to be deleted
-     * @return mixed JSON response confirming the deletion
-     *
-     * @throws \Throwable If an error occurs during deletion
+     * @param  string  $deviceUid  The UID of the device to retrieve
+     * @return array The formatted response after retrieval
      */
-    public function deleteDevice(string $deviceUid)
+    public function showDevice(string $deviceUid): array
     {
-        try {
-            // Find the device before deleting
-            $device = $this->deviceModel->where('uid', $deviceUid)->first();
+        return $this->entityCrudService->show(
+            $this->deviceModel,          // The model instance (Device)
+            $deviceUid,                  // The device UID
+            'device',                    // Cache key prefix for device
+            $this->transformer           // The transformer for Device
+        );
+    }
 
-            // If the device is not found, throw exception
-            if (! $device) {
-                throw new ModelNotFoundException('Device not found');
-            }
+    /**
+     * Update a device based on UID and input data.
+     *
+     * @param  string  $deviceUid  The UID of the device to update
+     * @param  array  $inputData  The input data to update the device
+     * @return array The formatted response after update
+     */
+    public function updateDevice(string $deviceUid, array $inputData): array
+    {
+        return $this->entityCrudService->update(
+            $this->deviceModel,          // The model instance (Device)
+            $deviceUid,                  // The device UID
+            $inputData,                  // The data to update
+            'device',                    // Cache key prefix for device
+            $this->transformer           // The transformer for Device
+        );
+    }
 
-            // Delete the device
-            $device->delete();
-
-            // Forget cache for the deleted device
-            Cache::forget("device_$deviceUid");
-
-            // Return JSON response confirming the deletion
-            return response()->json(['message' => 'Device deleted successfully']);
-        } catch (\Throwable $th) {
-            // Log the error
-            Log::error("Error deleting device with UID: {$deviceUid}, Error: {$th->getMessage()}");
-            throw $th;
-        }
+    /**
+     * Delete a device based on UID.
+     *
+     * @param  string  $deviceUid  The UID of the device to delete
+     * @return array The response after deletion
+     */
+    public function deleteDevice(string $deviceUid): array
+    {
+        return $this->entityCrudService->delete(
+            $this->deviceModel,          // The model instance (Device)
+            $deviceUid,                  // The device UID
+            'device'                     // Cache key prefix for device
+        );
     }
 }
