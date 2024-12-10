@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace App\Services\Configuration\Location;
 
-use App\Helpers\PaginationHelper;
 use App\Models\Location;
+use App\Services\Configuration\EntityCrudService;
 use App\Traits\ExceptionHandlerTrait;
 use App\Transformers\LocationTransformer;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class LocationService
 {
     use ExceptionHandlerTrait;
+
+    protected EntityCrudService $entityCrudService;
 
     protected LocationTransformer $transformer;
 
@@ -24,8 +24,9 @@ class LocationService
     /**
      * Constructor for dependency injection
      */
-    public function __construct(LocationTransformer $transformer, Location $location)
+    public function __construct(EntityCrudService $entityCrudService, LocationTransformer $transformer, Location $location)
     {
+        $this->entityCrudService = $entityCrudService;
         $this->transformer = $transformer;
         $this->locationModel = $location;
     }
@@ -38,17 +39,13 @@ class LocationService
      */
     public function createLocation(array $inputData)
     {
-        return DB::transaction(function () use ($inputData) {
-            $location = $this->locationModel->create($inputData);
-
-            // Forget cache for the newly created location
-            Cache::forget("location_{$location->uid}");
-
-            // Return formatted JSON API response
-            return $this->formatJsonApiResponse(
-                $this->transformer->transform($location)
-            );
-        });
+        // Call the generic create method from EntityCrudService
+        return $this->entityCrudService->create(
+            $this->locationModel,            // Model
+            $inputData,                    // Input data
+            'location',                       // Cache key prefix
+            $this->transformer              // Transformer
+        );
     }
 
     /**
@@ -59,26 +56,16 @@ class LocationService
      */
     public function readLocation(array $queryParams)
     {
-        $perPage = $queryParams['page']['size'] ?? 10;
-        $page = $queryParams['page']['number'] ?? 1;
+        // Define the relationships for the Location model
+        $relations = ['account', 'pit'];
 
-        $query = $this->locationModel->with(['account', 'pit']);
-
-        // Apply filters if any
-        if (isset($queryParams['filter'])) {
-            foreach ($queryParams['filter'] as $field => $value) {
-                $query->where($field, $value);
-            }
-        }
-
-        // Get paginated location data
-        $locations = $query->paginate($perPage, ['*'], 'page[number]', $page);
-
-        // Transform location data using the transformer
-        $data = $locations->map(fn ($location) => $this->transformer->transform($location))->values()->all();
-
-        // Return paginated data with formatting
-        return PaginationHelper::format($locations, $data);
+        // Call the generic read method from EntityCrudService
+        return $this->entityCrudService->read(
+            $this->locationModel,            // The model instance (Location)
+            $queryParams,                  // The query parameters
+            $this->transformer,            // The transformer for Location
+            $relations                     // Relationships to eager load
+        );
     }
 
     /**
@@ -91,16 +78,11 @@ class LocationService
      */
     public function showLocation(string $locationUid)
     {
-        $location = Cache::remember("location_$locationUid", 60, function () use ($locationUid) {
-            return $this->locationModel->where('uid', $locationUid)->first();
-        });
-
-        if (! $location) {
-            throw new ModelNotFoundException('Location not found');
-        }
-
-        return $this->formatJsonApiResponse(
-            $this->transformer->transform($location)
+        return $this->entityCrudService->show(
+            $this->locationModel,          // The model instance (Location)
+            $locationUid,                  // The location UID
+            'location',                    // Cache key prefix for location
+            $this->transformer           // The transformer for Location
         );
     }
 
@@ -115,21 +97,13 @@ class LocationService
      */
     public function updateLocation(string $locationUid, array $inputData)
     {
-        return DB::transaction(function () use ($locationUid, $inputData) {
-            $this->locationModel->where('uid', $locationUid)->update($inputData);
-
-            $location = $this->locationModel->where('uid', $locationUid)->first();
-
-            if ($location) {
-                Cache::put("location_$locationUid", $location, 60);
-
-                return $this->formatJsonApiResponse(
-                    $this->transformer->transform($location)
-                );
-            }
-
-            throw new ModelNotFoundException('Location not found');
-        });
+        return $this->entityCrudService->update(
+            $this->locationModel,          // The model instance (Location)
+            $locationUid,                  // The location UID
+            $inputData,                  // The data to update
+            'location',                    // Cache key prefix for location
+            $this->transformer           // The transformer for Location
+        );
     }
 
     /**
@@ -142,21 +116,10 @@ class LocationService
      */
     public function deleteLocation(string $locationUid)
     {
-        try {
-            $location = $this->locationModel->where('uid', $locationUid)->first();
-
-            if (! $location) {
-                throw new ModelNotFoundException('Location not found');
-            }
-
-            $location->delete();
-
-            Cache::forget("location_$locationUid");
-
-            return response()->json(['message' => 'Location deleted successfully']);
-        } catch (\Throwable $th) {
-            Log::error("Error deleting location with UID: {$locationUid}, Error: {$th->getMessage()}");
-            throw $th;
-        }
+        return $this->entityCrudService->delete(
+            $this->locationModel,          // The model instance (Location)
+            $locationUid,                  // The location UID
+            'location'                     // Cache key prefix for location
+        );
     }
 }
