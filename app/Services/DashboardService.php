@@ -4,46 +4,35 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Helpers\PaginationHelper;
 use App\Models\Trip;
-use App\Traits\ExceptionHandlerTrait;
+use App\Services\Configuration\EntityCrudService;
 use App\Transformers\TripTransformer;
 use Illuminate\Support\Facades\DB;
 
 class DashboardService
 {
-    use ExceptionHandlerTrait;
+    protected Trip $tripModel;
 
-    protected $transformer;
+    protected TripTransformer $transformer;
 
-    protected $tripModel;
+    protected EntityCrudService $entityCrudService;
 
-    public function __construct(TripTransformer $transformer, Trip $trip)
+    public function __construct(Trip $tripModel, TripTransformer $transformer, EntityCrudService $entityCrudService)
     {
+        $this->tripModel = $tripModel;
         $this->transformer = $transformer;
-        $this->tripModel = $trip;
+        $this->entityCrudService = $entityCrudService;
     }
 
     public function readTrip(array $queryParams)
     {
-        $perPage = $queryParams['page']['size'] ?? 10;
-        $page = $queryParams['page']['number'] ?? 1;
-
-        $query = $this->tripModel->query();
-
-        if (isset($queryParams['filter'])) {
-            foreach ($queryParams['filter'] as $field => $value) {
-                $query->where($field, $value);
-            }
-        }
-
-        $trips = $query->paginate($perPage, ['*'], 'page[number]', $page);
-
-        $data = $trips->map(function ($role) {
-            return $this->transformer->transform($role);
-        })->values()->all(); // Convert to array
-
-        return PaginationHelper::format($trips, $data);
+        // Pass $this->tripModel to EntityCrudService for generic handling
+        return $this->entityCrudService->read(
+            $this->tripModel,     // Use the injected model instance
+            $queryParams,         // Query parameters
+            $this->transformer,   // Transformer
+            []                    // No additional relationships required
+        );
     }
 
     public function readProduction()

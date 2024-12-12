@@ -9,7 +9,6 @@ use App\Services\Configuration\EntityCrudService;
 use App\Traits\ExceptionHandlerTrait;
 use App\Transformers\LocationTransformer;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Cache;
 
 class LocationService
 {
