@@ -37,8 +37,8 @@ class Location extends Model
                 }
             }
 
-            // Cek apakah geom_type adalah "Point"
-            if ($location->geom_type === 'Point') {
+            // Cek apakah geom_type adalah "Polygon"
+            if ($location->geom_type === 'Polygon') {
                 // Hitung radius otomatis
                 $location->radius = $location->calculateRadius();
             }
@@ -55,7 +55,7 @@ class Location extends Model
     public function calculateRadius()
     {
         // Ambil nilai x dan y dari geom POINT
-        preg_match('/POINT\((\d+)\s(\d+)\)/', $this->geom, $matches);
+        preg_match('/POLYGON\((\d+)\s(\d+)\)/', $this->geom, $matches);
 
         if ($matches) {
             $x = (float) $matches[1];
