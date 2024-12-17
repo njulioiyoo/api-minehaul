@@ -39,8 +39,7 @@ class Location extends Model
 
             // Cek apakah geom_type adalah "Point"
             if ($location->geom_type === 'Point') {
-                // Hitung radius otomatis (misalnya berdasarkan logika tertentu)
-                // Dalam contoh ini, kita asumsikan radius adalah jarak dari pusat (0,0)
+                // Hitung radius otomatis
                 $location->radius = $location->calculateRadius();
             }
 

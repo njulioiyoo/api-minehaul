@@ -84,19 +84,17 @@ class RoleTransformer
             })->values()->toArray();
         }
 
-        $results = $baseQuery
-            ->groupBy('account_id')
-            ->get($this->getSelectFields());
+        $results = $baseQuery->get($this->getSelectFields());
 
         // Konversi Collection menjadi array
-        return $results->map(function ($groupedAccounts) {
-            $account = $groupedAccounts->first();
+        return $results->groupBy('account_id')->map(function ($groupedAccounts) use ($isRoleAccessRoute) {
+            $account = $isRoleAccessRoute ? $groupedAccounts->first() : $groupedAccounts;
 
             return [
-                'id' => $account->account_id,
-                'company_code' => $account->company_code,
-                'company_name' => $account->company_name,
-                'uid' => $account->account_uid,
+                'id' => $isRoleAccessRoute ? $account->account_id : $groupedAccounts->pluck('account_id')->unique()->first(),
+                'company_code' => $isRoleAccessRoute ? $account->company_code : $groupedAccounts->pluck('company_code')->unique()->first(),
+                'company_name' => $isRoleAccessRoute ? $account->company_name : $groupedAccounts->pluck('company_name')->unique()->first(),
+                'uid' => $isRoleAccessRoute ? $account->account_uid : $groupedAccounts->pluck('account_uid')->unique()->first(),
                 'pits' => $groupedAccounts->map(function ($item) {
                     return [
                         'id' => $item->pit_id,
