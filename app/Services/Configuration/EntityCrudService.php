@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class EntityCrudService
 {
@@ -38,7 +39,9 @@ class EntityCrudService
             Cache::forget("{$cacheKeyPrefix}_{$entity->id}");
 
             // Return the formatted JSON API response using the transformer
-            return $transformer->transform($entity);
+            return $this->formatJsonApiResponse(
+                $transformer->transform($entity)
+            );
         });
     }
 
@@ -120,7 +123,9 @@ class EntityCrudService
             Cache::put("{$cacheKeyPrefix}_{$uid}", $entity, 60);
 
             // Return the formatted JSON API response using the transformer
-            return $transformer->transform($entity);
+            return $this->formatJsonApiResponse(
+                $transformer->transform($entity)
+            );
         });
     }
 
@@ -170,19 +175,30 @@ class EntityCrudService
         Model $model,
         string $uid,
         string $cacheKeyPrefix,
-        $transformer
+        $transformer,
     ) {
         // Attempt to retrieve the entity from cache first
         $entity = Cache::remember("{$cacheKeyPrefix}_{$uid}", 60, function () use ($model, $uid) {
-            return $model->where('uid', $uid)->first();
+            $query = $model->newQuery();
+
+            if (Schema::hasColumn($model->getTable(), 'uid')) {
+                $query->where('uid', $uid);
+            }
+
+            // Check if the UID is numeric before querying 'id'
+            if (is_numeric($uid)) {
+                $query->orWhere('id', $uid);
+            }
+
+            return $query->first();
         });
 
-        // If the entity is not found, throw a ModelNotFoundException
         if (! $entity) {
             throw new ModelNotFoundException("{$cacheKeyPrefix} not found");
         }
 
-        // Return the formatted JSON API response using the transformer
-        return $transformer->transform($entity);
+        return $this->formatJsonApiResponse(
+            $transformer->transform($entity)
+        );
     }
 }

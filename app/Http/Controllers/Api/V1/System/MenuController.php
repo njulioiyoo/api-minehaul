@@ -51,6 +51,22 @@ class MenuController extends Controller
         }
     }
 
+    public function showMenu(Request $request)
+    {
+        try {
+            // Retrieve input and menu ID from the request
+            [, $menuId] = $this->requestHelperService->getInputAndId($request, 'menus', true);
+            // Get menu details using the service
+            $response = $this->menuService->showMenu($menuId);
+
+            // Return the menu details
+            return response()->json($response);
+        } catch (\Exception $e) {
+            // Handle any exceptions and return an error response
+            return $this->handleException($e, 'Error showing menu');
+        }
+    }
+
     public function updateMenu(UpdateMenuRequest $request)
     {
         try {

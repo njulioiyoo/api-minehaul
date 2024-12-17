@@ -53,6 +53,7 @@ Route::middleware(['json.api'])->group(function () {
             Route::post('/', [MenuController::class, 'createMenu'])->name('menus.create')->middleware('verify.user.permission:create-menus');
             Route::patch('/', [MenuController::class, 'updateMenu'])->name('menus.update')->middleware('verify.user.permission:edit-menus');
             Route::delete('/', [MenuController::class, 'deleteMenu'])->name('menus.delete')->middleware('verify.user.permission:delete-menus');
+            Route::post('/detail', [MenuController::class, 'showMenu'])->name('menus.show')->middleware('verify.user.permission:show-menus');
         });
     });
 });
