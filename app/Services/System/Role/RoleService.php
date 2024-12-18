@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\System\Role;
 
-use App\Helpers\PaginationHelper;
 use App\Models\RoleHasPit;
+use App\Services\Configuration\EntityCrudService;
 use App\Traits\ExceptionHandlerTrait;
 use App\Transformers\RoleTransformer;
 use Illuminate\Support\Facades\Cache;
@@ -17,12 +17,15 @@ class RoleService
 {
     use ExceptionHandlerTrait;
 
+    protected $entityCrudService;
+
     protected $transformer;
 
     protected $roleModel;
 
-    public function __construct(RoleTransformer $transformer, Role $role)
+    public function __construct(EntityCrudService $entityCrudService, RoleTransformer $transformer, Role $role)
     {
+        $this->entityCrudService = $entityCrudService;
         $this->transformer = $transformer;
         $this->roleModel = $role;
     }
@@ -65,24 +68,13 @@ class RoleService
 
     public function readRole(array $queryParams)
     {
-        $perPage = $queryParams['page']['size'] ?? 10;
-        $page = $queryParams['page']['number'] ?? 1;
-
-        $query = Role::query();
-
-        if (isset($queryParams['filter'])) {
-            foreach ($queryParams['filter'] as $field => $value) {
-                $query->where($field, $value);
-            }
-        }
-
-        $roles = $query->paginate($perPage, ['*'], 'page[number]', $page);
-
-        $data = $roles->map(function ($role) {
-            return $this->transformer->transform($role);
-        })->values()->all(); // Convert to array
-
-        return PaginationHelper::format($roles, $data);
+        // Define the relationships for the Role model
+        // Call the generic read method from EntityCrudService
+        return $this->entityCrudService->read(
+            $this->roleModel,            // The model instance (Role)
+            $queryParams,                  // The query parameters
+            $this->transformer            // The transformer for Role
+        );
     }
 
     public function updateRole(string $roleId, array $inputData, array $permissions = [])

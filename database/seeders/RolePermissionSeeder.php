@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\User;
+use App\Models\Account;
+use App\Models\Pit; // Assuming you have a Pit model
+use App\Models\User; // Assuming you have an Account model
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -147,6 +150,25 @@ class RolePermissionSeeder extends Seeder
             if ($user) {
                 $user->syncRoles([$role]);
                 $user->syncPermissions($role->permissions); // Ensure permissions are also synced
+            }
+        }
+
+        // Insert data into role_has_pits table
+        $roles = Role::all();
+        $accounts = Account::all(); // Assuming you have an Account model
+        $pits = Pit::all(); // Assuming you have a Pit model
+
+        foreach ($roles as $role) {
+            foreach ($accounts as $account) {
+                foreach ($pits as $pit) {
+                    DB::table('role_has_pits')->insert([
+                        'role_id' => $role->id,
+                        'account_id' => $account->id,
+                        'pit_id' => $pit->id,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
             }
         }
     }
