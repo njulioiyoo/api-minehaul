@@ -23,13 +23,12 @@ class StoreLocationRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'pit_id' => ['nullable', 'integer', 'exists:pits,id'],
             'location_type_id' => ['required', 'integer', 'exists:location_types,id'],
             'name' => ['required', 'string', 'regex:/^[\p{L}0-9 ]+$/u'],
-            'geom_type' => ['required', 'in:Polygon,Point'],  // geom_type harus diisi
+            'geom_type' => ['required', 'in:Polygon,Point'], // geom_type harus diisi
             'geom' => ['required', 'string', function ($attribute, $value, $fail) {
-                // Cek apakah geom sesuai dengan tipe geometri
                 $geomType = request()->input('geom_type');
                 if ($geomType === 'Polygon' && ! preg_match('/^POLYGON\(\(.*\)\)$/', $value)) {
                     $fail('The '.$attribute.' must be a valid POLYGON format.');
@@ -38,5 +37,11 @@ class StoreLocationRequest extends FormRequest
                 }
             }],
         ];
+
+        if ($this->input('geom_type') === 'Point') {
+            $rules['radius'] = ['required', 'numeric', 'min:0'];
+        }
+
+        return $rules;
     }
 }
