@@ -54,19 +54,34 @@ class Location extends Model
 
     public function calculateRadius()
     {
-        // Ambil nilai x dan y dari geom POINT
-        preg_match('/POLYGON\((\d+)\s(\d+)\)/', $this->geom, $matches);
-
+        // Ambil nilai koordinat dari geom POLYGON
+        preg_match('/POLYGON\(\((.*?)\)\)/', $this->geom, $matches);
         if ($matches) {
-            $x = (float) $matches[1];
-            $y = (float) $matches[2];
+            $coordinates = explode(',', $matches[1]);
 
-            // Menggunakan rumus sederhana jarak Euclidean untuk menghitung radius
-            // Jarak dari titik (x, y) ke pusat (0, 0)
-            return sqrt(pow($x, 2) + pow($y, 2));
+            $points = array_map(function ($coordinate) {
+                [$x, $y] = explode(' ', trim($coordinate));
+
+                return [(float) $x, (float) $y];
+            }, $coordinates);
+
+            // Hitung pusat poligon (rata-rata koordinat)
+            $xSum = array_sum(array_column($points, 0));
+            $ySum = array_sum(array_column($points, 1));
+            $numPoints = count($points);
+
+            $centerX = $xSum / $numPoints;
+            $centerY = $ySum / $numPoints;
+
+            // Hitung radius (jarak maksimum dari pusat ke titik-titik poligon)
+            $radius = max(array_map(function ($point) use ($centerX, $centerY) {
+                return sqrt(pow($point[0] - $centerX, 2) + pow($point[1] - $centerY, 2));
+            }, $points));
+
+            return $radius;
         }
 
-        // Jika tidak bisa menghitung, return null atau default value
+        // Jika geom tidak valid, return null
         return null;
     }
 

@@ -19,9 +19,6 @@ class DatabaseSeeder extends Seeder
         $this->call(PeopleSeeder::class);
         $this->call(UsersTableSeeder::class);
 
-        $this->call(RolePermissionSeeder::class);
-        $this->call(MenuSeeder::class);
-
         $this->call(AccountSeeder::class);
         $this->call(PitsTableSeeder::class);
 
@@ -51,5 +48,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call(DriverSeeder::class);
         $this->call(TripTypesSeeder::class);
+
+        $this->call(RolePermissionSeeder::class);
+        $this->call(MenuSeeder::class);
     }
 }
